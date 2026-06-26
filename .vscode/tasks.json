@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile COBOL",
+            "type": "shell",
+            "command": "G:/mys2/ucrt64/bin/cobc.exe",
+            "args": [
+                "-x",
+                "-free",
+                "-conf", "G:/mys2/ucrt64/share/gnucobol/config/default.conf",
+                "-L", "G:/mys2/ucrt64/lib",
+                "${file}"
+            ],
+            "options": {
+                "env": {
+                    "PATH": "${env:PATH};G:/mys2/ucrt64/bin"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
