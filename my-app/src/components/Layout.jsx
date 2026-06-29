@@ -38,6 +38,7 @@ function Layout() {
                 `d-block p-3 rounded text-decoration-none ${
                   isActive ? "bg-warning text-white" : "text-dark"
                 }`
+                
               }
             >
               {collapsed ? "D" : " Dashboard"}
@@ -46,7 +47,7 @@ function Layout() {
 
           <li className="mb-2">
             <NavLink
-              to="/User/NewClaims"
+              to="/User/NewClaim"
               className={({ isActive }) =>
                 `d-block p-3 rounded text-decoration-none ${
                   isActive ? "bg-warning text-white" : "text-dark"

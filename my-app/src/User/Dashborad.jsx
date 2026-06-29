@@ -86,7 +86,8 @@ function Dashboard() {
                                 <td>Approved</td>
                             </tr>
                         </tbody>
-                    </table><a href=""></a>
+                    </table>
+                    <a href=""></a>
                 </div>
             </div>
 
