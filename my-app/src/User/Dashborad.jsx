@@ -1,5 +1,6 @@
 import React from "react";
 import Layout from "../components/Layout";
+import { Link } from "react-router-dom";
 
 
 function Dashboard() {
@@ -54,13 +55,13 @@ function Dashboard() {
 
                 {/* Recent Claim List */}
 
-                <div className="row my-4 bg-white ">
+                <div className="row my-4 bg-white px-3 rounded">
 
                     {/* Header */}
                     <div className="col-11">
-                        <div className="d-flex justify-content-between align-items-center my-3 px-3">
+                        <div className="d-flex justify-content-between align-items-center my-3 px-3 ">
                             <h5 className="mb-0">Recent Claims</h5>
-                            <button className="btn btn-warning ">View All</button>
+                            <button className="btn btn-warning "><Link to="../MyClaims" className="text-decoration-none text-dark">All</Link></button>
                         </div>
                     </div>
 

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-
+import {Link} from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEdit } from "@fortawesome/free-solid-svg-icons";
 function MyClaims() {
 
 
@@ -14,6 +16,7 @@ function MyClaims() {
   
   return (
    <>
+  
    <div className="d-flex justify-content-end me-5 mb-4">
  <div className="dropdown ">
       <button
@@ -62,8 +65,8 @@ function MyClaims() {
           </ul>
 </div>
    </div>
-   <div className="row">
-    
+   <div className="row bg-white">
+     <div className="py-5 px-3">
       {/* Table */}
                     <table className="table table-bordered">
                         <thead >
@@ -84,10 +87,11 @@ function MyClaims() {
                                 <td>John Smith</td>
                                 <td>$1,000</td>
                                 <td>Approved</td>
-                                 <td>View</td>
+                                 <td><Link to="../MyClaims/ClaimDetails" className="text-decoration-none text-dark"><button className="btn btn-warning"><FontAwesomeIcon icon={faEye} /> </button> </Link></td>
                             </tr>
                         </tbody>
                     </table><a href=""></a>
+   </div>
    </div>
    </>
   )

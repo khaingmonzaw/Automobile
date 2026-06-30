@@ -1,128 +1,212 @@
-import React from 'react'
-import { useState } from "react";
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 function NewClaim() {
 
 
+    const handleReset=(e)=>{
+        
+        setFormData({
+            accidentDate: "",
+            accidentType: "",
+            claimAmount: "",
+            location: "",
+            vehicleModel: "",
+            vehicleNumber: "",
+            description: ""
+        });
+
+    }
+
+
+
+    const saveSubmit = (e) => {
+        e.preventDefault();
+        console.log(formData)
+        alert("Data submitted successfully!");
+        handleReset();
+
+
+
+    }
+
+
+
+    const [formData, setFormData] = useState({
+        accidentDate: "",
+        accidentType: "",
+        claimAmount: "",
+        location: "",
+        vehicleModel: "",
+        vehicleNumber: "",
+        description: ""
+    });
+
+
+    const handleData = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    }
     const [location, setLocation] = useState("");
+    const [loading, setLoading] = useState(false);
+
     const getLocation = () => {
         if (!navigator.geolocation) {
-            alert("Error: Your Current Location can not Get");
+            alert("Geolocation not found");
             return;
         }
+
+        setLoading(true);
         navigator.geolocation.getCurrentPosition(
             async (position) => {
-                const lat = position.coords.latitude
-                const lon = position.coords.longitude
+                try {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    const respone = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+                    );
+
+                    const data = await respone.json();
+                    setFormData((prev) => ({
+                        ...prev,
+                        location: data.display_name || ""
+                    }));
+                } catch (error) {
+                    alert("Failed to fetch Location")
+                } finally {
+                    setLoading(false)
+                }
+            },
+            (error) => {
+                setLoading(false);
+            }
+        );
 
 
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-                );
 
-                const data = await response.json();
-                setLocation(data.display_name)
-            });
+
+
+
+
     };
+
     return (
         <div>
-            <h3 className='text-start'>New Claim Submission</h3>
-              <form>
-            <div className="row bg-white  p-5 border rounded-4 my-4">
-              
+            <h3 className="text-start">New Claim Submission</h3>
+
+            <form onSubmit={saveSubmit}>
+                <div className="row bg-white p-5 border rounded-4 my-4 text-start">
+
                     <div className="col-md-6">
 
-                        {/* Accident Date */}
                         <div className="mb-4">
-                            <label className="form-label d-block text-start">Accident Date</label>
-                            <input
-                                type="date"
-                                className="form-control border border-1"
-                                placeholder="Enter Accident Date"
-                            />
+                            <label>Accident Date</label>
+                            <input type="date"
+                                name="accidentDate"
+                                value={formData.accidentDate}
+                                onChange={handleData}
+                                className="form-control" />
                         </div>
-                        {/* Accident Type */}
+
                         <div className="mb-4">
-                            <label className="form-label d-block text-start">Accident Type</label>
-                            <select className='form-select ' >
-                                <option>Selct Accident Type</option>
+                            <label>Accident Type</label>
+                            <select className="form-select"
+                                name="accidentType"
+                                value={formData.accidentType}
+                                onChange={handleData}
+                            >
+                                <option>Select Accident Type</option>
                                 <option>Thief</option>
                                 <option>Third Party Collision</option>
                             </select>
                         </div>
 
-                        {/* Claim Amount */}
                         <div className="mb-4">
-                            <label className="form-label d-block text-start">Claim Amount</label>
-                            <input
-                                type='text'
-                                className='form-control border border-1'
-                                placeholder='Enter Amount  MMK'
+                            <label>Claim Amount</label>
+                            <input type="text" className="form-control"
+                                name="claimAmount"
+                                value={formData.claimAmount}
+                                onChange={handleData}
                             />
                         </div>
 
-                        {/* Location */}
                         <div className="mb-4">
-                            <div className="row ">
-                                <label className='form-label d-block text-start'>Location</label>
-                                <div className="col-9">
+                            <label>Location</label>
 
+                            <div className="row">
+                                <div className="col-9">
                                     <input
                                         type="text"
-                                        className='form-control'
-                                        value={location}
-                                        placeholder='Current Location'
-                                        readOnly
+                                        className="form-control"
+                                        name="location"
+                                        placeholder="Current Location"
+                                        value={formData.location}
+
                                     />
                                 </div>
+
                                 <div className="col-3">
                                     <button
-                                        class="btn btn-sm btn-warning"
                                         type="button"
+                                        className="btn btn-warning btn-sm"
                                         onClick={getLocation}
-                                    >Find</button>
+                                        disabled={loading}
+                                    >
+                                        {loading ? <FontAwesomeIcon icon={faMagnifyingGlass} />
+                                            : <FontAwesomeIcon icon={faMagnifyingGlass} />
+                                        }
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="col-md-6">
-                        <div className="mb-4">
-                            <label className="form-label d-block text-start">
-                                Vehicle Model
-                            </label>
-                            <input className='form-control border border-1'
-                            type="text"
-                            placeholder='Enter Vehicle Model'
-                            
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className='form-label d-block text-start'>Vehicle Number</label>
-                            <input
-                            className="form-control"
-                            type="text"
-                            placeholder='Enter Vehicle Number'
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="form-label d-block text-start">Description</label>
-                            <textarea
-                            className="form-control"
-                            rows="5"
-                           
-                            placeholder='Describe the accident......'
 
+                    </div>
+
+                    <div className="col-md-6">
+
+                        <div className="mb-4">
+                            <label>Vehicle Model</label>
+                            <input className="form-control"
+                                name="vehicleModel"
+                                value={formData.vehicleModel}
+                                onChange={handleData} />
+                        </div>
+
+                        <div className="mb-4">
+                            <label>Vehicle Number</label>
+                            <input className="form-control"
+                                name="vehicleNumber"
+                                value={formData.vehicleNumber}
+                                onChange={handleData} />
+                        </div>
+
+                        <div className="mb-4">
+                            <label>Description</label>
+                            <textarea className="form-control" rows="5"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleData}
                             ></textarea>
                         </div>
+
                     </div>
-               
-            </div>
-            <div className='d-flex justify-content-center gap-3'>
-                <button className="btn btn-warning " type="submit">Submit</button>
-                <button className="btn btn-danger " type="reset">Reset</button>
-            </div>
- </form>
+
+                </div>
+
+                <div className="d-flex justify-content-center gap-3">
+                    <button className="btn btn-warning" type="submit">
+                        Submit
+                    </button>
+                    <button className="btn btn-danger" type="button" onClick={handleReset}>
+                        Reset
+                    </button>
+                </div>
+            </form>
         </div>
-    )
+    );
 }
 
-export default NewClaim
+export default NewClaim;
