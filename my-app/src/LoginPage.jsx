@@ -53,7 +53,7 @@ function LoginPage(props) {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         if (data.user.role == "admin") {
-          navigate("/LoginPage")
+          navigate("../Admin/ClaimDetails")
         } else {
           navigate("../User/Dashboard");
         }

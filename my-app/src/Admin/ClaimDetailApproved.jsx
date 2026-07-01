@@ -7,11 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 function ClaimDetailApproved() {
 
 
-    const navigate=useNavigate();
-    const {id} =useParams();
-
-    const [claim,setClaim]=useState();
-    const [loading,setLoading]=useState(false);
+    
 
     const claim = {
         id: 'CLM001',
@@ -38,62 +34,62 @@ function ClaimDetailApproved() {
                     </button></Link>
 
             </div>
-            <div className="row g-4 justify-content-center">
+            <div className="row g-4 justify-content-center ">
                 {/* Left Card: Claim Information */}
-                <div className="col-8">
-                    <div className="card shadow border-0 px-4 py-5" style={{ borderRadius: '25px' }}>
+                <div className="col-md-8 col-12 ">
+                    <div className="card shadow border-0  p-5" style={{ borderRadius: '25px' }}>
                         <h2 className="fw-bold mb-3 text-dark fs-3" >Claim Information</h2>
                         <hr className="border border-dark opacity-100 mb-4" />
                         <div className="d-flex flex-column gap-3">
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Claim ID</span>
-                                <span className="text-dark fw-bold">{claim.id}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Claim ID</p>
+                                <p className="col-6 text-dark fw-bold">{claim.id}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Claimant Name</span>
-                                <span className="text-dark">{claim.claimant}</span>
+                            <div className="row ">
+                                <p className=" col-6 text-secondary fw-semibold">Claimant Name</p>
+                                <p className="col-6 text-dark">{claim.claimant}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Vehicle Model</span>
-                                <span className="text-dark">{claim.vehicleModel}</span>
+                            <div className="row">
+                                <p className="col-6 text-secondary fw-semibold">Vehicle Model</p>
+                                <p className="col-6 text-dark">{claim.vehicleModel}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Vehicle Number</span>
-                                <span className="text-dark">{claim.vehicleNumber}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Vehicle Number</p>
+                                <p className=" col-6 text-dark">{claim.vehicleNumber}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Accident Date</span>
-                                <span className="text-dark">{claim.accidentDate}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Accident Date</p>
+                                <p className="col-6 text-dark">{claim.accidentDate}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Accident Type</span>
-                                <span className="text-dark">{claim.accidentType}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Accident Type</p>
+                                <p className="col-6 text-dark" style={{ maxWidth: '60%' }}>{claim.accidentType}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Claim Amount</span>
-                                <span className="text-dark fw-bold text-success">{claim.claimAmount}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Claim Amount</p>
+                                <p className="col-6 text-dark fw-bold text-success">{claim.claimAmount}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Location</span>
-                                <span className="text-dark text-end" style={{ maxWidth: '60%' }}>{claim.location}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Location</p>
+                                <p className="col-6 text-dark " style={{ maxWidth: '60%' }}>{claim.location}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Description</span>
-                                <span className="text-dark">{claim.description}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Description</p>
+                                <p className="col-6 text-dark">{claim.description}</p>
                             </div>
 
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Submitted Date</span>
-                                <span className="text-dark">{claim.submittedDate}</span>
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Submitted Date</p>
+                                <p className="col-6 text-dark">{claim.submittedDate}</p>
                             </div>
-                            <div className="d-flex justify-content-between ">
-                                <span className="text-secondary fw-semibold">Status</span>
-                                <span className="badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold fs-6 rounded-pill">
+                            <div className="row ">
+                                <p className="col-6 text-secondary fw-semibold">Status</p>
+                                <p className="col-6 badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold fs-6 rounded-pill">
                                     {claim.status}
-                                </span>
+                                </p>
                             </div>
                             <div className="p-3 mt-4 rounded-3" style={{ backgroundColor: 'rgba(217, 217, 217, 0.25)', borderLeft: '5px solid #52DD75' }}>
-                                <span className="d-block fw-bold text-dark mb-2 ">Remarks *</span>
+                                <p className="d-block fw-bold text-dark mb-2 ">Remarks *</p>
                                 <p className="text-muted mb-0 fs-5">{claim.remarks}</p>
                             </div>
                         </div>
