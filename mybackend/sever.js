@@ -19,32 +19,36 @@ const db = mysql.createConnection({
 // Login API
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
-  const sql = "SELECT * FROM users WHERE email = ? ";
+
+  const sql = "SELECT * FROM users WHERE email = ?";
 
   db.query(sql, [email], (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Database Error" });
     }
-  
+
+    // Email not found
     if (results.length === 0) {
-      return res.status(401).json({ message: "Invalid email" });
-    }
-    const user = results[0];
-
-    if (user.password !== password) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-
-    if (results.length > 0) {
-      res.json({
-        message: "Login Successful",
-        token: "login-token",
-        user,
+      return res.status(401).json({
+        message: "*Invalid credentials",
       });
     }
-    // else {
-    //   res.status(401).json({ message: "Invalid credentials" });
-    // }
+
+    const user = results[0];
+
+    // Password incorrect
+    if (user.password !== password) {
+      return res.status(401).json({
+        message: "*Invalid credentials",
+      });
+    }
+
+    // Login success
+    res.json({
+      message: "Login Successful",
+      token: "login-token",
+      user,
+    });
   });
 });
 

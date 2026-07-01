@@ -9,6 +9,7 @@ import NewClaim from './User/NewClaim';
 import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
 import ClaimDetails from './User/ClaimDetails';
+import ClaimDetailApproved from './Admin/ClaimDetailApproved';
 
 
 
@@ -29,10 +30,18 @@ function App() {
     <Route path="MyClaims" element={<MyClaims />} />
     <Route path="NewClaim" element={<NewClaim/>}/>
     <Route path="MyClaims/ClaimDetails" element ={<ClaimDetails/>}/>
-   
   </Route>
 
-    </Routes>
+
+
+<Route path="/Admin" element={<Layout/>}>
+<Route path="ClaimDetails" element={<ClaimDetailApproved/>}/>
+
+
+</Route>
+</Routes>
+
+
   )
 
 

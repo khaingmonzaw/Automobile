@@ -118,11 +118,11 @@ function LoginPage(props) {
               <small className="text-danger text-start">{errors.email}</small>
             )}</div>
             <div>
-              {serverError && (
+             <div className='text-start'> {serverError && (
                 <small className="text-danger">
                   {serverError}
                 </small>
-              )}
+              )}</div>
             </div>
           </div>
 
@@ -142,11 +142,12 @@ function LoginPage(props) {
             )}</div>
 
             <div>
-              {serverError && (
+              <div className='text-start'> {serverError && (
                 <small className="text-danger">
                   {serverError}
                 </small>
               )}
+                   </div>
             </div>
           </div>
 
