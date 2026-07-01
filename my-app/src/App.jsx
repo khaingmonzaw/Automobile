@@ -2,11 +2,16 @@ import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Login from './Login'; // Login component နာမည်
-import Customer from './Customer'; // ဆောက်ထားတဲ့ ဖိုင်အသစ်
+import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from './LoginPage';
 import Dashboard from './User/Dashborad';
+import NewClaim from './User/NewClaim';
+import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
-import { Routes, Route } from "react-router-dom";
+import ClaimDetails from './User/ClaimDetails';
+
+
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
@@ -14,10 +19,19 @@ function App() {
   return(
 
   <Routes>
-     <Route path="/LoginPage" element={<LoginPage />} />
-      <Route path="/" element={<Layout />}>
-        <Route path="/User/Dashboard" element={<Dashboard />} />
-      </Route>
+   <Route path="/" element={<LoginPage />} />
+
+  <Route path="/LoginPage" element={<LoginPage />} />
+
+  <Route path="/User" element={<Layout />}>
+    <Route index element={<Navigate to="Dashboard" replace />} />
+    <Route path="Dashboard" element={<Dashboard />} />
+    <Route path="MyClaims" element={<MyClaims />} />
+    <Route path="NewClaim" element={<NewClaim/>}/>
+    <Route path="MyClaims/ClaimDetails" element ={<ClaimDetails/>}/>
+   
+  </Route>
+
     </Routes>
   )
 
