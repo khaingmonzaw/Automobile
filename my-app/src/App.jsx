@@ -9,7 +9,10 @@ import NewClaim from './User/NewClaim';
 import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
 import ClaimDetails from './User/ClaimDetails';
-
+import ClaimApprovalDetails from './Admin/claim_approval_details.jsx';
+import CoverageTypes from './Admin/coverage_types.jsx';
+import NewCoverage from './Admin/new_coverage.jsx';
+import CoverageUpdate from './Admin/coverage_update.jsx';
 
 
 function App() {
@@ -19,6 +22,16 @@ function App() {
   return(
 
   <Routes>
+
+  <Route path="/Admin" element={<Layout />}>
+    <Route index element={<Navigate to="CoverageTypes" replace />} />
+    <Route path="CoverageTypes" element={<CoverageTypes />} />
+    <Route path="NewCoverage" element={<NewCoverage />} />
+    <Route path="CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
+    <Route path="ApprovalDetails" element={<ClaimApprovalDetails />} />
+  </Route>
+
+
    <Route path="/" element={<LoginPage />} />
 
   <Route path="/LoginPage" element={<LoginPage />} />
