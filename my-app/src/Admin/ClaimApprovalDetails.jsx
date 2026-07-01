@@ -10,7 +10,7 @@ const ClaimApprovalDetails = () => {
     <div className="container-fluid py-3">
       {/* Page Header Area */}
       <div className="d-flex align-items-center gap-3 mb-4">
-        <Link to="../MyClaims" className="text-decoration-none">
+        <Link to="" className="text-decoration-none">
           <button 
             className="btn btn-warning d-flex align-items-center justify-content-center fw-bold text-dark" 
             style={{ width: "40px", height: "36px", borderRadius: "8px" }}
@@ -171,10 +171,12 @@ const ClaimApprovalDetails = () => {
 
         {/* Action Bottom Buttons Segment (Centered) */}
         <div className="d-flex justify-content-center gap-3 mt-5 px-2">
-          <button className="btn btn-warning px-5 py-2 fw-bold text-dark shadow-sm" style={{ borderRadius: "10px", minWidth: "160px" }}>
+          <button className="btn btn-warning
+          fw-bold text-dark shadow-sm" >
             Submit
           </button>
-          <button className="btn btn-danger px-5 py-2 fw-bold text-white shadow-sm" style={{ borderRadius: "10px", minWidth: "160px" }}>
+          <button className="btn btn-danger
+          fw-bold text-white shadow-sm" >
             Cancel
           </button>
         </div>

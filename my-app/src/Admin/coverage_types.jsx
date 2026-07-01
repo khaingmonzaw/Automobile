@@ -24,13 +24,15 @@ const CoverageTypes = () => {
         }
       `}</style>
 
+
       {/* Top Header Row */}
-      <div className="d-flex justify-content-between align-items-center mb-4 mx-auto w-100" style={{ maxWidth: "1150px" }}>
+      <div className='row'>
+      <div className="d-flex justify-content-between align-items-center mb-4 mx-auto w-100" >
         <h2 className="mb-0 fw-bold fs-3 text-dark">Coverage Types</h2>
         <button 
           className="btn btn-warning d-flex align-items-center justify-content-center fw-bold fs-4 text-dark shadow-sm" 
           style={{ width: "42px", height: "36px", borderRadius: "8px" }}
-          onClick={() => navigate('/Admin/NewCoverage')}
+          onClick={() => navigate('/Admin/CoverageTypes/NewCoverage')}
           aria-label="Add New Coverage"
         >
           +
@@ -38,21 +40,22 @@ const CoverageTypes = () => {
       </div>
 
       {/* Table Main Wrapper Card Container */}
+      
       <div 
         className="card bg-white border border-secondary-subtle rounded-4 shadow-sm mx-auto w-100 overflow-hidden" 
-        style={{ maxWidth: "1150px" }}
+        
       >
-        <div className="table-responsive">
-          <table className="table align-middle mb-0 text-start">
+        <div className="table-responsive m-4 ">
+          <table className="table  align-middle mb-0 text-start">
             <thead>
               <tr>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Coverage _ID</th>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Coverage type</th>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Description</th>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Base Rate (MMK)</th>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Coverage Limit (MMK)</th>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3 text-center" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Status</th>
-                <th className="border-bottom-0 text-dark fw-bold px-4 py-3 text-center" style={{ fontSize: "14px", backgroundColor: "#FFF9DB" }}>Action</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Coverage _ID</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Coverage type</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Description</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Base Rate (MMK)</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Coverage Limit (MMK)</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3 text-center" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Status</th>
+                <th className="border-bottom-0 text-dark fw-bold px-4 py-3 text-center" style={{ fontSize: "14px", backgroundColor: "#ffed92" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -80,7 +83,7 @@ const CoverageTypes = () => {
                     <button 
                       className="btn btn-link text-secondary p-2 rounded-2 border-0 d-inline-flex align-items-center justify-content-center"
                       style={{ background: "none" }}
-                      onClick={() => navigate(`/Admin/CoverageUpdate/${coverage.id}`)}
+                      onClick={() => navigate(`/Admin/CoverageTypes/CoverageUpdate/${coverage.id}`)}
                       aria-label={`Edit ${coverage.type} coverage`}
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -146,6 +149,7 @@ const CoverageTypes = () => {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 };

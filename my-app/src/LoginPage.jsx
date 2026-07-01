@@ -1,4 +1,5 @@
-import React from 'react';
+import * as React from 'react';
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 function LoginPage(props) {
@@ -53,7 +54,7 @@ function LoginPage(props) {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         if (data.user.role == "admin") {
-          navigate("../Admin/ClaimDetails")
+          navigate("../Admin/ClaimDetailApproved")
         } else {
           navigate("../User/Dashboard");
         }

@@ -9,55 +9,58 @@ import NewClaim from './User/NewClaim';
 import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
 import ClaimDetails from './User/ClaimDetails';
-import ClaimApprovalDetails from './Admin/claim_approval_details.jsx';
+import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
 import CoverageTypes from './Admin/coverage_types.jsx';
 import NewCoverage from './Admin/new_coverage.jsx';
 import CoverageUpdate from './Admin/coverage_update.jsx';
 
-
+import ClaimDetailApproved from './Admin/ClaimDetailApproved'
+import PasswordChangeUser from './User/PasswordChangeUser.jsx';
+import PasswordChangeAdmin from './Admin/PasswordChangeAdmin.jsx';
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [role, setRole] = useState(null);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [role, setRole] = useState(null);
 
-  return(
+  return (
 
-  <Routes>
-
-  <Route path="/Admin" element={<Layout />}>
-    <Route index element={<Navigate to="CoverageTypes" replace />} />
-    <Route path="CoverageTypes" element={<CoverageTypes />} />
-    <Route path="NewCoverage" element={<NewCoverage />} />
-    <Route path="CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
-    <Route path="ApprovalDetails" element={<ClaimApprovalDetails />} />
-  </Route>
-
-
-   <Route path="/" element={<LoginPage />} />
-
-  <Route path="/LoginPage" element={<LoginPage />} />
-
-  <Route path="/User" element={<Layout />}>
-    <Route index element={<Navigate to="Dashboard" replace />} />
-    <Route path="Dashboard" element={<Dashboard />} />
-    <Route path="MyClaims" element={<MyClaims />} />
-    <Route path="NewClaim" element={<NewClaim/>}/>
-    <Route path="MyClaims/ClaimDetails" element ={<ClaimDetails/>}/>
-  </Route>
+    <Routes>
 
 
 
-<Route path="/Admin" element={<Layout/>}>
-<Route path="ClaimDetails" element={<ClaimDetailApproved/>}/>
+      <Route path="/" element={<LoginPage />} />
+
+      <Route path="/LoginPage" element={<LoginPage />} />
+
+      <Route path="/User" element={<Layout />}>
+        <Route index element={<Navigate to="Dashboard" replace />} />
+        <Route path="Dashboard" element={<Dashboard />} />
+        <Route path="MyClaims" element={<MyClaims />} />
+        <Route path="NewClaim" element={<NewClaim />} />
+        <Route path="MyClaims/ClaimDetails" element={<ClaimDetails />} />
+        <Route path="PasswordChangeUser" element={< PasswordChangeUser/>} />
+      </Route>
 
 
-</Route>
-</Routes>
+
+      <Route path="/Admin" element={<Layout />}>
+        <Route index element={<Navigate to="ClaimDetailApproved" replace />} />
+        <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} />
+        <Route path="CoverageTypes" element={<CoverageTypes />} />
+        <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
+        <Route path="CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
+        <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
+        <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin/>} />
+
+
+      </Route>
+    </Routes>
+
 
 
   )
 
 
- 
+
   // Login မဝင်ရသေးရင် Login Page 
   // if (!isLoggedIn) {
   //   return <Login onLoginSuccess={(userRole) => {

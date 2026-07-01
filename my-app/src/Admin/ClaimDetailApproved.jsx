@@ -5,10 +5,6 @@ import { Link } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
 
 function ClaimDetailApproved() {
-
-
-    
-
     const claim = {
         id: 'CLM001',
         claimant: 'Tia Bett',
@@ -84,7 +80,7 @@ function ClaimDetailApproved() {
                             </div>
                             <div className="row ">
                                 <p className="col-6 text-secondary fw-semibold">Status</p>
-                                <p className="col-6 badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold fs-6 rounded-pill">
+                                <p className="col-6 badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold  rounded-pill">
                                     {claim.status}
                                 </p>
                             </div>

@@ -18,6 +18,7 @@ const CoverageUpdate = () => {
 
   return (
     <div className="container-fluid py-3 text-start">
+      
       {/* Back Arrow Trigger Area (Increased icon font size) */}
       <div className="mb-2 text-start">
         <button 
@@ -39,18 +40,18 @@ const CoverageUpdate = () => {
         
        {/* --- CHANGE THIS CARD WRAPPER LINE --- */}
         <div 
-          className="card bg-white p-4 border rounded-3 shadow-sm mx-auto my-2 w-100" 
-          style={{ maxWidth: "750px" }}
+          className="card  col-12 bg-white p-4 border rounded-3 shadow-sm mx-auto my-2 w-100" 
+        
         >
           {/* Centered Heading Element */}
           <h2 className="mb-2 fw-bold fs-4 text-dark text-center">Update Coverage</h2>
           <hr className="mb-4 text-secondary opacity-25" />
           
           {/* --- CHANGE THIS FORM GAP LINE --- */}
-          <form onSubmit={handleSave} className="col-md-11 col-lg-10 mx-auto d-flex flex-column gap-3">
+          <form onSubmit={handleSave}>
             
             {/* Coverage Type Row */}
-            <div className="row align-items-center">
+            <div className="row r">
               <div className="col-sm-4">
                 <label htmlFor="coverage-type" className="form-label text-secondary fw-semibold mb-sm-0">
                   Coverage Type
@@ -70,7 +71,7 @@ const CoverageUpdate = () => {
             </div>
 
             {/* Base Rate Row */}
-            <div className="row align-items-center">
+            <div className="row align-items-center my-3">
               <div className="col-sm-4">
                 <label htmlFor="base-rate" className="form-label text-secondary fw-semibold mb-sm-0">
                   Base Rate
@@ -98,7 +99,7 @@ const CoverageUpdate = () => {
             </div>
 
             {/* Coverage Limit Row */}
-            <div className="row align-items-center">
+            <div className="row align-items-center my-3">
               <div className="col-sm-4">
                 <label htmlFor="coverage-limit" className="form-label text-secondary fw-semibold mb-sm-0">
                   Coverage Limit
@@ -126,7 +127,7 @@ const CoverageUpdate = () => {
             </div>
 
             {/* Description Row */}
-            <div className="row align-items-start">
+            <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-1">
                 <label htmlFor="form-description" className="form-label text-secondary fw-semibold mb-sm-0">
                   Description
@@ -146,7 +147,7 @@ const CoverageUpdate = () => {
             </div>
             
             {/* Added Status Row Component Grid Linkage */}
-          <div className="row align-items-center">
+          <div className="row align-items-center my-3">
             <div className="col-sm-4 text-start">
               <label htmlFor="form-status" className="form-label text-secondary fw-semibold mb-sm-0">
                 Status
@@ -170,15 +171,15 @@ const CoverageUpdate = () => {
             <div className="d-flex justify-content-center gap-3 mt-4">
               <button 
                 type="submit" 
-                className="btn btn-warning px-5 py-2 fw-bold text-dark shadow-sm" 
-                style={{ borderRadius: "10px", minWidth: "150px" }}
+                className="btn btn-warning  fw-bold text-dark shadow-sm" 
+                
               >
                 Update
               </button>
               <button 
                 type="button" 
-                className="btn btn-danger px-5 py-2 fw-bold text-white shadow-sm" 
-                style={{ borderRadius: "10px", minWidth: "150px" }}
+                className="btn btn-danger  fw-bold text-white shadow-sm" 
+               
                 onClick={() =>  navigate('/Admin/CoverageTypes')}
               >
                 Cancel

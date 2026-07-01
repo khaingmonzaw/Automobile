@@ -28,6 +28,14 @@ const navigate = useNavigate();
     }
 
   }
+
+  const handleChangePassword = () => {
+  if (user?.role === "admin") {
+    navigate("/Admin/PasswordChangeAdmin");
+  } else {
+    navigate("/User/PasswordChangeUser");
+  }
+};
   return (
     <div className="d-flex ">
 
@@ -147,7 +155,7 @@ const navigate = useNavigate();
     <>
       <li className="mb-2">
         <NavLink
-          to=""
+          to="/Admin/ClaimDetailApproved"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -167,7 +175,7 @@ const navigate = useNavigate();
 
       <li className="mb-2">
         <NavLink
-          to="/Admin/ClaimDetails"
+          to="/Admin/ClaimDetailApproved"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -189,7 +197,7 @@ const navigate = useNavigate();
 
       <li className="mb-2">
         <NavLink
-          to=""
+          to="/Admin/ClaimDetailApproved"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -210,7 +218,7 @@ const navigate = useNavigate();
 
         <li className="mb-2">
         <NavLink
-          to=""
+          to="/Admin/CoverageTypes"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -291,7 +299,7 @@ const navigate = useNavigate();
                   </li>
                   <hr />
                   <li>
-                    <button className="dropdown-item">Change Password</button>
+                    <button className="dropdown-item" onClick={handleChangePassword}>Change Password</button>
                   </li>
                 </ul>
               )}

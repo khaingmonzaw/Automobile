@@ -45,10 +45,10 @@ const NewCoverage = () => {
           <hr className="mb-4 text-secondary opacity-25" />
           
           {/* --- CHANGE THIS FORM GAP LINE --- */}
-          <form onSubmit={handleSave} className="col-md-11 col-lg-10 mx-auto d-flex flex-column gap-3">
+          <form onSubmit={handleSave} >
             
             {/* Coverage Type Row */}
-            <div className="row align-items-center">
+            <div className="row align-items-center my-3">
               <div className="col-sm-4">
                 <label htmlFor="coverage-type" className="form-label text-secondary fw-semibold mb-sm-0">
                   Coverage Type
@@ -68,7 +68,7 @@ const NewCoverage = () => {
             </div>
 
             {/* Base Rate Row */}
-            <div className="row align-items-center">
+            <div className="row align-items-center my-3">
               <div className="col-sm-4">
                 <label htmlFor="base-rate" className="form-label text-secondary fw-semibold mb-sm-0">
                   Base Rate
@@ -96,7 +96,7 @@ const NewCoverage = () => {
             </div>
 
             {/* Coverage Limit Row */}
-            <div className="row align-items-center">
+            <div className="row align-items-center my-3">
               <div className="col-sm-4">
                 <label htmlFor="coverage-limit" className="form-label text-secondary fw-semibold mb-sm-0">
                   Coverage Limit
@@ -124,7 +124,7 @@ const NewCoverage = () => {
             </div>
 
             {/* Description Row */}
-            <div className="row align-items-start">
+            <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-1">
                 <label htmlFor="form-description" className="form-label text-secondary fw-semibold mb-sm-0">
                   Description
@@ -147,15 +147,15 @@ const NewCoverage = () => {
             <div className="d-flex justify-content-center gap-3 mt-4">
               <button 
                 type="submit" 
-                className="btn btn-warning px-5 py-2 fw-bold text-dark shadow-sm" 
-                style={{ borderRadius: "10px", minWidth: "150px" }}
+                className="btn btn-warning fw-bold text-dark shadow-sm" 
+               
               >
                 Save
               </button>
               <button 
                 type="button" 
-                className="btn btn-danger px-5 py-2 fw-bold text-white shadow-sm" 
-                style={{ borderRadius: "10px", minWidth: "150px" }}
+                className="btn btn-danger  fw-bold text-white shadow-sm" 
+             
                 onClick={() => navigate('/Admin/CoverageTypes')}
               >
                 Cancel
