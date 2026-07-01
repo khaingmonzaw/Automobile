@@ -1,12 +1,25 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket, faCircleUser, faSackDollar, faHandHoldingDollar, faFileInvoiceDollar, faHouseChimney } from "@fortawesome/free-solid-svg-icons";
 function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
+const navigate = useNavigate();
+  const user=JSON.parse(localStorage.getItem('user'));
   const sidebarWidth = collapsed ? "80px" : "230px";
 
+  const handleClick=(e)=>{
+    e.preventDefault();
+    const confirmLogout=window.confirm("Do You want to Logout");
+    if(confirmLogout){
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+       navigate("/LoginPage");
+    }
+
+  }
   return (
     <div className="d-flex ">
 
@@ -107,7 +120,7 @@ function Layout() {
             >
               {collapsed ? <FontAwesomeIcon icon={faRightFromBracket} />
                 :
-                <><FontAwesomeIcon icon={faRightFromBracket} className="me-3" />Logout</>
+                <><FontAwesomeIcon icon={faRightFromBracket} className="me-3" /><button className="btn" type="button" onClick={handleClick}>Logout</button></>
               }
             </NavLink>
           </li>
@@ -136,7 +149,7 @@ function Layout() {
                 className="btn btn-warning dropdown-toggle"
                 onClick={() => setOpen(!open)}
               >
-                username
+                {user?.name}
               </button>
 
               {open && (
@@ -148,10 +161,10 @@ function Layout() {
                   }}
                 >
                   <li>
-                    <button className="dropdown-item">Username</button>
+                    <button className="dropdown-item">{user?.name}</button>
                   </li>
                   <li>
-                    <button className="dropdown-item">Plan Name</button>
+                    <button className="dropdown-item">{user?.email}</button>
                   </li>
                   <hr />
                   <li>
