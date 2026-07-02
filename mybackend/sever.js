@@ -19,7 +19,12 @@ const db = mysql.createConnection({
 //"Added this for new coverage"
 const coverageRouter = require("./Admin/NewCoverage"); 
 app.use(coverageRouter);
-
+//"Added this for coverage types"
+const coverageTypesRouter = require("./Admin/CoverageTypes");
+app.use(coverageTypesRouter);
+//"Added this for coverage update"
+const coverageUpdateRouter = require("./Admin/CoverageUpdate");
+app.use(coverageUpdateRouter);
 
 // Login API
 app.post("/api/login", (req, res) => {

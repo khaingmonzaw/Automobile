@@ -47,7 +47,7 @@ function App() {
         <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} />
         <Route path="CoverageTypes" element={<CoverageTypes />} />
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
-        <Route path="CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
+        <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
         <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
         <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin/>} />
 
