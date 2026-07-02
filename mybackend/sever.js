@@ -16,6 +16,11 @@ const db = mysql.createConnection({
   database: "auto_assurance_db",
 });
 
+//"Added this for new coverage"
+const coverageRouter = require("./Admin/NewCoverage"); 
+app.use(coverageRouter);
+
+
 // Login API
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;

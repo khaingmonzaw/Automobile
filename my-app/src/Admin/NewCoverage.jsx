@@ -9,10 +9,36 @@ const NewCoverage = () => {
   const [coverageLimit, setCoverageLimit] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleSave = (e) => {
+ const handleSave = async (e) => {
     e.preventDefault();
-    console.log("Saving coverage:", { coverageType, baseRate, coverageLimit, description });
-    navigate('/Admin/CoverageTypes');
+    const formData = {
+      coverageType,
+      baseRate,
+      coverageLimit,
+      description
+    }
+
+    try {
+      // Send the data to your Node.js backend server
+      const response = await fetch('http://localhost:3000/api/coverage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert('Coverage saved successfully!');
+        navigate('/Admin/CoverageTypes'); // Redirect on success
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to save: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Network Error:', error);
+      alert('Could not connect to the backend server.');
+    }
   };
 
   return (
@@ -80,7 +106,7 @@ const NewCoverage = () => {
                     id="base-rate"
                     type="text" 
                     className="form-control border-secondary-subtle py-2 px-3 text-dark fw-medium"
-                    placeholder="1,0000" 
+                    placeholder="10,000" 
                     value={baseRate}
                     onChange={(e) => setBaseRate(e.target.value)}
                     style={{ borderRadius: "8px", paddingRight: "65px", fontSize: "14px" }}
@@ -108,7 +134,7 @@ const NewCoverage = () => {
                     id="coverage-limit"
                     type="text" 
                     className="form-control border-secondary-subtle py-2 px-3 text-dark fw-medium"
-                    placeholder="10,0000" 
+                    placeholder="100,000" 
                     value={coverageLimit}
                     onChange={(e) => setCoverageLimit(e.target.value)}
                     style={{ borderRadius: "8px", paddingRight: "65px", fontSize: "14px" }}
@@ -168,5 +194,4 @@ const NewCoverage = () => {
     </div>
   );
 };
-
 export default NewCoverage;

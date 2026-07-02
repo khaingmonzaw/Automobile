@@ -83,7 +83,7 @@ const CoverageTypes = () => {
                     <button 
                       className="btn btn-link text-secondary p-2 rounded-2 border-0 d-inline-flex align-items-center justify-content-center"
                       style={{ background: "none" }}
-                      onClick={() => navigate(`/Admin/CoverageTypes/CoverageUpdate/${coverage.id}`)}
+                      onClick={() => navigate('/Admin/CoverageTypes/CoverageUpdate/${coverage.id}')}
                       aria-label={`Edit ${coverage.type} coverage`}
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

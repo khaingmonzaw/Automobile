@@ -10,9 +10,9 @@ import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
 import ClaimDetails from './User/ClaimDetails';
 import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
-import CoverageTypes from './Admin/coverage_types.jsx';
-import NewCoverage from './Admin/new_coverage.jsx';
-import CoverageUpdate from './Admin/coverage_update.jsx';
+import CoverageTypes from './Admin/CoverageTypes.jsx';
+import NewCoverage from './Admin/NewCoverage.jsx';
+import CoverageUpdate from './Admin/CoverageUpdate.jsx';
 
 import ClaimDetailApproved from './Admin/ClaimDetailApproved'
 import PasswordChangeUser from './User/PasswordChangeUser.jsx';
