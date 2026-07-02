@@ -1,10 +1,13 @@
 import React from 'react';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 function LoginPage(props) {
 
   const navigate = useNavigate();
 
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [formData, setFormData] = useState({
@@ -127,16 +130,35 @@ function LoginPage(props) {
           </div>
 
           {/* Password */}
-          <div className="mb-4">
-            <label className="form-label d-block text-start">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control border border-1"
-              placeholder="Enter your password"
-              onChange={handleChange}
-              value={formData.password}
-            />
+
+          <div className="position-relative">
+            <div className="mb-4">
+              <label className="form-label d-block text-start">Password</label>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="form-control border border-1"
+                placeholder="Enter your password"
+                onChange={handleChange}
+                value={formData.password}
+              />
+
+
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "15px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  color: "#6c757d",
+                }}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              </span>
+            </div>
+
             <div className=" text-start"> {errors.password && (
               <small className="text-danger ">{errors.password}</small>
             )}</div>
