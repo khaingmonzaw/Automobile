@@ -25,7 +25,7 @@ app.post("/api/login", (req, res) => {
     if (err) {
       return res.status(500).json({ message: "Database Error" });
     }
-  
+
     if (results.length === 0) {
       return res.status(401).json({ message: "Invalid email" });
     }
@@ -46,6 +46,86 @@ app.post("/api/login", (req, res) => {
     //   res.status(401).json({ message: "Invalid credentials" });
     // }
   });
+});
+
+/* ================= GET POLICIES BY USER ================= */
+app.get("/api/policies/:userId", (req, res) => {
+  const userId = req.params.userId;
+
+  const sql = `
+        SELECT p.policy_id, p.policy_number, v.vehicle_number, v.vehicle_model
+        FROM policies p
+        JOIN vehicles v ON p.vehicle_id = v.vehicle_id
+        WHERE p.user_id = ?
+    `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ message: "DB Error" });
+
+    res.json(results);
+  });
+});
+
+/* ================= GET COVERAGES BY POLICY ================= */
+app.get("/api/coverages/:policyId", (req, res) => {
+  const policyId = req.params.policyId;
+
+  const sql = `
+        SELECT id, type, base_rate, coverage_limit
+        FROM coverages
+        WHERE policy_id = ?
+    `;
+
+  db.query(sql, [policyId], (err, results) => {
+    if (err) return res.status(500).json({ message: "DB Error" });
+
+    res.json(results);
+  });
+});
+
+app.post("/api/claims", (req, res) => {
+  const {
+     user_id,
+      policy_id,
+      accident_type,
+      claimed_amount,
+      compensation_amount,
+      approved_staff,
+      status,
+      remark,
+      description,
+      location,
+  } = req.body;
+
+  const sql = `
+       INSERT INTO claims
+(user_id, policy_id, accident_type, claimed_amount, compensation_amount, approved_staff, status, remark, description, location)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
+
+  db.query(
+    sql,
+    [
+      user_id,
+      policy_id,
+      accident_type,
+      claimed_amount,
+      compensation_amount,
+      approved_staff,
+      status,
+      remark,
+      description,
+      location,
+    ],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "DB Error" });
+      }
+
+      res.json({ message: "Claim submitted successfully" });
+    },
+  );
 });
 
 // Add Claim API
