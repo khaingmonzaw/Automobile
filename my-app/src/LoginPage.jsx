@@ -1,11 +1,13 @@
 import * as React from 'react';
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 function LoginPage(props) {
 
   const navigate = useNavigate();
 
+  const [showPassword,setShowPassword]=useState(false);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [formData, setFormData] = useState({
@@ -76,7 +78,7 @@ function LoginPage(props) {
 
 
       {/* Left Side Text and Image*/}
-      <div className="col-md-5 text-white d-flex flex-column justify-content-center align-items-center p-4">
+      <div className="col-md-5 text-dark d-flex flex-column justify-content-center align-items-center p-4">
         <h1 className="text-start">
           Automobile
           <div >
@@ -119,7 +121,7 @@ function LoginPage(props) {
               <small className="text-danger text-start">{errors.email}</small>
             )}</div>
             <div>
-             <div className='text-start'> {serverError && (
+              <div className='text-start'> {serverError && (
                 <small className="text-danger">
                   {serverError}
                 </small>
@@ -128,18 +130,35 @@ function LoginPage(props) {
           </div>
 
           {/* Password */}
+
           <div className="mb-4">
             <label className="form-label d-block text-start">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control border border-1"
-              placeholder="Enter your password"
-              onChange={handleChange}
-              value={formData.password}
-            />
+
+
+            <div className="position-relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="form-control border border-1"
+                placeholder="Enter your password"
+                onChange={handleChange}
+                value={formData.password}
+              />
+              <span
+ onClick={() => setShowPassword(!showPassword)}
+ style={{
+        position: "absolute",
+        right: "15px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        cursor: "pointer",
+        color: "#6c757d",
+      }}
+              ><FontAwesomeIcon icon={faEye} /></span>
+            </div>
             <div className=" text-start"> {errors.password && (
               <small className="text-danger ">{errors.password}</small>
+
             )}</div>
 
             <div>
@@ -148,7 +167,7 @@ function LoginPage(props) {
                   {serverError}
                 </small>
               )}
-                   </div>
+              </div>
             </div>
           </div>
 
