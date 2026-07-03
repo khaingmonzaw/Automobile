@@ -16,14 +16,12 @@ const db = mysql.createConnection({
   database: "auto_assurance_db",
 });
 
-//"Added this for new coverage"
-const coverageRouter = require("./Admin/NewCoverage"); 
-app.use(coverageRouter);
-//"Added this for coverage types"
+const newCoverageRouter = require("./Admin/NewCoverage");
 const coverageTypesRouter = require("./Admin/CoverageTypes");
-app.use(coverageTypesRouter);
-//"Added this for coverage update"
 const coverageUpdateRouter = require("./Admin/CoverageUpdate");
+
+app.use(newCoverageRouter);
+app.use(coverageTypesRouter);
 app.use(coverageUpdateRouter);
 
 // Login API
