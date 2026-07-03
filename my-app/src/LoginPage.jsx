@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 function LoginPage(props) {
 
   const navigate = useNavigate();
 
-  const [showPassword,setShowPassword]=useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [formData, setFormData] = useState({
@@ -106,6 +106,8 @@ function LoginPage(props) {
 
         <form onSubmit={handleSubmit} method="POST">
 
+
+
           {/* Email */}
           <div className="mb-4">
             <label className="form-label d-block text-start">Email address</label>
@@ -129,37 +131,37 @@ function LoginPage(props) {
             </div>
           </div>
 
+
           {/* Password */}
 
-          <div className="mb-4">
-            <label className="form-label d-block text-start">Password</label>
+          <div className="">
+            <div className="mb-4">
+              <label className="form-label d-block text-start">Password</label>
 
+              <div className="input-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="form-control"
+                  placeholder="Enter your password"
+                  onChange={handleChange}
+                  value={formData.password}
+                />
 
-            <div className="position-relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                className="form-control border border-1"
-                placeholder="Enter your password"
-                onChange={handleChange}
-                value={formData.password}
-              />
-              <span
- onClick={() => setShowPassword(!showPassword)}
- style={{
-        position: "absolute",
-        right: "15px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        cursor: "pointer",
-        color: "#6c757d",
-      }}
-              ><FontAwesomeIcon icon={faEye} /></span>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                </button>
+              </div>
+
+              {errors.password && (
+                <small className="text-danger">{errors.password}</small>
+              )}
             </div>
-            <div className=" text-start"> {errors.password && (
-              <small className="text-danger ">{errors.password}</small>
-
-            )}</div>
+           
 
             <div>
               <div className='text-start'> {serverError && (
@@ -175,6 +177,7 @@ function LoginPage(props) {
           <button type="submit" className="btn btn-warning w-100 py-2 my-2">
             LOGIN
           </button>
+
 
         </form>
 
