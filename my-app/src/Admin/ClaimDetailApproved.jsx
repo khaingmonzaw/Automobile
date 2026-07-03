@@ -1,27 +1,40 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useNavigate, useParams } from "react-router-dom";
 
-function ClaimDetailApproved() {
 
-    const claim = {
-        id: 'CLM001',
-        claimant: 'Tia Bett',
-        vehicleModel: 'Honda Fit',
-        vehicleNumber: '3P-8452',
-        accidentDate: '2026/06/23',
-        accidentType: 'Third-party collision',
-        claimAmount: '100000 MMK',
-        location: 'No 84, Kamaryut Township, Yangon',
-        description: 'Collision',
-        submittedDate: '2026/06/30',
-        status: 'Approved',
-        remarks: 'Information is valid. Claim is approved.',
+const ClaimDetailApproved = () => {
+  const [claims, setClaims] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAllClaims = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/claims');
+        const data = await response.json();
+        
+        if (response.ok) {
+          setClaims(data);
+        } else {
+          console.error("Failed to fetch claims");
+        }
+      } catch (error) {
+        console.error("Error fetching claims:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
+    fetchAllClaims();
+  }, []);
+
+  if (loading) return <div className="text-center py-5">Loading your claims list...</div>;
+
+  return (
         <div className="container " style={{ backgroundColor: '#F2F9FF', minHeight: '100%' }}>
             <div className="row text-start my-3">
 
@@ -81,7 +94,7 @@ function ClaimDetailApproved() {
                             </div>
                             <div className="row ">
                                 <p className="col-6 text-secondary fw-semibold">Status</p>
-                                <p className="col-6 badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold fs-6 rounded-pill">
+                                <p className="col-6 badge bg-success-subtle text-success border border-success px-3 py-2 fw-bold  rounded-pill">
                                     {claim.status}
                                 </p>
                             </div>
@@ -91,13 +104,7 @@ function ClaimDetailApproved() {
                             </div>
                         </div>
                     </div>
-
-
-                    
                 </div>
-
-
-
 
                 {/* Right Card
         <div className="col-12 col-lg-5">
@@ -133,6 +140,4 @@ function ClaimDetailApproved() {
     );
 };
 
-
-
-export default ClaimDetailApproved
+export default ClaimDetailApproved;

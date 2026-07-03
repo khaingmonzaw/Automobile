@@ -12,10 +12,27 @@ const db = mysql.createConnection({
   password: "",
   database: "auto_assurance_db",
 });
+//
+router.get('/api/coverage/:type', (req, res) => {
+  const { type } = req.params;
+  // Use LOWER to guarantee case-insensitive duplicate validation checks
+  const query = 'SELECT coverage_type FROM coverage_types WHERE LOWER(coverage_type) = LOWER(?)';
+  
+  db.query(query, [type.trim()], (err, results) => {
+    if (err) {
+      console.error('MySQL retrieval error:', err);
+      return res.status(500).json({ error: 'Failed to retrieve coverage data' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Coverage not found' });
+    }
+    return res.status(200).json(results[0]);
+  });
+});
 
 // Change app.post to router.post
 router.post('/api/coverage', (req, res) => {
-  const { coverageType, baseRate, coverageLimit, description } = req.body;
+ const { coverageType, baseRate, coverageLimit, description } = req.body;
   
   // FIX: Cleaned up duplicate 'description' column inside the parentheses
   const query = `
