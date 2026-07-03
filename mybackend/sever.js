@@ -66,11 +66,20 @@ app.post("/api/login", (req, res) => {
 app.get("/api/policies/:userId", (req, res) => {
   const userId = req.params.userId;
 
+  const updateSql = `
+  
+  update policies set status = "inactive "where end_date < CURDATE() and status="active";
+  
+  `;
+
+  db.query(updateSql,(err)=>{
+    if(err) return res.status(500).json({message : "DB error"})
+  
   const sql = `
         SELECT p.policy_id, p.policy_number, v.vehicle_number, v.vehicle_model
         FROM policies p
         JOIN vehicles v ON p.vehicle_id = v.vehicle_id
-        WHERE p.user_id = ?
+        WHERE p.user_id = ? and p.status="active"
     `;
 
   db.query(sql, [userId], (err, results) => {
@@ -78,6 +87,7 @@ app.get("/api/policies/:userId", (req, res) => {
 
     res.json(results);
   });
+  })
 });
 
 /* ================= GET COVERAGES BY POLICY USER================= */
@@ -115,7 +125,7 @@ app.post("/api/claims", (req, res) => {
     location
   } = req.body;
 
-  console.log(req.body)
+
   // GET COVERAGES
   const sql = `
     SELECT ct.coverage_type_id, ct.coverage_type
@@ -206,6 +216,7 @@ SELECT
   c.claimed_amount,
   c.compensation_amount,
   c.status,
+  c.location,
   c.remark,
   ct.coverage_type AS accident_type,
   v.vehicle_number AS v_number,

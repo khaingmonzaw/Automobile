@@ -109,7 +109,7 @@ function MyClaims() {
                 currentItems.map((c) => (
                   <tr key={c.claim_id}>
                     <td>CLM-{c.claim_id}</td>
-                    <td>{c.accident_date}</td>
+                    <td>{c.accident_date ? new Date(c.accident_date).toISOString().split("T")[0] : "-"}</td>
                     <td>{c.status}</td>
                     <td>{c.claimed_amount}</td>
                     <td> {c.description.length > 10
