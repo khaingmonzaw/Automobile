@@ -235,6 +235,20 @@ WHERE c.claim_id = ?;
     res.json(result[0]);
   });
 });
+
+
+//Admin Cliaim
+app.get("/api/claims",(req,res)=>{
+  const sql=
+  `select * from claims`;
+
+  db.query(sql,(err,result)=>{
+   return res.status(500).json(err);
+    if (result.length === 0) return res.status(404).json({ message: "Not found" });
+
+    res.json(result[0]);
+  });
+})
 // Add Claim API
 // app.post('/api/add-claim', (req, res) => {
 //   console.log("Frontend မှ ရရှိသော Data:", req.body);
