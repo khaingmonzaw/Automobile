@@ -1,14 +1,28 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightFromBracket, faCircleUser, faSackDollar, faHandHoldingDollar, faFileInvoiceDollar, faHouseChimney } from "@fortawesome/free-solid-svg-icons";
 function Layout() {
   const [collapsed, setCollapsed] = useState(false);
-
-  const sidebarWidth = collapsed ? "70px" : "230px";
-
+  const [open, setOpen] = useState(false);
+const navigate = useNavigate();
+  const user=JSON.parse(localStorage.getItem('user'));
+  const sidebarWidth = collapsed ? "80px" : "230px";
+ 
+  const handleClick=(e)=>{
+    e.preventDefault();
+    const confirmLogout=window.confirm("Do You want to Logout");
+    if(confirmLogout){
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+       navigate("/LoginPage");
+    }
+ 
+  }
   return (
     <div className="d-flex ">
-
+ 
       {/* Sidebar */}
       <div
         className=" d-flex flex-column bg-white border-end shadow-sm position-fixed text-start "
@@ -17,7 +31,7 @@ function Layout() {
           height: "100vh",
           top: 0,
           left: 0,
-          
+ 
         }}
       >
         <div className="p-3 text-center border-bottom ">
@@ -28,82 +42,91 @@ function Layout() {
             ☰
           </button>
         </div>
-
+ 
         <ul className="list-unstyled p-3">
-
+ 
           <li className="mb-2">
             <NavLink
               to="/User/Dashboard"
               className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${
-                  isActive ? "bg-warning text-white" : "text-dark"
+                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
                 }`
+ 
               }
             >
-              {collapsed ? "D" : " Dashboard"}
+              {collapsed ? <FontAwesomeIcon icon={faHouseChimney} /> :
+ 
+                <><FontAwesomeIcon icon={faHouseChimney} className="me-3" />Dashboard</>
+ 
+              }
             </NavLink>
           </li>
-
+ 
           <li className="mb-2">
             <NavLink
-              to="/User/NewClaims"
+              to="/User/NewClaim"
               className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${
-                  isActive ? "bg-warning text-white" : "text-dark"
+                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
                 }`
               }
             >
-              {collapsed ? "N" : " New Claims"}
+              {collapsed ? <FontAwesomeIcon icon={faSackDollar} /> :
+                <><FontAwesomeIcon icon={faSackDollar} className="me-3" /> New Claim</>
+              }
             </NavLink>
           </li>
-
+ 
           <li className="mb-2">
             <NavLink
               to="/User/MyClaims"
               className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${
-                  isActive ? "bg-warning text-white" : "text-dark"
+                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
                 }`
               }
             >
-              {collapsed ? "M" : " My Claims"}
+              {collapsed ? <FontAwesomeIcon icon={faFileInvoiceDollar} /> :
+ 
+                <><FontAwesomeIcon icon={faFileInvoiceDollar} className="me-3" />All Claims
+                </>
+              }
             </NavLink>
           </li>
-
+ 
           <li className="mb-2">
             <NavLink
-              to="/User/Profile"
+              to="/LoginPage"
               className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${
-                  isActive ? "bg-warning text-white" : "text-dark"
+                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
                 }`
               }
             >
-              {collapsed ? "P" : "Profile"}
+              {collapsed ? <FontAwesomeIcon icon={faCircleUser} /> : <><FontAwesomeIcon icon={faCircleUser} className="me-3" />Profile</>}
             </NavLink>
           </li>
-
-
-         
-
+ 
+ 
+ 
+ 
         </ul>
-
-  <ul className="list-unstyled p-3 mt-auto border-top ">
-  <li className="mb-2">
-    <NavLink
-      to="/LoginPage"
-      className={({ isActive }) =>
-        `d-block p-3 rounded text-decoration-none ${
-          isActive ? "bg-warning text-white" : "text-dark"
-        }`
-      }
-    >
-      {collapsed ? "L" : "Logout"}
-    </NavLink>
-  </li>
-</ul>
+ 
+        <ul className="list-unstyled p-3 mt-auto border-top ">
+          <li className="mb-2">
+            <NavLink
+              to="/LoginPage"
+              className={({ isActive }) =>
+                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
+                }`
+              }
+            >
+              {collapsed ? <FontAwesomeIcon icon={faRightFromBracket} />
+                :
+                <><FontAwesomeIcon icon={faRightFromBracket} className="me-3" /><button className="btn" type="button" onClick={handleClick}>Logout</button></>
+              }
+            </NavLink>
+          </li>
+        </ul>
       </div>
-
+ 
       {/* Right Side */}
       <div
         style={{
@@ -113,22 +136,55 @@ function Layout() {
         }}
       >
         {/* Navbar */}
-        <nav className="navbar navbar-expand-lg bg-warning shadow-sm px-4 py-3 sticky-top">
-          <h3 className="mb-0 fw-bold">AIMS</h3>
-
-          <div className="ms-auto">
-            <span className="fw-semibold"> UserName</span>
+        <nav className="navbar navbar-expand-lg bg-warning shadow-sm px-4 py-3 sticky-top"
+ 
+ 
+        >
+          <div className="d-flex justify-content-between w-100 align-items-center">
+            <h3 className="mb-0 fw-bold">AIMS</h3>
+ 
+ 
+            <div className="dropdown position-relative">
+              <button
+                className="btn btn-warning dropdown-toggle"
+                onClick={() => setOpen(!open)}
+              >
+                {user?.name}
+              </button>
+ 
+              {open && (
+                <ul className="dropdown-menu show"
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: "100%"
+                  }}
+                >
+                  <li>
+                    <button className="dropdown-item">{user?.name}</button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item">{user?.email}</button>
+                  </li>
+                  <hr />
+                  <li>
+                    <button className="dropdown-item">Change Password</button>
+                  </li>
+                </ul>
+              )}
+            </div>
           </div>
+ 
         </nav>
-
+ 
         {/* Page Content */}
-        <div className="container-fluid p-4 bg-light" style={{ minHeight: "100vh" }}>
+        <div className="container-fluid p-4 " style={{ minHeight: "100vh", backgroundColor: "F2F9FF" }}>
           <Outlet />
         </div>
       </div>
-
+ 
     </div>
   );
 }
-
+ 
 export default Layout;

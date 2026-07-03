@@ -95,4 +95,63 @@ app.get('/api/db-to-cobol', (req, res) => {
   });
 });
 
+// Admin all user(userlists)
+app.get('/api/users', (req, res) => {
+  const sql = `
+    SELECT 
+        u.id AS User_ID, 
+        u.name AS User_Name, 
+        p.policy_number AS Policy_Number, 
+        u.claimed_frequency AS Claimed_Freq, 
+        u.status 
+    FROM users u
+    LEFT JOIN policies p ON u.id = p.user_id
+    WHERE u.role = 'user'  -- <--- Move Admin 
+  `;
+  
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+});
+
+// Admin User Detail 
+app.get('/api/users/:id', (req, res) => {
+  const userId = req.params.id;
+  if (!userId || userId === 'undefined') {
+    return res.status(400).json({ message: "Invalid User ID" });
+  }
+
+  const sql = `
+    SELECT 
+        u.id, 
+        u.name, 
+        u.email, 
+        u.phone, 
+        p.policy_number AS policyNumber, 
+        p.status AS policyStatus, 
+        p.start_date AS startDate, 
+        p.end_date AS endDate,
+        v.vehicle_number AS vehicleNumber, 
+        v.vehicle_model AS vehicleModel,
+        GROUP_CONCAT(ct.coverage_type SEPARATOR ', ') AS coverageType
+    FROM users u
+    LEFT JOIN policies p ON u.id = p.user_id
+    LEFT JOIN vehicles v ON p.vehicle_id = v.vehicle_id
+    LEFT JOIN coverage_policies cp ON p.policy_id = cp.policy_id
+    LEFT JOIN coverage_types ct ON cp.coverage_type_id = ct.coverage_type_id
+    WHERE u.id = ?
+    GROUP BY u.id, p.policy_id
+  `;
+  
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+        console.error("SQL Error:" ,err);
+        return res.status(500).json(err);
+    }
+    if (results.length === 0) return res.status(404).json({ message: "User not found" });
+    res.json(results[0]); 
+  });
+});
+
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));

@@ -7,20 +7,10 @@ function UserDetail() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Mock Data
-    const mockUser = {
-      id: "UID001",
-      name: "Tia Bett",
-      email: "tiabett@gmail.com",
-      phone: "09123456789",
-      policy_number: "PLC001",
-      coverage: "Theft, Third Party Liability",
-      vehicle_model: "Honda Fit",
-      vehicle_number: "3P-8452",
-      start_date: "01-12-2023",
-      end_date: "01-12-2025"
-    };
-    setUser(mockUser);
+    fetch(`http://localhost:3000/api/users/${id}`)
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.error("Error fetching user detail:", err));
   }, [id]);
 
   if (!user) return <div className="text-center mt-5">Loading...</div>;
@@ -57,12 +47,12 @@ function UserDetail() {
           <tr><td style={{ fontWeight: "bold" }}>User Name</td><td>:</td><td>{user.name}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Email</td><td>:</td><td>{user.email}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Phone</td><td>:</td><td>{user.phone}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>Policy Number</td><td>:</td><td>{user.policy_number}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>Coverage Type</td><td>:</td><td>{user.coverage}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>Vehicle Model</td><td>:</td><td>{user.vehicle_model}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>Vehicle Number</td><td>:</td><td>{user.vehicle_number}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>Start Date</td><td>:</td><td>{user.start_date}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>End Date</td><td>:</td><td>{user.end_date}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Policy Number</td><td>:</td><td>{user.policyNumber || "-"}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Coverage Type</td><td>:</td><td>{user.coverageType || "-"}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Vehicle Model</td><td>:</td><td>{user.vehicleModel || "-"}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Vehicle Number</td><td>:</td><td>{user.vehicleNumber || "-"}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Start Date</td><td>:</td><td>{user.startDate || "-"}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>End Date</td><td>:</td><td>{user.endDate || "-"}</td></tr>
         </tbody>
       </table>
     </div>
