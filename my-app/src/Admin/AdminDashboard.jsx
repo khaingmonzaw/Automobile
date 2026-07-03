@@ -1,14 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faGauge, 
-  faFileInvoice, 
-  faUsers, 
-  faShieldHalved, 
-  faSignOutAlt, 
-  faBars 
-} from "@fortawesome/free-solid-svg-icons";
 
 const AdminDashboard = () => {
   // Mock Data for Recent Claims Table
@@ -64,7 +55,8 @@ const AdminDashboard = () => {
             <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3 className="fs-5 fw-bold text-dark mb-0">Recent Claims</h3>
-                <button className="btn btn-light btn-sm border-0 fw-semibold px-3 text-primary rounded-pill bg-primary-subtle">View All</button>
+                <Link to="/Admin/AllClaims">
+                <button className="btn btn-light btn-sm border-0 fw-semibold px-3 text-primary rounded-pill bg-primary-subtle"> View All</button></Link>
               </div>
 
               {/* ပြင်ဆင်ထားသော Data Table */}

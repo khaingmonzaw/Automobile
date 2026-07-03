@@ -9,6 +9,11 @@ import NewClaim from './User/NewClaim';
 import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
 import ClaimDetails from './User/ClaimDetails';
+
+import AdminDashboard from './Admin/AdminDashboard.jsx';
+import AllClaims from './Admin/AllClaims.jsx';
+import Profile from './User/Profile.jsx';
+
 import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
 import CoverageTypes from './Admin/CoverageTypes.jsx';
 import NewCoverage from './Admin/NewCoverage.jsx';
@@ -36,6 +41,7 @@ function App() {
         <Route path="Dashboard" element={<Dashboard />} />
         <Route path="MyClaims" element={<MyClaims />} />
         <Route path="NewClaim" element={<NewClaim />} />
+        <Route path="Profile" element={<Profile />} />
         <Route path="MyClaims/ClaimDetails" element={<ClaimDetails />} />
         <Route path="PasswordChangeUser" element={< PasswordChangeUser/>} />
       </Route>
@@ -44,6 +50,8 @@ function App() {
 
       <Route path="/Admin" element={<Layout />}>
         <Route index element={<Navigate to="ClaimDetailApproved" replace />} />
+        <Route path="AdminDashboard" element={<AdminDashboard />} />
+        <Route path="AllClaims" element={<AllClaims />} />
         <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} />
         <Route path="CoverageTypes" element={<CoverageTypes />} />
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
