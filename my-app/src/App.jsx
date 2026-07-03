@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+ 
 import Login from './Login'; // Login component နာမည်
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from './LoginPage';
@@ -91,5 +91,5 @@ function App() {
   //   </div>
   // );
 }
-
+ 
 export default App;
