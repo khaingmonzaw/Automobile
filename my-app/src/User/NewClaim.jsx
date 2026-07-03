@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
@@ -8,6 +9,8 @@ function NewClaim() {
     const [selectedPolicy, setSelectedPolicy] = useState(null);
     const [location, setLocation] = useState("");
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [coverages, setCoverages] = useState([]);
 
     // ================= ADDED: formData now includes vehicle_id =================
     const [formData, setFormData] = useState({
@@ -16,7 +19,7 @@ function NewClaim() {
         claimAmount: "",
         location: "",
         description: "",
-        
+
     });
 
     const user = JSON.parse(localStorage.getItem("user"));
@@ -36,23 +39,35 @@ function NewClaim() {
     const handlePolicyChange = (e) => {
         const id = e.target.value;
 
-        const selected = policies.find(p => p.id == id);
+        const selected = policies.find(p => p.policy_id == id);
 
         setSelectedPolicy(selected);
 
-
-        setFormData(prev => ({
+        setErrors((prev) => ({
             ...prev,
-            coverage: "",
-            vehicle_id: selected?.vehicle_id || ""
+            policy: "",
         }));
+
+        // FETCH COVERAGES HERE
+        fetch(`http://localhost:3000/api/coverages/${id}`)
+            .then(res => res.json())
+            .then(data => setCoverages(data))
+            .catch(err => console.log(err));
+
+
     };
 
     // ================= FORM CHANGE =================
     const handleData = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value,
+        });
+
+        setErrors({
+            ...errors,
+            [name]: "",
         });
     };
 
@@ -64,7 +79,7 @@ function NewClaim() {
             claimAmount: "",
             location: "",
             description: "",
-         
+
 
         });
     };
@@ -73,18 +88,55 @@ function NewClaim() {
     const saveSubmit = async (e) => {
         e.preventDefault();
 
+
+        const newErrors = {};
+        if (!selectedPolicy) {
+            newErrors.policy = "*Please select a policy.";
+        }
+
+        if (!formData.accidentDate) {
+            newErrors.accidentDate = "*Accident Date is required.";
+        }
+
+
+        if (
+            !formData.accidentType ||
+            formData.accidentType === "Select Accident Type"
+        ) {
+            newErrors.accidentType = "*Please select an accident type.";
+        }
+
+        if (!formData.claimAmount) {
+            newErrors.claimAmount = "*Claim amount is required.";
+        }
+
+        if (!formData.location) {
+            newErrors.location = "*Location is required.";
+        }
+
+        if (!formData.description.trim()) {
+            newErrors.description = "*Description is required.";
+        }
+
+        setErrors(newErrors);
+
+
+        if (Object.keys(newErrors).length > 0) {
+            return;
+        }
+
         const payload = {
             user_id: userId,
-            policy_id: selectedPolicy?.id,
+            policy_id: selectedPolicy?.policy_id,
             accident_type: formData.accidentType,
+            accident_date: formData.accidentDate,
             claimed_amount: formData.claimAmount,
-            accident_date:formData.accidentDate,
             location: formData.location,
             description: formData.description,
-            remark: "",                
-            status: "PENDING",         
-            approved_staff: null,    
-            compensation_amount: 0    
+            remark: "",
+            status: "PENDING",
+            approved_staff: null,
+            compensation_amount: 0
         };
 
         const res = await fetch("http://localhost:3000/api/claims", {
@@ -97,6 +149,8 @@ function NewClaim() {
 
         const data = await res.json();
         alert(data.message);
+        handleReset();
+
     };
 
     // ================= LOCATION =================
@@ -135,52 +189,95 @@ function NewClaim() {
 
     return (
         <div>
-            <h3 className="text-start">New Claim Submission</h3>
+            <h3 className="fw-bold mb-4">New Claim Submission</h3>
 
-            {/* ================= POLICY SELECT ================= */}
-            <div className="mb-3">
-                <label>Select Policy</label>
+            {/* Policy Selection */}
+            <div className="card shadow-sm border-0 mb-4">
+                <div className="card-body">
 
-                <select className="form-select" onChange={handlePolicyChange}>
-                    <option value="">Select Policy</option>
+                    <div className="row align-items-center">
 
-                    {policies.map(p => (
-                        <option key={p.id} value={p.id}>
-                            {p.policy_number}
-                        </option>
-                    ))}
-                </select>
+                        <div className="col-md-3">
+                            <label className="fw-bold mb-0">
+                                Select Policy
+                            </label>
+                        </div>
+
+                        <div className="col-md-9">
+                            <select
+                                className={`form-select ${errors.policy ? "is-invalid" : ""}`}
+                                onChange={handlePolicyChange}
+                                value={selectedPolicy?.policy_id || ""}
+                            >
+                                <option value="">-- Select Policy Number --</option>
+
+                                {policies.map((p) => (
+                                    <option
+                                        key={p.policy_id}
+                                        value={p.policy_id}
+                                    >
+                                        {p.policy_number}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.policy && (
+                                <small className="text-danger">
+                                    {errors.policy}
+                                </small>
+                            )}
+
+
+
+
+
+
+                        </div>
+
+
+
+                    </div>
+
+                </div>
             </div>
 
-            {/* ================= POLICY INFO ================= */}
+            {/* Policy Information */}
             {selectedPolicy && (
-                <div className="card p-3 mb-3 bg-light">
-                    <p><b>Vehicle:</b> {selectedPolicy.vehicle_number}</p>
-                    <p><b>Model:</b> {selectedPolicy.vehicle_model}</p>
+                <div className="card shadow border-0 rounded-4 mb-4">
+                    <div className="card-header bg-warning text-dark fw-bold">
+                        Policy Information
+                    </div>
 
+                    <div className="card-body">
 
-                   
+                        <div className="row">
+
+                            <div className="col-md-4 mb-3">
+                                <p className="text-muted">Policy Number</p>
+                                <h5 className="fw-bold">
+                                    {selectedPolicy.policy_number}
+                                </h5>
+                            </div>
+
+                            <div className="col-md-4 mb-3">
+                                <p className="text-muted">Vehicle Number</p>
+                                <h5 className="fw-bold">
+                                    {selectedPolicy.vehicle_number}
+                                </h5>
+                            </div>
+
+                            <div className="col-md-4 mb-3">
+                                <p className="text-muted">Vehicle Model</p>
+                                <h5 className="fw-bold">
+                                    {selectedPolicy.vehicle_model}
+                                </h5>
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
             )}
 
-            {/* ================= COVERAGE ================= */}
-            {selectedPolicy && (
-                <div className="mb-3">
-                    <label>Select Coverage</label>
-
-                    <select
-                        className="form-select"
-                        name="coverage"
-                        value={formData.coverage}
-                        onChange={handleData}
-                    >
-                        <option value="">Select Coverage</option>
-                        <option>Liability</option>
-                        <option>Collision</option>
-                        <option>Theft</option>
-                    </select>
-                </div>
-            )}
 
             <form onSubmit={saveSubmit}>
                 <div className="row bg-white p-5 border rounded-4 my-4 text-start">
@@ -194,33 +291,56 @@ function NewClaim() {
                                 name="accidentDate"
                                 value={formData.accidentDate}
                                 onChange={handleData}
-                                className="form-control"
+                                className={`form-control ${errors.accidentDate ? "is-invalid" : ""}`}
                             />
+                            {errors.accidentDate && (
+                                <small className="text-danger">
+                                    {errors.accidentDate}
+                                </small>
+                            )}
                         </div>
 
                         <div className="mb-4">
                             <label>Accident Type</label>
+
+
                             <select
-                                className="form-select"
+                                className={`form-select ${errors.accidentType ? "is-invalid" : ""}`}
+
                                 name="accidentType"
                                 value={formData.accidentType}
                                 onChange={handleData}
                             >
-                                <option>Select Accident Type</option>
-                                <option>Thief</option>
-                                <option>Third Party Collision</option>
+                                <option>--Select Accident Type---</option>
+                                {Array.isArray(coverages) &&
+                                    coverages.map((c) => (
+                                        <option key={c.coverage_type_id} value={c.coverage_type}>
+                                            {c.coverage_type}
+                                        </option>
+                                    ))
+                                }
                             </select>
+                            {errors.accidentType && (
+                                <small className="text-danger">
+                                    {errors.accidentType}
+                                </small>
+                            )}
                         </div>
 
                         <div className="mb-4">
                             <label>Claim Amount</label>
                             <input
                                 type="text"
-                                className="form-control"
+                                className={`form-control ${errors.claimAmount ? "is-invalid" : ""}`}
                                 name="claimAmount"
                                 value={formData.claimAmount}
                                 onChange={handleData}
                             />
+                            {errors.claimAmount && (
+                                <small className="text-danger">
+                                    {errors.claimAmount}
+                                </small>
+                            )}
                         </div>
 
                         <div className="mb-4">
@@ -230,11 +350,16 @@ function NewClaim() {
                                 <div className="col-9">
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className={`form-control ${errors.location ? "is-invalid" : ""}`}
                                         name="location"
                                         value={formData.location}
                                         onChange={handleData}
                                     />
+                                    {errors.location && (
+                                        <small className="text-danger">
+                                            {errors.location}
+                                        </small>
+                                    )}
                                 </div>
 
                                 <div className="col-3">
@@ -257,26 +382,32 @@ function NewClaim() {
                         <div className="mb-4">
                             <label>Description</label>
                             <textarea
-                                className="form-control"
+                                className={`form-control ${errors.description ? "is-invalid" : ""}`}
                                 rows="5"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleData}
                             />
+                            {errors.description && (
+                                <small className="text-danger">
+                                    {errors.description}
+                                </small>
+                            )}
                         </div>
 
+                    </div>
+                    <div className="d-flex justify-content-center gap-3">
+                        <button className="btn btn-warning" type="submit">
+                            Submit
+                        </button>
+                        <button className="btn btn-danger" type="button" onClick={handleReset}>
+                            Reset
+                        </button>
                     </div>
 
                 </div>
 
-                <div className="d-flex justify-content-center gap-3">
-                    <button className="btn btn-warning" type="submit">
-                        Submit
-                    </button>
-                    <button className="btn btn-danger" type="button" onClick={handleReset}>
-                        Reset
-                    </button>
-                </div>
+
             </form>
         </div>
     );

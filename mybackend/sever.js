@@ -19,7 +19,8 @@ const db = mysql.createConnection({
 // Login API
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
-  const sql = "SELECT * FROM users WHERE email = ? ";
+
+  const sql = "SELECT * FROM users WHERE email = ?";
 
   db.query(sql, [email], (err, results) => {
     if (err) {
@@ -27,12 +28,18 @@ app.post("/api/login", (req, res) => {
     }
 
     if (results.length === 0) {
-      return res.status(401).json({ message: "Invalid email" });
+      return res.status(401).json({
+        message: "*Invalid credentials",
+      });
     }
+
     const user = results[0];
 
+    // Password incorrect
     if (user.password !== password) {
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(401).json({
+        message: "*Invalid credentials",
+      });
     }
 
     if (results.length > 0) {
@@ -42,9 +49,6 @@ app.post("/api/login", (req, res) => {
         user,
       });
     }
-    // else {
-    //   res.status(401).json({ message: "Invalid credentials" });
-    // }
   });
 });
 
@@ -66,68 +70,151 @@ app.get("/api/policies/:userId", (req, res) => {
   });
 });
 
-/* ================= GET COVERAGES BY POLICY ================= */
+/* ================= GET COVERAGES BY POLICY USER================= */
 app.get("/api/coverages/:policyId", (req, res) => {
-  const policyId = req.params.policyId;
+ const policyId = req.params.policyId;
 
   const sql = `
-        SELECT id, type, base_rate, coverage_limit
-        FROM coverages
-        WHERE policy_id = ?
-    `;
+    SELECT ct.coverage_type_id, ct.coverage_type
+    FROM coverage_policies cp
+    JOIN coverage_types ct ON cp.coverage_type_id = ct.coverage_type_id
+    WHERE cp.policy_id = ?
+  `;
 
   db.query(sql, [policyId], (err, results) => {
-    if (err) return res.status(500).json({ message: "DB Error" });
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "DB Error" });
+    }
+
+   
+    res.json(results);
+  });
+});
+
+
+
+app.post("/api/claims", (req, res) => {
+  const {
+    user_id,
+    policy_id,
+    accident_type,
+    accident_date,
+    claimed_amount,
+    description,
+    location
+  } = req.body;
+
+  // GET COVERAGES
+  const sql = `
+    SELECT ct.coverage_type_id, ct.coverage_type
+    FROM coverage_policies cp
+    JOIN coverage_types ct ON cp.coverage_type_id = ct.coverage_type_id
+    WHERE cp.policy_id = ?
+  `;
+
+  db.query(sql, [policy_id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "DB Error" });
+    }
+
+    const allowed = results.map(r => r.coverage_type);
+
+    // CHECK COVERAGE
+    if (!allowed.includes(accident_type)) {
+      return res.status(400).json({
+        message: " This accident type is NOT covered by your policy"
+      });
+    }
+
+    // INSERT CLAIM (NO COBOL)
+    const insertSql = `
+      INSERT INTO claims
+      (user_id, policy_id, accident_type, accident_date,
+       claimed_amount, description, location, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING')
+    `;
+
+    db.query(insertSql, [
+      user_id,
+      policy_id,
+      accident_type,
+      accident_date,
+      claimed_amount,
+      description,
+      location
+    ], (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Insert Error" });
+      }
+
+      res.json({
+        message: "Claim submitted successfully"
+      });
+    });
+  });
+});
+
+
+// User Claim API
+app.get("/api/claims/user/:userId", (req, res) => {
+  const userId = req.params.userId;
+
+  const sql = `
+    SELECT *
+    FROM claims
+    WHERE user_id = ?
+    ORDER BY claim_id DESC
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "DB Error" });
+    }
 
     res.json(results);
   });
 });
 
-app.post("/api/claims", (req, res) => {
-  const {
-     user_id,
-      policy_id,
-      accident_type,
-      claimed_amount,
-      compensation_amount,
-      approved_staff,
-      status,
-      remark,
-      description,
-      location,
-  } = req.body;
 
-  const sql = `
-       INSERT INTO claims
-(user_id, policy_id, accident_type, claimed_amount, compensation_amount, approved_staff, status, remark, description, location)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`;
+// Claim Details User API
 
-  db.query(
-    sql,
-    [
-      user_id,
-      policy_id,
-      accident_type,
-      claimed_amount,
-      compensation_amount,
-      approved_staff,
-      status,
-      remark,
-      description,
-      location,
-    ],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "DB Error" });
-      }
+app.get("/api/claims/:id", (req, res) => {
+  const id = req.params.id;
 
-      res.json({ message: "Claim submitted successfully" });
-    },
-  );
+  const sql =
+  
+  
+  `
+SELECT 
+  c.claim_id,
+  c.created_at,
+  c.accident_date,
+  c.description,
+  c.claimed_amount,
+  c.compensation_amount,
+  c.status,
+  c.remark,
+  ct.coverage_type AS accident_type,
+  v.vehicle_number AS v_number,
+  v.vehicle_model AS v_model
+FROM claims c
+JOIN policies p ON c.policy_id = p.policy_id
+JOIN vehicles v ON p.vehicle_id = v.vehicle_id
+JOIN coverage_policies cp ON p.policy_id = cp.policy_id
+JOIN coverage_types ct ON cp.coverage_type_id = ct.coverage_type_id
+WHERE c.claim_id = ?;
+`
+  db.query(sql, [id], (err, result) => {
+    if (err) 
+      
+      return res.status(500).json(err);
+    if (result.length === 0) return res.status(404).json({ message: "Not found" });
+
+    res.json(result[0]);
+  });
 });
-
 // Add Claim API
 // app.post('/api/add-claim', (req, res) => {
 //   console.log("Frontend မှ ရရှိသော Data:", req.body);
