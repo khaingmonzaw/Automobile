@@ -6,54 +6,81 @@ const PasswordChangeUser = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Visibility states for each input field
+  // Visibility states
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // ✅ Handlers - API နှင့် ချိတ်ဆက်ရန် ပြင်ဆင်ပြီး
+  // Error states (for inline red messages)
+  const [currentPasswordError, setCurrentPasswordError] = useState('');
+  const [newPasswordError, setNewPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [formError, setFormError] = useState('');
+
+  // Handlers - clear specific error on typing
+  const handleCurrentChange = (e) => {
+    setCurrentPassword(e.target.value);
+    setCurrentPasswordError('');
+    setFormError('');
+  };
+  const handleNewChange = (e) => {
+    setNewPassword(e.target.value);
+    setNewPasswordError('');
+    setFormError('');
+  };
+  const handleConfirmChange = (e) => {
+    setConfirmPassword(e.target.value);
+    setConfirmPasswordError('');
+    setFormError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Clear previous errors
+    setCurrentPasswordError('');
+    setNewPasswordError('');
+    setConfirmPasswordError('');
+    setFormError('');
+
     // ၁။ ပါတ်စ်ဝေါ့အသစ်နှစ်ခု တူ/မတူ စစ်ဆေးခြင်း
     if (newPassword !== confirmPassword) {
-      alert("New Password နဲ့ Confirm Password မတူပါဘူး။");
+      setConfirmPasswordError("New Password နဲ့ Confirm Password မတူပါဘူး။");
       return;
     }
 
     // ၂။ Login ဝင်ထားတဲ့ User ရဲ့ အချက်အလက်ကို localStorage ထဲကနေ ယူခြင်း
     const loggedInUser = JSON.parse(localStorage.getItem("user"));
     if (!loggedInUser || !loggedInUser.email) {
-      alert("ကျေးဇူးပြု၍ အရင်ဆုံး Login ဝင်ပါ။");
+      setFormError("ကျေးဇူးပြု၍ အရင်ဆုံး Login ဝင်ပါ။");
       return;
     }
 
     try {
-      // ၃။ Backend API လမ်းကြောင်းဆီသို့ Data လှမ်းပို့ခြင်း
       const response = await fetch("http://localhost:3000/api/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: loggedInUser.email,       // localStorage ထဲက email ကို ပို့မည်
-          currentPassword: currentPassword, // ရိုက်ထည့်လိုက်သော လက်ရှိ password
-          newPassword: newPassword,         // password အသစ်
+          email: loggedInUser.email,
+          currentPassword: currentPassword,
+          newPassword: newPassword,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message); // Database မှာ အောင်မြင်စွာ ပြောင်းလဲပြီးပါက ပြသမည့်စာသား
-        // ၄။ အောင်မြင်သွားလျှင် Input field များကို ရှင်းထုတ်မည်
+        alert(data.message); // ✅ အောင်မြင်ပါက Alert ပြထားဆဲ (သို့သော် ခင်ဗျား စိတ်ကြိုက် ပြောင်းနိုင်ပါတယ်)
         handleCancel();
       } else {
-        alert(data.message); // Backend မှ ပြန်လာသော Error ပြသခြင်း (ဥပမာ- လက်ရှိ Password မှားနေခြင်း)
+        // Backend မှ ပြန်လာသော Error ကို Form Error အဖြစ်ပြမည်
+        setFormError(data.message || "Password ပြောင်းလဲမှု မအောင်မြင်ပါ။");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Server နဲ့ ချိတ်ဆက်မှု မအောင်မြင်ပါ (URL သို့မဟုတ် Port မှားနေနိုင်သည်)");
+      setFormError("Server နဲ့ ချိတ်ဆက်မှု မအောင်မြင်ပါ (URL သို့မဟုတ် Port မှားနေနိုင်သည်)");
     }
   };
 
@@ -64,6 +91,11 @@ const PasswordChangeUser = () => {
     setShowCurrent(false);
     setShowNew(false);
     setShowConfirm(false);
+    // Clear all errors
+    setCurrentPasswordError('');
+    setNewPasswordError('');
+    setConfirmPasswordError('');
+    setFormError('');
   };
 
   return (
@@ -78,20 +110,24 @@ const PasswordChangeUser = () => {
             <div className="input-group">
               <input
                 type={showCurrent ? 'text' : 'password'}
-                className="form-control form-control-lg bg-light" // ✅ Fixed Bootstrap Class
+                className="form-control form-control-lg bg-light"
                 placeholder="**********"
                 value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
+                onChange={handleCurrentChange}
                 required
               />
-              <span 
-                className="input-group-text bg-light border-start-0 text-secondary" 
+              <span
+                className="input-group-text bg-light border-start-0 text-secondary"
                 style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
                 onClick={() => setShowCurrent(!showCurrent)}
               >
                 <i className={`fas ${showCurrent ? 'fa-eye' : 'fa-eye-slash'}`}></i>
               </span>
             </div>
+            {/* Error message under the text box */}
+            {currentPasswordError && (
+              <div className="text-danger mt-1 small">{currentPasswordError}</div>
+            )}
           </div>
 
           {/* New Password */}
@@ -100,20 +136,23 @@ const PasswordChangeUser = () => {
             <div className="input-group">
               <input
                 type={showNew ? 'text' : 'password'}
-                className="form-control form-control-lg bg-light" // ✅ Fixed Bootstrap Class
+                className="form-control form-control-lg bg-light"
                 placeholder="**********"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={handleNewChange}
                 required
               />
-              <span 
-                className="input-group-text bg-light border-start-0 text-secondary" 
+              <span
+                className="input-group-text bg-light border-start-0 text-secondary"
                 style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
                 onClick={() => setShowNew(!showNew)}
               >
                 <i className={`fas ${showNew ? 'fa-eye' : 'fa-eye-slash'}`}></i>
               </span>
             </div>
+            {newPasswordError && (
+              <div className="text-danger mt-1 small">{newPasswordError}</div>
+            )}
           </div>
 
           {/* Confirm Password */}
@@ -122,21 +161,29 @@ const PasswordChangeUser = () => {
             <div className="input-group">
               <input
                 type={showConfirm ? 'text' : 'password'}
-                className="form-control form-control-lg bg-light" // ✅ Fixed Bootstrap Class
+                className="form-control form-control-lg bg-light"
                 placeholder="**********"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={handleConfirmChange}
                 required
               />
-              <span 
-                className="input-group-text bg-light border-start-0 text-secondary" 
+              <span
+                className="input-group-text bg-light border-start-0 text-secondary"
                 style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
                 onClick={() => setShowConfirm(!showConfirm)}
               >
                 <i className={`fas ${showConfirm ? 'fa-eye' : 'fa-eye-slash'}`}></i>
               </span>
             </div>
+            {confirmPasswordError && (
+              <div className="text-danger mt-1 small">{confirmPasswordError}</div>
+            )}
           </div>
+
+          {/* Form-level error (e.g., login required, server error) */}
+          {formError && (
+            <div className="text-danger text-center mb-3 small">{formError}</div>
+          )}
 
           {/* Buttons */}
           <div className="d-flex gap-3 justify-content-center mt-4">
