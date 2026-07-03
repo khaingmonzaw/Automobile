@@ -115,6 +115,7 @@ app.post("/api/claims", (req, res) => {
     location
   } = req.body;
 
+  console.log(req.body)
   // GET COVERAGES
   const sql = `
     SELECT ct.coverage_type_id, ct.coverage_type

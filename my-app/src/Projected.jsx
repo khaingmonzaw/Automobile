@@ -7,6 +7,7 @@ function Projected({role,children}) {
     const user=JSON.parse(localStorage.getItem("user"));
 
     if(!user){
+        alert("Login First!!!!")
         return <Navigate to="/" replace/>
     }
 
