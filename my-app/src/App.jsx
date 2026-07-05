@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+ 
 import Login from './Login'; // Login component နာမည်
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from './LoginPage';
@@ -22,9 +22,10 @@ import CoverageUpdate from './Admin/CoverageUpdate.jsx';
 import ClaimDetailApproved from './Admin/ClaimDetailApproved'
 import PasswordChangeUser from './User/PasswordChangeUser.jsx';
 import PasswordChangeAdmin from './Admin/PasswordChangeAdmin.jsx';
+import Projected from "./Projected.jsx"
 function App() {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const [role, setRole] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState(null);
 
   return (
 
@@ -36,14 +37,21 @@ function App() {
 
       <Route path="/LoginPage" element={<LoginPage />} />
 
-      <Route path="/User" element={<Layout />}>
+      <Route
+        path="/User"
+        element={
+          <Projected role="user">
+            <Layout />
+          </Projected>
+        }
+      >
         <Route index element={<Navigate to="Dashboard" replace />} />
         <Route path="Dashboard" element={<Dashboard />} />
         <Route path="MyClaims" element={<MyClaims />} />
         <Route path="NewClaim" element={<NewClaim />} />
         <Route path="Profile" element={<Profile />} />
-        <Route path="MyClaims/ClaimDetails" element={<ClaimDetails />} />
-        <Route path="PasswordChangeUser" element={< PasswordChangeUser/>} />
+        <Route path="MyClaims/ClaimDetails/:id" element={<ClaimDetails />} />
+        <Route path="PasswordChangeUser" element={< PasswordChangeUser />} />
       </Route>
 
 
@@ -57,10 +65,16 @@ function App() {
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
         <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
-        <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin/>} />
-
-
+        <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
+        {/* <Route path="Adduser" element={<Adduser />} />
+        <Route path="Adduser/:id" element={<Adduser />} />
+        <Route path="UserDetail/:id" element={<UserDetail />} />
+         <Route path="Users" element={<Userlist/>} /> */}
       </Route>
+
+
+
+
     </Routes>
 
 
@@ -69,7 +83,7 @@ function App() {
 
 
 
-  // Login မဝင်ရသေးရင် Login Page 
+
   // if (!isLoggedIn) {
   //   return <Login onLoginSuccess={(userRole) => {
   //     setIsLoggedIn(true);
@@ -77,7 +91,7 @@ function App() {
   //   }} />;
   // }
 
-  // Login ဝင်ပြီးသွားရင် Role ပေါ်မူတည်ပြီး Page ခွဲ
+
   // return (
   //   <div>
   //     {role === 'user' ? <Customer /> : <h1>Welcome, Staff Member!</h1>}
@@ -85,5 +99,5 @@ function App() {
   //   </div>
   // );
 }
-
+ 
 export default App;

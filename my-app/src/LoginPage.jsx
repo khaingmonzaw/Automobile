@@ -1,11 +1,13 @@
 import * as React from 'react';
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-function LoginPage(props) {
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+function LoginPage() {
 
   const navigate = useNavigate();
 
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [formData, setFormData] = useState({
@@ -54,7 +56,7 @@ function LoginPage(props) {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         if (data.user.role == "admin") {
-          navigate("../Admin/ClaimDetailApproved")
+          navigate("../Admin/AdminDashboard")
         } else {
           navigate("../User/Dashboard");
         }
@@ -76,7 +78,7 @@ function LoginPage(props) {
 
 
       {/* Left Side Text and Image*/}
-      <div className="col-md-5 text-white d-flex flex-column justify-content-center align-items-center p-4">
+      <div className="col-md-5 text-dark d-flex flex-column justify-content-center align-items-center p-4">
         <h1 className="text-start">
           Automobile
           <div >
@@ -104,6 +106,8 @@ function LoginPage(props) {
 
         <form onSubmit={handleSubmit} method="POST">
 
+
+
           {/* Email */}
           <div className="mb-4">
             <label className="form-label d-block text-start">Email address</label>
@@ -119,7 +123,7 @@ function LoginPage(props) {
               <small className="text-danger text-start">{errors.email}</small>
             )}</div>
             <div>
-             <div className='text-start'> {serverError && (
+              <div className='text-start'> {serverError && (
                 <small className="text-danger">
                   {serverError}
                 </small>
@@ -127,20 +131,37 @@ function LoginPage(props) {
             </div>
           </div>
 
+
           {/* Password */}
-          <div className="mb-4">
-            <label className="form-label d-block text-start">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control border border-1"
-              placeholder="Enter your password"
-              onChange={handleChange}
-              value={formData.password}
-            />
-            <div className=" text-start"> {errors.password && (
-              <small className="text-danger ">{errors.password}</small>
-            )}</div>
+
+          <div className="">
+            <div className="mb-4">
+              <label className="form-label d-block text-start">Password</label>
+
+              <div className="input-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="form-control"
+                  placeholder="Enter your password"
+                  onChange={handleChange}
+                  value={formData.password}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                </button>
+              </div>
+
+              {errors.password && (
+                <small className="text-danger">{errors.password}</small>
+              )}
+            </div>
+           
 
             <div>
               <div className='text-start'> {serverError && (
@@ -148,7 +169,7 @@ function LoginPage(props) {
                   {serverError}
                 </small>
               )}
-                   </div>
+              </div>
             </div>
           </div>
 
@@ -156,6 +177,7 @@ function LoginPage(props) {
           <button type="submit" className="btn btn-warning w-100 py-2 my-2">
             LOGIN
           </button>
+
 
         </form>
 

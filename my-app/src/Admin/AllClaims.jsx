@@ -1,55 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faFilter, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faEye } from "@fortawesome/free-solid-svg-icons";
 
 const AllClaims = () => {
-  // Mock Data (Pagination စမ်းသပ်ရန် တူညီသော Data အချို့ ထပ်တိုးထားပါသည်)
-  const initialClaimsData = [
-    { id: "CLM0001", name: "Htet Yati Zar Ni", date: "05-12-2026", status: "Approved", risk: "Medium", badgeClass: "bg-success-subtle text-success border-success-subtle", riskClass: "text-info" },
-    { id: "CLM0002", name: "Htet Yati Zar Ni", date: "05-12-2025", status: "Approved", risk: "Medium", badgeClass: "bg-success-subtle text-success border-success-subtle", riskClass: "text-info" },
-    { id: "CLM0003", name: "Htet Yati Zar Ni", date: "05-13-2026", status: "Pending", risk: "Low", badgeClass: "bg-warning-subtle text-warning-emphasis border-warning-subtle", riskClass: "text-success" },
-    { id: "CLM0004", name: "Htet Yati Zar Ni", date: "07-12-2025", status: "Rejected", risk: "High", badgeClass: "bg-danger-subtle text-danger border-danger-subtle", riskClass: "text-danger" },
-    { id: "CLM0005", name: "Htet Yati Zar Ni", date: "05-10-2026", status: "Approved", risk: "High", badgeClass: "bg-success-subtle text-success border-success-subtle", riskClass: "text-danger" },
-    { id: "CLM0006", name: "Htet Yati Zar Ni", date: "05-02-2026", status: "Pending", risk: "Low", badgeClass: "bg-warning-subtle text-warning-emphasis border-warning-subtle", riskClass: "text-success" },
-    { id: "CLM0007", name: "Htet Yati Zar Ni", date: "05-06-2026", status: "Rejected", risk: "High", badgeClass: "bg-danger-subtle text-danger border-danger-subtle", riskClass: "text-danger" },
-  ];
-
-  const [searchTerm, setSearchTerm] = useState("");
+  // State Variables သတ်မှတ်ခြင်း
+  const [claimsData, setClaimsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
-  
-  // 💡 Pagination အတွက် State များ
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // တစ်မျက်နှာလျှင် ပြသမည့် အရေအတွက်
+  const itemsPerPage = 5; // တစ်မျက်နှာလျှင် ပြသမည့် အရေအတွက် (၅ ခု ပြောင်းထားပါသည်)
 
-  // ၁။ Search နှင့် Filter အရင်လုပ်ဆောင်ခြင်း
-  const filteredClaims = initialClaimsData.filter(claim => {
-    const matchesSearch = claim.name.toLowerCase().includes(searchTerm.toLowerCase()) || claim.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "All" || claim.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Backend API မှ ဒေတာဆွဲထုတ်ခြင်း
+  useEffect(() => {
+    const fetchClaims = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/admin/claims');
+        if (!response.ok) {
+          throw new Error('ဒေတာဆွဲထုတ်ရာတွင် အမှားအယွင်းရှိနေပါသည်။');
+        }
+        const data = await response.json();
+        setClaimsData(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
 
-  // ဇယားထဲမှာ အပြောင်းအလဲလုပ်ရင် ပထမစာမျက်နှာကို ပြန်ပို့ရန်
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
+    fetchClaims();
+  }, []);
+
+  // Status အလိုက် Badge အရောင်ပြောင်းရန် Function
+  const getBadgeConfig = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'APPROVED': 
+        return { badge: 'bg-success-subtle text-success border-success-subtle', risk: 'Low', riskClass: 'text-success' };
+      case 'PENDING': 
+        return { badge: 'bg-warning-subtle text-warning-emphasis border-warning-subtle', risk: 'Medium', riskClass: 'text-info' };
+      case 'REJECTED': 
+        return { badge: 'bg-danger-subtle text-danger border-danger-subtle', risk: 'High', riskClass: 'text-danger' };
+      default: 
+        return { badge: 'bg-secondary-subtle text-secondary', risk: 'Unknown', riskClass: 'text-muted' };
+    }
   };
 
+  // Status Filter စစ်ထုတ်ခြင်း logic
+  const filteredClaims = claimsData.filter(claim => {
+    return statusFilter === "All" || claim.status?.toUpperCase() === statusFilter.toUpperCase();
+  });
+
+  // Filter ပြောင်းလျှင် ပထမစာမျက်နှာသို့ ပြန်ပို့ရန်
   const handleFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
 
-  // ဇ။ Pagination အတွက် တွက်ချက်မှုများ
-  const totalPages = Math.ceil(filteredClaims.length / itemsPerPage);
+  // Pagination တွက်ချက်မှုများ
+  const totalPages = Math.ceil(filteredClaims.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // လက်ရှိ စာမျက်နှာအတွက်ပဲ Data များကို ဖြတ်ထုတ်ခြင်း
   const currentItems = filteredClaims.slice(indexOfFirstItem, indexOfLastItem);
 
-  // စာမျက်နှာ နံပါတ်စဉ် Array ထုတ်ရန် (ဥပမာ - [1, 2, 3])
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
+  // Loading ပြသမည့် UI
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        <div className="spinner-border text-warning" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error ပြသမည့် UI
+  if (error) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        <div className="alert alert-danger" role="alert">{error}</div>
+      </div>
+    );
   }
 
   return (
@@ -64,130 +94,99 @@ const AllClaims = () => {
       {/* Main Content Card Container */}
       <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
         
-        {/* Controls Section: Search and Filter */}
-        <div className="row g-3 mb-4 align-items-center">
-          <div className="col-md-5">
-            <div className="input-group bg-light rounded-pill border px-3 py-1 align-items-center">
-              <FontAwesomeIcon icon={faSearch} className="text-secondary opacity-50 me-2" />
-              <input 
-                type="text" 
-                className="form-control bg-transparent border-0 p-1 small" 
-                placeholder="Search by Claim ID or Name..." 
-                value={searchTerm}
-                onChange={handleSearchChange}
-                style={{ boxShadow: "none" }}
-              />
-            </div>
-          </div>
-          
-          <div className="col-md-3 ms-auto">
-            <div className="d-flex align-items-center bg-light rounded-pill border px-3 py-1">
-              <FontAwesomeIcon icon={faFilter} className="text-secondary opacity-50 me-2" />
+        {/* Controls Section: Filter */}
+        <div className="row g-3 mb-4 justify-content-end">
+          <div className="col-md-3">
+            <div className="d-flex align-items-center rounded-pill border px-3 py-1 bg-white shadow-sm" style={{ backgroundColor: "rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important" }}>
+              <FontAwesomeIcon icon={faFilter} className="text-warning-emphasis opacity-75 me-2" />
               <select 
-                className="form-select bg-transparent border-0 p-1 small" 
+                className="form-select bg-transparent border-0 p-1 small fw-semibold text-warning-emphasis" 
                 value={statusFilter}
                 onChange={handleFilterChange}
                 style={{ boxShadow: "none", cursor: "pointer" }}
               >
-                <option value="All">Filter Status: All</option>
-                <option value="Approved">Approved</option>
-                <option value="Pending">Pending</option>
-                <option value="Rejected">Rejected</option>
+                <option value="All" className="text-dark bg-white">Filter Status: All</option>
+                <option value="Approved" className="text-dark bg-white">Approved</option>
+                <option value="Pending" className="text-dark bg-white">Pending</option>
+                <option value="Rejected" className="text-dark bg-white">Rejected</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Data Table */}
-        <div className="table-responsive">
+        <div className="table-responsive rounded-3 overflow-hidden">
           <table className="table table-hover align-middle mb-0">
-            <thead>
-              <tr className="text-muted small uppercase fw-bold border-bottom">
-                <th className="py-3 px-3" style={{ width: "15%" }}>Claim ID</th>
-                <th className="py-3" style={{ width: "25%" }}>Claimed Name</th>
-                <th className="py-3" style={{ width: "18%" }}>Accident Date</th>
-                <th className="py-3 text-center" style={{ width: "14%" }}>Status</th>
-                <th className="py-3 text-center" style={{ width: "14%" }}>Risk Level</th>
-                <th className="py-3 text-center" style={{ width: "14%" }}>Action</th>
+            <thead style={{ backgroundColor: "rgb(255, 237, 146)" }} className="text-warning-emphasis border-bottom">
+              <tr className="text-dark small uppercase fw-bold align-middle">
+                <th className="py-3 px-3" style={{ width: "15%", backgroundColor: "inherit" }}>Claim ID</th>
+                <th className="py-3" style={{ width: "25%", backgroundColor: "inherit" }}>Claimed Amount</th>
+                <th className="py-3" style={{ width: "18%", backgroundColor: "inherit" }}>Accident Date</th>
+                <th className="py-3 text-center" style={{ width: "14%", backgroundColor: "inherit" }}>Status</th>
+                <th className="py-3 text-center" style={{ width: "14%", backgroundColor: "inherit" }}>Risk Level</th>
+                <th className="py-3 text-center" style={{ width: "14%", backgroundColor: "inherit" }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.length > 0 ? (
-                currentItems.map((claim, index) => (
-                  <tr key={index} className="border-bottom-0">
-                    <td className="py-3 px-3 fw-bold text-dark small">{claim.id}</td>
-                    <td className="py-3 text-dark small fw-semibold">{claim.name}</td>
-                    <td className="py-3 text-secondary small">{claim.date}</td>
-                    <td className="py-3 text-center">
-                      <span className={`badge ${claim.badgeClass} px-3 py-2 border rounded-pill fw-semibold`} style={{ minWidth: "95px", fontSize: "0.8rem" }}>
-                        {claim.status}
-                      </span>
-                    </td>
-                    <td className="py-3 text-center">
-                      <span className={`fw-bold small ${claim.riskClass}`}>{claim.risk}</span>
-                    </td>
-                    <td className="py-3 text-center">
-                      <button className="btn btn-sm btn-light border rounded-circle text-secondary p-2" style={{ width: "35px", height: "35px" }}>
-                        <FontAwesomeIcon icon={faEye} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                currentItems.map((claim, index) => {
+                  const config = getBadgeConfig(claim.status);
+                  return (
+                    <tr key={claim.id || index} className="border-bottom">
+                      <td className="py-3 px-3 fw-bold text-primary small">CLM{String(claim.id).padStart(4, '0')}</td>
+                      <td className="py-3 text-dark small fw-bold">
+                        {claim.amount ? `${Number(claim.amount).toLocaleString()} MMK` : '0 MMK'}
+                      </td>
+                      <td className="py-3 text-secondary small">
+                        {claim.date ? new Date(claim.date).toLocaleDateString('en-GB') : '-'}
+                      </td>
+                      <td className="py-3 text-center">
+                        <span className={`badge ${config.badge} px-3 py-2 border rounded-pill fw-semibold`} style={{ minWidth: "95px", fontSize: "0.8rem" }}>
+                          {claim.status}
+                        </span>
+                      </td>
+                      <td className="py-3 text-center">
+                        <span className={`fw-bold small ${config.riskClass}`}>{config.risk}</span>
+                      </td>
+                      <td className="py-3 text-center">
+                        <button className="btn btn-sm btn-light border rounded-circle text-secondary p-2" style={{ width: "35px", height: "35px",backgroundColor: "rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important"  }}>
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-5 text-muted small">No data found matching your search.</td>
+                  <td colSpan="6" className="text-center py-5 text-muted small">No data found matching your selection.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* 💡 အလုပ်လုပ်သော Pagination အပိုင်း */}
-        {filteredClaims.length > 0 && (
-          <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <span className="text-muted small">
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredClaims.length)} of {filteredClaims.length} entries
-            </span>
-            <nav>
-              <ul className="pagination pagination-sm m-0">
-                {/* ‹ မြှားခလုတ် (Previous) */}
-                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button 
-                    className="page-link rounded-start-pill px-3" 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    ‹
-                  </button>
-                </li>
+        {/* Pagination Buttons */}
+        <div className="d-flex justify-content-center mt-4">
+          <button
+            className="btn btn-sm btn-outline-warning me-2 fw-semibold px-3 rounded-pill shadow-sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(prev => prev - 1)}
+          >
+            Prev
+          </button>
 
-                {/* စာမျက်နှာနံပါတ်များ (1, 2, 3) */}
-                {pageNumbers.map(number => (
-                  <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                    <button 
-                      className={`page-link px-3 ${currentPage === number ? 'bg-warning text-dark border-warning fw-bold' : 'text-secondary'}`}
-                      onClick={() => setCurrentPage(number)}
-                    >
-                      {number}
-                    </button>
-                  </li>
-                ))}
+          <span className="px-3 py-1 small fw-semibold align-self-center text-secondary">
+            Page {currentPage} of {totalPages}
+          </span>
 
-                {/* › မြှားခလုတ် (Next) */}
-                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <button 
-                    className="page-link rounded-end-pill px-3" 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    ›
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        )}
-
+          <button
+            className="btn btn-sm btn-outline-warning ms-2 fw-semibold px-3 rounded-pill shadow-sm"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -155,7 +155,7 @@ const navigate = useNavigate();
     <>
       <li className="mb-2">
         <NavLink
-          to="/Admin/ClaimDetailApproved"
+          to="/Admin/AdminDashboard"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -175,7 +175,7 @@ const navigate = useNavigate();
 
       <li className="mb-2">
         <NavLink
-          to="/Admin/ClaimDetailApproved"
+          to="/Admin/AllClaims"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
