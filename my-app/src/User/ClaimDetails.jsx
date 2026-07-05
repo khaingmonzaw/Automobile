@@ -61,7 +61,7 @@ function ClaimDetails() {
 
                                         <tr>
                                             <th>Claim Date</th>
-                                            <td>{claim.created_at}</td>
+                                            <td>{claim.created_at.split("T")[0]}</td>
                                         </tr>
 
 
@@ -80,7 +80,12 @@ function ClaimDetails() {
 
                                         <tr>
                                             <th>Accident Date</th>
-                                            <td>{claim.accident_date}</td>
+                                            <td>{claim.accident_date.split("T")[0] }</td>
+                                        </tr>
+
+                                          <tr>
+                                            <th>Accident Location</th>
+                                            <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>{claim.location}</td>
                                         </tr>
 
                                         <tr>

@@ -155,7 +155,11 @@ const navigate = useNavigate();
     <>
       <li className="mb-2">
         <NavLink
+<<<<<<< HEAD
           to="/Admin/AdminDashboard"
+=======
+          to="/User/Dashboard"
+>>>>>>> ac60189c7985917f71a68e2e8393866a8ae6231f
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -174,6 +178,7 @@ const navigate = useNavigate();
       </li>
 
       <li className="mb-2">
+<<<<<<< HEAD
         <NavLink
           to="/Admin/AllClaims"
           className={({ isActive }) =>
@@ -192,27 +197,47 @@ const navigate = useNavigate();
           )}
         </NavLink>
       </li>
+=======
+  <NavLink
+    to="/admin/claims" 
+    className={({ isActive }) =>
+      `d-block p-3 rounded text-decoration-none ${
+        isActive ? "bg-warning text-white" : "text-dark"
+      }`
+    }
+  >
+    {collapsed ? (
+      <FontAwesomeIcon icon={faSackDollar} />
+    ) : (
+      <>
+        <FontAwesomeIcon icon={faSackDollar} className="me-3" />
+        Claims
+      </>
+    )}
+  </NavLink>
+</li>
+>>>>>>> ac60189c7985917f71a68e2e8393866a8ae6231f
 
-  
-
-      <li className="mb-2">
-        <NavLink
-          to="/Admin/ClaimDetailApproved"
-          className={({ isActive }) =>
-            `d-block p-3 rounded text-decoration-none ${
-              isActive ? "bg-warning text-white" : "text-dark"
-            }`
-          }
-        >
-          {collapsed ? (
-            <FontAwesomeIcon icon={faUsers} />
-          ) : (
-            <>
-              <FontAwesomeIcon icon={faUsers} className="me-3" />
-              Users
-            </>
-          )}
-        </NavLink>
+{/* ❌ အဟောင်း: /Admin/ClaimListExample သို့သွားထားသည် */}
+{/* 💡 ပြင်ရန်: Users နှိပ်လျှင်လည်း ClaimListexample သို့မဟုတ် သက်ဆိုင်ရာ လမ်းကြောင်းမှန်ဆီသွားရန် */}
+<li className="mb-2">
+  <NavLink
+    to="/admin/users" 
+    className={({ isActive }) =>
+      `d-block p-3 rounded text-decoration-none ${
+        isActive ? "bg-warning text-white" : "text-dark"
+      }`
+    }
+  >
+    {collapsed ? (
+      <FontAwesomeIcon icon={faUsers} />
+    ) : (
+      <>
+        <FontAwesomeIcon icon={faUsers} className="me-3" />
+        Users
+      </>
+    )}
+  </NavLink>
       </li>
 
 

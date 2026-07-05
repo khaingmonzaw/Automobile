@@ -16,14 +16,12 @@ const db = mysql.createConnection({
   database: "auto_assurance_db",
 });
 
-//"Added this for new coverage"
-const coverageRouter = require("./Admin/NewCoverage"); 
-app.use(coverageRouter);
-//"Added this for coverage types"
+const newCoverageRouter = require("./Admin/NewCoverage");
 const coverageTypesRouter = require("./Admin/CoverageTypes");
-app.use(coverageTypesRouter);
-//"Added this for coverage update"
 const coverageUpdateRouter = require("./Admin/CoverageUpdate");
+
+app.use(newCoverageRouter);
+app.use(coverageTypesRouter);
 app.use(coverageUpdateRouter);
 
 // Login API
@@ -226,6 +224,20 @@ WHERE c.claim_id = ?;
     res.json(result[0]);
   });
 });
+
+
+//Admin Cliaim
+app.get("/api/claims",(req,res)=>{
+  const sql=
+  `select * from claims`;
+
+  db.query(sql,(err,result)=>{
+   return res.status(500).json(err);
+    if (result.length === 0) return res.status(404).json({ message: "Not found" });
+
+    res.json(result[0]);
+  });
+})
 // Add Claim API
 // app.post('/api/add-claim', (req, res) => {
 //   console.log("Frontend မှ ရရှိသော Data:", req.body);

@@ -103,7 +103,7 @@ function Dashboard() {
 
 
                                     <td>CLM-{c.claim_id}</td>
-                                    <td>{c.accident_date}</td>
+                                    <td>{c.accident_date.split("T")[0]}</td>
                                     <td>{c.status}</td>
                                     <td>{c.claimed_amount}</td>
                                 </tr>

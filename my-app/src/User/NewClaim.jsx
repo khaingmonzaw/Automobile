@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import LocationMap from "../components/LocationMap";
 
 function NewClaim() {
 
@@ -11,6 +12,11 @@ function NewClaim() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [coverages, setCoverages] = useState([]);
+    const [submit, setSubmit] = useState(false);
+    const [mapPosition, setMapPosition] = useState({
+    lat: 16.8409,
+    lng: 96.1735
+});
 
     // ================= ADDED: formData now includes vehicle_id =================
     const [formData, setFormData] = useState({
@@ -86,7 +92,15 @@ function NewClaim() {
 
     // ================= SUBMIT (FIXED async) =================
     const saveSubmit = async (e) => {
+
         e.preventDefault();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const accidentDate = new Date(formData.accidentDate);
+        accidentDate.setHours(0, 0, 0, 0);
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setDate(today.getDate() - 5);
+
 
 
         const newErrors = {};
@@ -96,6 +110,11 @@ function NewClaim() {
 
         if (!formData.accidentDate) {
             newErrors.accidentDate = "*Accident Date is required.";
+        } else if (accidentDate > today) {
+            newErrors.accidentDate = "*Accident Date cannot be in the future.";
+        } else if (accidentDate < fiveDaysAgo) {
+            newErrors.accidentDate =
+                "*Claim must be submitted within 5 days of the accident date.";
         }
 
 
@@ -108,6 +127,8 @@ function NewClaim() {
 
         if (!formData.claimAmount) {
             newErrors.claimAmount = "*Claim amount is required.";
+        } else if (isNaN(formData.claimAmount) || Number(formData.claimAmount) <= 0) {
+            newErrors.claimAmount = "*Claim amount must be greater than 0.";
         }
 
         if (!formData.location) {
@@ -125,67 +146,46 @@ function NewClaim() {
             return;
         }
 
-        const payload = {
-            user_id: userId,
-            policy_id: selectedPolicy?.policy_id,
-            accident_type: formData.accidentType,
-            accident_date: formData.accidentDate,
-            claimed_amount: formData.claimAmount,
-            location: formData.location,
-            description: formData.description,
-            remark: "",
-            status: "PENDING",
-            approved_staff: null,
-            compensation_amount: 0
-        };
+         const confirmSubmit=window.confirm("Do You want to submit this claim?"
+            );
+            if (!confirmSubmit) return ;
+            setSubmit(true);
+        try {
 
-        const res = await fetch("http://localhost:3000/api/claims", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
+            const payload = {
+                user_id: userId,
+                policy_id: selectedPolicy?.policy_id,
+                accident_type: formData.accidentType,
+                accident_date: formData.accidentDate,
+                claimed_amount: formData.claimAmount,
+                location: formData.location,
+                description: formData.description,
+                remark: "",
+                status: "PENDING",
+                approved_staff: null,
+                compensation_amount: 0
+            };
 
-        const data = await res.json();
-        alert(data.message);
-        handleReset();
+           
+            const res = await fetch("http://localhost:3000/api/claims", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
 
-    };
-
-    // ================= LOCATION =================
-    const getLocation = () => {
-        if (!navigator.geolocation) {
-            alert("Geolocation not found");
-            return;
+            const data = await res.json();
+            alert(data.message);
+            handleReset();
+        } catch (err) {
+            alert("Faied to submit claim");
+        } finally {
+            setSubmit(false);
         }
 
-        setLoading(true);
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                try {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    const respone = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-                    );
-
-                    const data = await respone.json();
-
-                    setFormData((prev) => ({
-                        ...prev,
-                        location: data.display_name || ""
-                    }));
-                } catch (error) {
-                    alert("Failed to fetch Location");
-                } finally {
-                    setLoading(false);
-                }
-            },
-            () => setLoading(false)
-        );
     };
+
 
     return (
         <div>
@@ -291,8 +291,9 @@ function NewClaim() {
                                 name="accidentDate"
                                 value={formData.accidentDate}
                                 onChange={handleData}
+                                max={new Date().toISOString().split("T")[0]}
                                 className={`form-control ${errors.accidentDate ? "is-invalid" : ""}`}
-                            />
+                            />window .load want to ask confir msubmtit this form
                             {errors.accidentDate && (
                                 <small className="text-danger">
                                     {errors.accidentDate}
@@ -347,7 +348,7 @@ function NewClaim() {
                             <label>Location</label>
 
                             <div className="row">
-                                <div className="col-9">
+                                <div className="">
                                     <input
                                         type="text"
                                         className={`form-control ${errors.location ? "is-invalid" : ""}`}
@@ -362,19 +363,20 @@ function NewClaim() {
                                     )}
                                 </div>
 
-                                <div className="col-3">
-                                    <button
-                                        type="button"
-                                        className="btn btn-warning btn-sm"
-                                        onClick={getLocation}
-                                        disabled={loading}
-                                    >
-                                        <FontAwesomeIcon icon={faMagnifyingGlass} />
-                                    </button>
-                                </div>
+                               
                             </div>
                         </div>
 
+
+<div className="mb-4">
+    <label>Pick Accident Location on Map</label>
+
+    <LocationMap
+        position={mapPosition}
+        setPosition={setMapPosition}
+        setFormData={setFormData}
+    />
+</div>
                     </div>
 
                     <div className="col-md-6">
@@ -387,7 +389,9 @@ function NewClaim() {
                                 name="description"
                                 value={formData.description}
                                 onChange={handleData}
+                            
                             />
+                           
                             {errors.description && (
                                 <small className="text-danger">
                                     {errors.description}
@@ -397,8 +401,8 @@ function NewClaim() {
 
                     </div>
                     <div className="d-flex justify-content-center gap-3">
-                        <button className="btn btn-warning" type="submit">
-                            Submit
+                        <button className="btn btn-warning" type="submit" disabled={submit}>
+                            {submit ? "Submitting" : "Submit"}
                         </button>
                         <button className="btn btn-danger" type="button" onClick={handleReset}>
                             Reset

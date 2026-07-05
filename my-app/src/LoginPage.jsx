@@ -114,11 +114,14 @@ function LoginPage() {
             <input
               type="email"
               name="email"
-              className="form-control border border-1"
+              className={`form-control   ${errors.email ? "is-invalid" : ""} border border-1`}
               placeholder="Enter your email"
               onChange={handleChange}
               value={formData.email}
             />
+
+
+            
             <div className=" text-start"> {errors.email && (
               <small className="text-danger text-start">{errors.email}</small>
             )}</div>
@@ -142,7 +145,7 @@ function LoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className="form-control"
+                  className={`form-control ${errors.password ? "is-invalid" : ""}`}
                   placeholder="Enter your password"
                   onChange={handleChange}
                   value={formData.password}
