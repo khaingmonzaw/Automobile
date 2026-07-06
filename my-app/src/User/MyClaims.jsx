@@ -112,9 +112,7 @@ function MyClaims() {
                     <td>{c.accident_date ? new Date(c.accident_date).toISOString().split("T")[0] : "-"}</td>
                     <td>{c.status}</td>
                     <td>{c.claimed_amount}</td>
-                    <td> {c.description.length > 10
-                      ? c.description.substring(0, 10) + "..."
-                      : c.description}</td>
+                    <td> {c.description}</td>
                     <td>
                       <Link to={`../MyClaims/ClaimDetails/${c.claim_id}`}>
                         <button className="btn btn-warning">

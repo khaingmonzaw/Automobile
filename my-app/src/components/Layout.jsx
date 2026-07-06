@@ -155,7 +155,7 @@ const navigate = useNavigate();
     <>
       <li className="mb-2">
         <NavLink
-          to="/User/Dashboard"
+          to="/Admin/AdminDashboard"
           className={({ isActive }) =>
             `d-block p-3 rounded text-decoration-none ${
               isActive ? "bg-warning text-white" : "text-dark"
@@ -174,6 +174,25 @@ const navigate = useNavigate();
       </li>
 
       <li className="mb-2">
+        <NavLink
+          to="/Admin/AllClaims"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faSackDollar} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faSackDollar} className="me-3" />
+              Claims
+            </>
+          )}
+        </NavLink>
+      </li>
+        <li className="mb-2">
   <NavLink
     to="/admin/claims" 
     className={({ isActive }) =>
@@ -197,7 +216,7 @@ const navigate = useNavigate();
 {/* 💡 ပြင်ရန်: Users နှိပ်လျှင်လည်း ClaimListexample သို့မဟုတ် သက်ဆိုင်ရာ လမ်းကြောင်းမှန်ဆီသွားရန် */}
 <li className="mb-2">
   <NavLink
-    to="/admin/users" 
+    to="" 
     className={({ isActive }) =>
       `d-block p-3 rounded text-decoration-none ${
         isActive ? "bg-warning text-white" : "text-dark"

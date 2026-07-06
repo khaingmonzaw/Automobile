@@ -18,9 +18,8 @@ function Login(props) {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         alert('Login Successful!');
-        
-        // 2. ဒီနေရာမှာ props.onLoginSuccess ကို ခေါ်ရပါမယ်
-        props.onLoginSuccess(role); 
+        props.onLoginSuccess(role);
+       
       } else {
         alert(data.message || 'Login Failed');
       }
