@@ -66,7 +66,7 @@ app.get("/api/policies/:userId", (req, res) => {
 
   const updateSql = `
   
-  update policies set status = "inactive "where end_date < CURDATE() and status="active";
+  update policies set status = "inactive" where end_date < CURDATE() and status="active";
   
   `;
 
@@ -243,10 +243,12 @@ app.get("/api/claims",(req,res)=>{
   `select * from claims`;
 
   db.query(sql,(err,result)=>{
-   return res.status(500).json(err);
+    if (err) {
+      return res.status(500).json(err);
+    }
     if (result.length === 0) return res.status(404).json({ message: "Not found" });
 
-    res.json(result[0]);
+    res.json(result);
   });
 })
 // Add Claim API
