@@ -2,24 +2,40 @@ import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket, faCircleUser, faSackDollar, faHandHoldingDollar, faFileInvoiceDollar, faHouseChimney } from "@fortawesome/free-solid-svg-icons";
+import {
+  faRightFromBracket,
+  faCircleUser,
+  faSackDollar,
+  faFileInvoiceDollar,
+  faHouseChimney,
+  faUsers,
+  faShieldHalved
+} from "@fortawesome/free-solid-svg-icons";
 function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
 const navigate = useNavigate();
   const user=JSON.parse(localStorage.getItem('user'));
-  const sidebarWidth = collapsed ? "80px" : "230px";
- 
+  const sidebarWidth = collapsed ? "90px" : "230px";
+
   const handleClick=(e)=>{
     e.preventDefault();
     const confirmLogout=window.confirm("Do You want to Logout");
     if(confirmLogout){
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-       navigate("/LoginPage");
+      navigate('/LoginPage');
     }
- 
+
   }
+
+  const handleChangePassword = () => {
+  if (user?.role === "admin") {
+    navigate("/Admin/PasswordChangeAdmin");
+  } else {
+    navigate("/User/PasswordChangeUser");
+  }
+};
   return (
     <div className="d-flex ">
  
@@ -31,7 +47,7 @@ const navigate = useNavigate();
           height: "100vh",
           top: 0,
           left: 0,
- 
+
         }}
       >
         <div className="p-3 text-center border-bottom ">
@@ -42,73 +58,188 @@ const navigate = useNavigate();
             ☰
           </button>
         </div>
- 
-        <ul className="list-unstyled p-3">
- 
-          <li className="mb-2">
-            <NavLink
-              to="/User/Dashboard"
-              className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
-                }`
- 
-              }
-            >
-              {collapsed ? <FontAwesomeIcon icon={faHouseChimney} /> :
- 
-                <><FontAwesomeIcon icon={faHouseChimney} className="me-3" />Dashboard</>
- 
-              }
-            </NavLink>
-          </li>
- 
-          <li className="mb-2">
-            <NavLink
-              to="/User/NewClaim"
-              className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
-                }`
-              }
-            >
-              {collapsed ? <FontAwesomeIcon icon={faSackDollar} /> :
-                <><FontAwesomeIcon icon={faSackDollar} className="me-3" /> New Claim</>
-              }
-            </NavLink>
-          </li>
- 
-          <li className="mb-2">
-            <NavLink
-              to="/User/MyClaims"
-              className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
-                }`
-              }
-            >
-              {collapsed ? <FontAwesomeIcon icon={faFileInvoiceDollar} /> :
- 
-                <><FontAwesomeIcon icon={faFileInvoiceDollar} className="me-3" />All Claims
-                </>
-              }
-            </NavLink>
-          </li>
- 
-          <li className="mb-2">
-            <NavLink
-              to="/LoginPage"
-              className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
-                }`
-              }
-            >
-              {collapsed ? <FontAwesomeIcon icon={faCircleUser} /> : <><FontAwesomeIcon icon={faCircleUser} className="me-3" />Profile</>}
-            </NavLink>
-          </li>
- 
- 
- 
- 
-        </ul>
- 
+
+         <ul className="list-unstyled p-3">
+
+  {user?.role === "user" && (
+    <>
+      <li className="mb-2">
+        <NavLink
+          to="/User/Dashboard"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faHouseChimney} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faHouseChimney} className="me-3" />
+              Dashboard
+            </>
+          )}
+        </NavLink>
+      </li>
+
+      <li className="mb-2">
+        <NavLink
+          to="/User/NewClaim"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faSackDollar} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faSackDollar} className="me-3" />
+              New Claim
+            </>
+          )}
+        </NavLink>
+      </li>
+
+      <li className="mb-2">
+        <NavLink
+          to="/User/MyClaims"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faFileInvoiceDollar} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faFileInvoiceDollar} className="me-3" />
+              All Claims
+            </>
+          )}
+        </NavLink>
+      </li>
+
+      <li className="mb-2">
+        <NavLink
+          to="/User/Profile"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faCircleUser} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faCircleUser} className="me-3" />
+              Profile
+            </>
+          )}
+        </NavLink>
+      </li>
+    </>
+  )}
+
+</ul>
+
+
+
+<ul className="list-unstyled p-3">
+
+  {user?.role === "admin" && (
+    <>
+      <li className="mb-2">
+        <NavLink
+          to="/User/Dashboard"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faHouseChimney} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faHouseChimney} className="me-3" />
+              Dashboard
+            </>
+          )}
+        </NavLink>
+      </li>
+
+      <li className="mb-2">
+  <NavLink
+    to="/admin/claims" 
+    className={({ isActive }) =>
+      `d-block p-3 rounded text-decoration-none ${
+        isActive ? "bg-warning text-white" : "text-dark"
+      }`
+    }
+  >
+    {collapsed ? (
+      <FontAwesomeIcon icon={faSackDollar} />
+    ) : (
+      <>
+        <FontAwesomeIcon icon={faSackDollar} className="me-3" />
+        Claims
+      </>
+    )}
+  </NavLink>
+</li>
+
+{/* ❌ အဟောင်း: /Admin/ClaimListExample သို့သွားထားသည် */}
+{/* 💡 ပြင်ရန်: Users နှိပ်လျှင်လည်း ClaimListexample သို့မဟုတ် သက်ဆိုင်ရာ လမ်းကြောင်းမှန်ဆီသွားရန် */}
+<li className="mb-2">
+  <NavLink
+    to="/Admin/users" 
+    className={({ isActive }) =>
+      `d-block p-3 rounded text-decoration-none ${
+        isActive ? "bg-warning text-white" : "text-dark"
+      }`
+    }
+  >
+    {collapsed ? (
+      <FontAwesomeIcon icon={faUsers} />
+    ) : (
+      <>
+        <FontAwesomeIcon icon={faUsers} className="me-3" />
+        Users
+      </>
+    )}
+  </NavLink>
+      </li>
+
+
+        <li className="mb-2">
+        <NavLink
+          to="/Admin/CoverageTypes"
+          className={({ isActive }) =>
+            `d-block p-3 rounded text-decoration-none ${
+              isActive ? "bg-warning text-white" : "text-dark"
+            }`
+          }
+        >
+          {collapsed ? (
+            <FontAwesomeIcon icon={faShieldHalved} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faShieldHalved} className="me-3" />
+              Coverage
+            </>
+          )}
+        </NavLink>
+      </li>
+    </>
+  )}
+
+</ul>
+        
         <ul className="list-unstyled p-3 mt-auto border-top ">
           <li className="mb-2">
             <NavLink
@@ -137,13 +268,13 @@ const navigate = useNavigate();
       >
         {/* Navbar */}
         <nav className="navbar navbar-expand-lg bg-warning shadow-sm px-4 py-3 sticky-top"
- 
- 
+
+
         >
           <div className="d-flex justify-content-between w-100 align-items-center">
             <h3 className="mb-0 fw-bold">AIMS</h3>
- 
- 
+
+
             <div className="dropdown position-relative">
               <button
                 className="btn btn-warning dropdown-toggle"
@@ -151,7 +282,7 @@ const navigate = useNavigate();
               >
                 {user?.name}
               </button>
- 
+
               {open && (
                 <ul className="dropdown-menu show"
                   style={{
@@ -168,13 +299,13 @@ const navigate = useNavigate();
                   </li>
                   <hr />
                   <li>
-                    <button className="dropdown-item">Change Password</button>
+                    <button className="dropdown-item" onClick={handleChangePassword}>Change Password</button>
                   </li>
                 </ul>
               )}
             </div>
           </div>
- 
+
         </nav>
  
         {/* Page Content */}

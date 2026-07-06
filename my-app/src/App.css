@@ -185,3 +185,30 @@
   }
 }
 
+/* for userlist*/
+/* Table Header Color */
+.custom-header th {
+    background-color: #FFECB3 !important; 
+    color: #000 !important;              
+    border-bottom: 2px solid #FFC107;   
+}
+
+
+/* Status Badges */
+.status-badge-active {
+    background-color: #d1fae5; 
+    color: #065f46;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge-inactive {
+    background-color: #fee2e2; 
+    color: #991b1b;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}

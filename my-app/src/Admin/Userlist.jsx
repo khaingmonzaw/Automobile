@@ -45,7 +45,7 @@ function Userlist() {
 </div>
 
       <table className="table table-hover shadow-sm" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
-        <thead style={{ backgroundColor: '#FFC107' }}>
+        <thead className="custom-header">
           <tr>
             <th>User_ID</th>
             <th>User Name</th>

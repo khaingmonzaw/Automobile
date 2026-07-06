@@ -7,7 +7,10 @@ function AddUser() {
   const { id } = useParams();
   const isEditMode = !!id;
   const [errors, setErrors] = useState({});
-
+  const [coverageOptions, setCoverageOptions] = useState([]); // Database မှလာမည့် Coverage များ
+  
+   
+  
   // Consistent yellow border style
   const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
   //validation
@@ -97,14 +100,11 @@ if (!formData.vehicleNumber.trim()) {
   }
 }
 //Policy
-const validatePolicy = (policyNumber, usedPolicies) => {
-const policyValue = policyNumber.trim().toUpperCase();
-if (!policyValue) {
-    newErrors.policyNumber = "Policy number is required";
-  }
-if (!policyRegex.test(policyValue)) {
+  if (!formData.policyNumber.trim()) {
+    newErrors.policyNumber= "Policy Number is required";
+  } else if (!policyRegex.test(formData.policyNumber)) {
     newErrors.policyNumber = "Invalid format! Example: POL-0001";
-  } /*else {
+  }/*else {
     ၂။ Database ထဲမှာ ရှိ/မရှိ စစ်ဆေးခြင်း
     try {
       const response = await fetch(`/api/check-policy?number=${policyValue}`);
@@ -118,56 +118,116 @@ if (!policyRegex.test(policyValue)) {
       newErrors.policyNumber = "Error checking policy. Please try again.";
     }
   }*/
-}
+
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
-
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     fullName: "", email: "", phone: "", dob: "", nrcState: "", 
     nrcTownship: "", nrcType: "N", nrcNumber: "", address: "", 
     driverLicense: "", drivingYear: "", vehicleModel: "", 
     vehicleNumber: "", modelYear: "", policyNumber: "", 
     coverage: [], startDate: "", endDate: "", coverageLimit: ""
   });
-
+ 
+ // Fetch coverage options
+  useEffect(() => {
+    fetch("http://localhost:3000/api/coverage_types")
+      .then(res => res.json())
+      .then(data => setCoverageOptions(data))
+      .catch(err => console.error("Error fetching coverage:", err));
+  }, []);
   useEffect(() => {
     if (isEditMode) {
-      setFormData({
-        fullName: "Tia Bett", email: "tiabett@gmail.com", phone: "09123456789",
-        dob: "1995-05-15", nrcState: "12", nrcTownship: "LAGANA", nrcType: "N", 
-        nrcNumber: "123456", address: "Yangon", driverLicense: "DL-123", 
-        drivingYear: "2023", vehicleModel: "Honda Fit", vehicleNumber: "3P-8452", 
-        modelYear: "2020", policyNumber: "PLC001", coverage: ["Third Party"], 
-        startDate: "2023-12-01", endDate: "2025-12-01", coverageLimit: "5000000"
-      });
+      fetch(`http://localhost:3000/api/users/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        // NRC Parsing
+          let nrcS = "", nrcT = "", nrcTy = "N", nrcN = "";
+          if (data.nrc) {
+            const match = data.nrc.match(/(\d+)\/([a-zA-Z]+)\(([A-Z])\)(\d+)/);
+            if (match) { [nrcS, nrcT, nrcTy, nrcN] = [match[1], match[2], match[3], match[4]]; }
+          }
+        // Map the database response to your formData state
+        setFormData({
+            fullName: data.name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+            dob: data.dob ? data.dob.split('T')[0] : "",
+           nrcState: nrcS,
+            nrcTownship: nrcT,
+            nrcType: nrcTy,
+            nrcNumber: nrcN,
+            address: data.address || "",
+            driverLicense: data.driver_license || "",
+            drivingYear: data.driver_year || "",
+            vehicleModel: data.vehicleModel || "",
+            vehicleNumber: data.vehicleNumber || "",
+            modelYear: data.model_year || "",
+            policyNumber: data.policyNumber || "",
+            coverage: data.coverage ? data.coverage.split(',').map(Number) : [],
+            startDate: data.startDate ? data.startDate.split('T')[0] : "",
+            endDate: data.endDate ? data.endDate.split('T')[0] : "",
+            coverageLimit: data.coverageLimit || ""
+          });
+      })
+      .catch((err) => console.error("Error fetching user for edit:", err));
     }
-  }, [isEditMode, id]);
-
+   } , [isEditMode, id]);
   const states = mmNrc.getNrcStates();
   const types = mmNrc.getNrcTypes();
   const allTownships = mmNrc.getNrcTownships();
   const townships = formData.nrcState ? mmNrc.getNrcTownshipsByStateId(formData.nrcState) : allTownships;
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-    const handleSave = () => {
-    if (validate()) {
-      alert("Form saved successfully!");
-      // ဒီနေရာမှာ API call သို့မဟုတ် data သိမ်းမည့် function ကို ထည့်ပါ
-    }
-  };
-  const handleCheckboxChange = (type) => {
+  const handleCheckboxChange = (id) => {
     setFormData(prev => {
-      const coverage = prev.coverage.includes(type) 
-        ? prev.coverage.filter(c => c !== type) 
-        : [...prev.coverage, type];
+      const coverage = prev.coverage.includes(id) 
+        ? prev.coverage.filter(c => c !== id) 
+        : [...prev.coverage, id];
       return { ...prev, coverage };
     });
   };
-
+   const handleSave = async () => {
+  if (validate()) {
+    if (formData.coverage.length === 0) {
+        alert("Please select at least one coverage type.");
+        return;
+      }
+      const fullNrc = `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`;   
+    const dataToSend = {
+      ...formData,
+      nrc: fullNrc 
+    };
+    const url = isEditMode ? `http://localhost:3000/api/update-user/${id}` : "http://localhost:3000/api/add-user";
+    const method = isEditMode ? "PUT" : "POST";
+    try {
+     
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+       const result = await response.json();
+      if (response.ok) {
+        alert("Success");
+        navigate('/Admin/Users'); //  List page 
+      } else {
+        const errorData = await response.json().catch(() => ({ message: "Unknown Server Error" }));
+        alert("Error: " + (result.message || "Failed to save"));
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Connection Error to Sever");
+    }
+  }
+};
   const renderRow = (label, input , error) => (
     <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
       <label className="col-sm-4 col-form-label fw-bold text-dark" style={{ textAlign: 'left' }}>{label}</label>
@@ -252,13 +312,18 @@ if (!policyRegex.test(policyValue)) {
           <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
             <label className="col-sm-4 col-form-label fw-bold">Coverage Type</label>
             <div className="col-sm-8 d-flex flex-column align-items-start">
-              {["Third Party", "Comprehensive", "Fire"].map((type) => (
-                <div className="form-check" key={type}>
-                  <input className="form-check-input" type="checkbox" checked={formData.coverage.includes(type)} onChange={() => handleCheckboxChange(type)} style={inputStyle} />
-                  <label className="form-check-label">{type}</label>
-                </div>
-              ))}
-            </div>
+              {coverageOptions.map((item) => (
+    <div className="form-check" key={item.coverage_type_id}>
+      <input 
+        className="form-check-input" 
+        type="checkbox" 
+        checked={formData.coverage.includes(item.coverage_type_id)} 
+        onChange={() => handleCheckboxChange(item.coverage_type_id)} 
+      />
+      <label className="form-check-label">{item.coverage_type}</label>
+    </div>
+  ))}
+</div>
           </div>
 
           {renderRow("Start Date", <input name="startDate" type="date" value={formData.startDate} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}

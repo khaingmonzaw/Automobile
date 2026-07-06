@@ -47,6 +47,11 @@ function UserDetail() {
           <tr><td style={{ fontWeight: "bold" }}>User Name</td><td>:</td><td>{user.name}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Email</td><td>:</td><td>{user.email}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Phone</td><td>:</td><td>{user.phone}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Date of Birth</td><td>:</td><td>{user.dob}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Driver License</td><td>:</td><td>{user.driver_license}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Driving Year</td><td>:</td><td>{user.driver_year}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>NRC</td><td>:</td><td>{user.nrc}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>Address</td><td>:</td><td>{user.address}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Policy Number</td><td>:</td><td>{user.policyNumber || "-"}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Coverage Type</td><td>:</td><td>{user.coverageType || "-"}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Vehicle Model</td><td>:</td><td>{user.vehicleModel || "-"}</td></tr>
