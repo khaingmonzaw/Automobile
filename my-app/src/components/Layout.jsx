@@ -192,7 +192,7 @@ const navigate = useNavigate();
           )}
         </NavLink>
       </li>
-        <li className="mb-2">
+        {/* <li className="mb-2">
   <NavLink
     to="/admin/claims" 
     className={({ isActive }) =>
@@ -210,13 +210,12 @@ const navigate = useNavigate();
       </>
     )}
   </NavLink>
-</li>
+</li> */}
 
 {/* ❌ အဟောင်း: /Admin/ClaimListExample သို့သွားထားသည် */}
-{/* 💡 ပြင်ရန်: Users နှိပ်လျှင်လည်း ClaimListexample သို့မဟုတ် သက်ဆိုင်ရာ လမ်းကြောင်းမှန်ဆီသွားရန် */}
 <li className="mb-2">
   <NavLink
-    to="" 
+    to="/Admin/Users" 
     className={({ isActive }) =>
       `d-block p-3 rounded text-decoration-none ${
         isActive ? "bg-warning text-white" : "text-dark"

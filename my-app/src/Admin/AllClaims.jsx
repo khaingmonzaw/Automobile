@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faEye } from "@fortawesome/free-solid-svg-icons";
+import { Link } from 'react-router-dom';
 
 const AllClaims = () => {
   // State Variables သတ်မှတ်ခြင်း
@@ -147,11 +148,13 @@ const AllClaims = () => {
                       <td className="py-3 text-center">
                         <span className={`fw-bold small ${config.riskClass}`}>{config.risk}</span>
                       </td>
-                      <td className="py-3 text-center">
-                        <button className="btn btn-warning border text-dark " >
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                      </td>
+                   <td className="py-3 text-center">
+  <Link to={`/Admin/ClaimStatusAction/${claim.id}`}>
+    <button className="btn btn-warning border text-dark">
+      <FontAwesomeIcon icon={faEye} />
+    </button>
+  </Link>
+</td>
                     </tr>
                   );
                 })

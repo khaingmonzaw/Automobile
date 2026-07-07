@@ -13,14 +13,15 @@ import AdminDashboard from './Admin/AdminDashboard.jsx';
 import AllClaims from './Admin/AllClaims.jsx';
 import Profile from './User/Profile.jsx';
 
-import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
+// import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
 import CoverageTypes from './Admin/CoverageTypes.jsx';
 import NewCoverage from './Admin/NewCoverage.jsx';
 import CoverageUpdate from './Admin/CoverageUpdate.jsx';
 
-import ClaimDetailApproved from './Admin/ClaimDetailApproved'
+// import ClaimDetailApproved from './Admin/ClaimDetailApproved'
 import PasswordChangeUser from './User/PasswordChangeUser.jsx';
 import PasswordChangeAdmin from './Admin/PasswordChangeAdmin.jsx';
+import ClaimStatusAction from './Admin/ClaimStatusAction';
 import Projected from "./Projected.jsx"
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -59,12 +60,14 @@ function App() {
         <Route index element={<Navigate to="ClaimDetailApproved" replace />} />
         <Route path="AdminDashboard" element={<AdminDashboard />} />
         <Route path="AllClaims" element={<AllClaims />} />
-        <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} />
+        {/* <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} /> */}
         <Route path="CoverageTypes" element={<CoverageTypes />} />
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
-        <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
+        {/* <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} /> */}
         <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
+        <Route path="ClaimStatusAction/:id" element={< ClaimStatusAction />} />
+
         {/* <Route path="Adduser" element={<Adduser />} />
         <Route path="Adduser/:id" element={<Adduser />} />
         <Route path="UserDetail/:id" element={<UserDetail />} />

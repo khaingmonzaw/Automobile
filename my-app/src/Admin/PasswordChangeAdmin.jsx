@@ -5,6 +5,7 @@ const PasswordChange = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState({});
 
   // 👁️ Font Awesome Icon တွေကို အဖွင့်/အပိတ် လုပ်ပေးမယ့် State များ
   const [showCurrent, setShowCurrent] = useState(false);
@@ -12,50 +13,70 @@ const PasswordChange = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Handlers
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // ၁။ ပါတ်စ်ဝေါ့အသစ်နှစ်ခု တူ/မတူ စစ်ဆေးခြင်း
-    if (newPassword !== confirmPassword) {
-      alert("New Password နဲ့ Confirm Password မတူပါဘူး။");
-      return;
-    }
+  let newErrors = {};
 
-    // ၂။ Login ဝင်ထားတဲ့ User ရဲ့ အချက်အလက်ကို localStorage ထဲကနေ ယူခြင်း
-    const loggedInUser = JSON.parse(localStorage.getItem("user"));
-    if (!loggedInUser || !loggedInUser.email) {
-      alert("ကျေးဇူးပြု၍ အရင်ဆုံး Login ဝင်ပါ။");
-      return;
-    }
+  if (!currentPassword) {
+    newErrors.currentPassword = "Current password is required";
+  }
 
-    try {
-      // ၃။ Backend API လမ်းကြောင်းဆီသို့ Data လှမ်းပို့ခြင်း
-      const response = await fetch("http://localhost:3000/api/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: loggedInUser.email,       // localStorage ထဲက email ကို ပို့မည်
-          currentPassword: currentPassword, // ရိုက်ထည့်လိုက်သော လက်ရှိ password
-          newPassword: newPassword,         // password အသစ်
-        }),
-      });
+  if (!newPassword) {
+    newErrors.newPassword = "New password is required";
+  }
 
-      const data = await response.json();
+  if (!confirmPassword) {
+    newErrors.confirmPassword = "Confirm password is required";
+  }
 
-      if (response.ok) {
-        alert(data.message); // Database မှာ အောင်မြင်စွာ ပြောင်းလဲပြီးပါက ပြသမည့်စာသား
-        // ၄။ အောင်မြင်သွားလျှင် Input field များကို ရှင်းထုတ်မည်
-        handleCancel();
-      } else {
-        alert(data.message); // Backend မှ ပြန်လာသော Error ပြသခြင်း (ဥပမာ- လက်ရှိ Password မှားနေခြင်း)
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Server နဲ့ ချိတ်ဆက်မှု မအောင်မြင်ပါ (URL သို့မဟုတ် Port မှားနေနိုင်သည်)");
-    }
-  };
+  if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+    newErrors.confirmPassword = "Passwords do not match";
+  }
+
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length > 0) return;
+
+  const loggedInUser = JSON.parse(localStorage.getItem("user"));
+  if (!loggedInUser || !loggedInUser.id) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/api/change-password", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: loggedInUser.id,
+        currentPassword,
+        newPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+  alert(data.message);
+  handleCancel();
+  setErrors({});
+} else {
+  if (data.message === "Current password is incorrect") {
+    setErrors({
+      currentPassword: data.message,
+    });
+  } else {
+    setErrors({
+      form: data.message,
+    });
+  }
+}
+  } catch (error) {
+    console.error(error);
+    alert("Server error");
+  }
+};
 
   const handleCancel = () => {
     setCurrentPassword('');
@@ -79,11 +100,12 @@ const PasswordChange = () => {
             <div className="input-group">
               <input
                 type={showCurrent ? "text" : "password"} 
-                className="form-control form-control-lg bg-light"
+               className={`form-control form-control-lg bg-light ${
+    errors.currentPassword ? "is-invalid" : ""
+  }`}
                 placeholder="**********"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                required
               />
               <span 
                 className="input-group-text bg-light border-start-0 text-secondary" 
@@ -91,8 +113,13 @@ const PasswordChange = () => {
                 onClick={() => setShowCurrent(!showCurrent)} 
               >
                 <i className={showCurrent ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
+
               </span>
+            
             </div>
+              {errors.currentPassword && (
+  <small className="text-danger">{errors.currentPassword}</small>
+)}
           </div>
 
           {/* New Password */}
@@ -101,11 +128,12 @@ const PasswordChange = () => {
             <div className="input-group">
               <input
                 type={showNew ? "text" : "password"}
-                className="form-control form-control-lg bg-light"
+               className={`form-control form-control-lg bg-light ${
+    errors.newPassword ? "is-invalid" : ""
+  }`}
                 placeholder="**********"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                required
               />
               <span 
                 className="input-group-text bg-light border-start-0 text-secondary" 
@@ -114,7 +142,12 @@ const PasswordChange = () => {
               >
                 <i className={showNew ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
               </span>
+            
             </div>
+          
+            {errors.newPassword && (
+  <small className="text-danger">{errors.newPassword}</small>
+)}
           </div>
 
           {/* Confirm Password */}
@@ -123,11 +156,12 @@ const PasswordChange = () => {
             <div className="input-group">
               <input
                 type={showConfirm ? "text" : "password"}
-                className="form-control form-control-lg bg-light"
+                className={`form-control form-control-lg bg-light ${
+    errors.confirmPassword ? "is-invalid" : ""
+  }`}
                 placeholder="**********"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                required
               />
               <span 
                 className="input-group-text bg-light border-start-0 text-secondary" 
@@ -136,7 +170,11 @@ const PasswordChange = () => {
               >
                 <i className={showConfirm ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
               </span>
+              
             </div>
+            {errors.confirmPassword && (
+  <small className="text-danger">{errors.confirmPassword}</small>
+)}
           </div>
 
           {/* Buttons */}

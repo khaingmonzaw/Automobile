@@ -136,67 +136,25 @@ const CoverageTypes = () => {
           </table>
         </div>
 
-        {/* Responsive Wrap-Friendly Bootstrap Pagination Layout Footer Container */}
-        {/* --- UPDATED: MAXIMUM DARKNESS & THICKNESS FOR ARROWS --- */}
-        <div className="d-flex flex-wrap justify-content-center align-items-center gap-2 py-4 px-2 bg-light border-top border-light-subtle">
+        {/* Pagination */}
+        <div className="d-flex justify-content-center my-5">
+
           <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
+          className="btn btn-outline-warning me-2"
+          onClick={()=>setCurrentPage(prev=>prev-1)}
+          >Prev</button>
+
+          <span className='px-3 py-1'>
+
+            Page {currentPage} of {totalPages}
+          </span>
+          <button className="btn btn-outline-warning"
+          disabled={currentPage==totalPages}
+
+          onClick={()=>setCurrentPage(prev=>prev+1)}
           >
-            &lt;&lt;
-          </button>
-          <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center me-2 shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </button>
-          
-          <div className="d-flex flex-wrap gap-2 align-items-center">
-            {Array.from({ length: totalPages }, (_, index) => {
-              const pageNum = index + 1;
-              const isActive = currentPage === pageNum;
-              return (
-                <button 
-                  key={pageNum}
-                  className={isActive ? "btn text-white fw-bold d-flex align-items-center justify-content-center mx-0 shadow-sm" : "btn custom-pag-btn text-dark border fw-semibold d-flex align-items-center justify-content-center mx-0 shadow-sm"} 
-                  style={{ 
-                    fontSize: "16px", 
-                    width: "40px", 
-                    height: "40px", 
-                    borderRadius: "8px",
-                    backgroundColor: isActive ? "#40a9ff" : "#ffffff",
-                    borderColor: isActive ? "#40a9ff" : "#dee2e6",
-                    borderStyle: "solid",
-                    borderWidth: "1px"
-                  }}
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-          </div>
-          
-          <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center ms-2 shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            &gt;
-          </button>
-          <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            &gt;&gt;
+
+            Next
           </button>
         </div>
       </div>
