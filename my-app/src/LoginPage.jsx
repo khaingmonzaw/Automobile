@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-function LoginPage(props) {
+function LoginPage() {
 
   const navigate = useNavigate();
 
@@ -56,7 +56,7 @@ function LoginPage(props) {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         if (data.user.role == "admin") {
-          navigate("../Admin/ClaimDetailApproved")
+          navigate("../Admin/AdminDashboard")
         } else {
           navigate("../User/Dashboard");
         }

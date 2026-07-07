@@ -293,7 +293,7 @@ function NewClaim() {
                                 onChange={handleData}
                                 max={new Date().toISOString().split("T")[0]}
                                 className={`form-control ${errors.accidentDate ? "is-invalid" : ""}`}
-                            />window .load want to ask confir msubmtit this form
+                            />
                             {errors.accidentDate && (
                                 <small className="text-danger">
                                     {errors.accidentDate}
