@@ -406,4 +406,152 @@ app.get("/api/user/profile/:userId", (req, res) => {
     res.json(result[0]); 
   });
 });
+
+
+
+
+//[06/07/2026 13:42] Myoyadanar: 
+
+  //myo's code 
+  // =============================================
+// ✅ GET all claims (ClaimStatusList အတွက်)
+// =============================================
+// app.get('/api/admin/claims', (req, res) => {
+//   const sql = `
+//     SELECT 
+//       claim_id, 
+//       user_id, 
+//       policy_id, 
+//       accident_type, 
+//       accident_date, 
+//       claimed_amount, 
+//       status,
+//       remark
+//     FROM claims
+//   `;
+
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Database error:", err);
+//       return res.status(500).json({ message: "Database Error", error: err });
+//     }
+//     res.status(200).json(results);
+//   });
+// });
+
+// ✅ NEW: Get all claims from the database
+app.get('/api/admin/ClaimStatus/:id', (req, res) => {
+  const claim_id = req.params.id; // 
+  
+  const sql = `
+    SELECT 
+      claim_id, 
+      user_id, 
+      policy_id, 
+      accident_type, 
+      accident_date, 
+      claimed_amount, 
+      status,
+      remark
+    FROM claims
+    WHERE claim_id = ?
+  `;
+//[06/07/2026 13:42] Myoyadanar: 
+db.query(sql, [claim_id], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ message: "Database Error", error: err });
+    }
+    
+   
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Claim not found" });
+    }
+    
+ 
+    res.status(200).json(results[0]);
+  });
+});
+
+// =============================================
+// 2. PUT Update Claim Status (Approve/Reject လုပ်ဖို့)
+// =============================================
+app.put('/api/admin/claims/:id', (req, res) => {
+  const claim_id = req.params.id;
+  const { status, remark } = req.body;
+
+  // Status နဲ့ Remark ကို Update လုပ်မယ်
+  const sql = "UPDATE claims SET status = ?, remark = ? WHERE claim_id = ?";
+  
+  db.query(sql, [status, remark, claim_id], (err, result) => {
+    if (err) {
+      console.error("Update error:", err);
+      return res.status(500).json({ message: "Update failed", error: err });
+    }
+
+    // ဘာ Update မှမဖြစ်ခဲ့ရင် (claim မရှိရင်)
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Claim not found" });
+    }
+
+    res.status(200).json({ 
+      message: 
+      
+    "Claim ${status} successfully",
+      claim_id: claim_id,
+      status: status
+    });
+  });
+});
+//myo's code end
+
+
+// Change Password API
+app.put("/api/change-password", (req, res) => {
+  const { id, currentPassword, newPassword } = req.body;
+
+  if (!id || !currentPassword || !newPassword) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+
+  // Check current password
+  const checkSql =
+    "SELECT * FROM users WHERE id = ? AND password = ?";
+
+  db.query(checkSql, [id, currentPassword], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({
+        message: "Database Error",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(400).json({
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Update password
+    const updateSql =
+      "UPDATE users SET password = ? WHERE id = ?";
+
+    db.query(updateSql, [newPassword, id], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({
+          message: "Failed to update password",
+        });
+      }
+
+      res.json({
+        message: "Password changed successfully",
+      });
+    });
+  });
+});
+
+
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
