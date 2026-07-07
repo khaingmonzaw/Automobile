@@ -361,6 +361,7 @@ app.get('/api/users/:id', (req, res) => {
         v.vehicle_number AS vehicleNumber, 
         v.vehicle_model AS vehicleModel,
         v.model_year,
+        GROUP_CONCAT(ct.coverage_type_id) AS coverageTypeIds,
         GROUP_CONCAT(ct.coverage_type SEPARATOR ', ') AS coverageType,
         GROUP_CONCAT(ct.coverage_limit SEPARATOR ', ') AS coverageLimit
     FROM users u
@@ -383,7 +384,7 @@ app.get('/api/users/:id', (req, res) => {
 });
 //Coverage types
 app.get("/api/coverage_types", (req, res) => {
-    db.query("SELECT coverage_type_id, coverage_type FROM coverage_types WHERE status = 'active'", (err, results) => {
+    db.query("SELECT coverage_type_id, coverage_type, coverage_limit FROM coverage_types WHERE status = 'active'", (err, results) => {
         if (err){
           console.error("Database Error:", err);
          return res.status(500).json(err);
@@ -460,7 +461,7 @@ app.put('/api/update-user/:id', (req, res) => {
         vehicleNumber, vehicleModel, modelYear, 
         policyNumber, startDate, endDate, coverage 
     } = req.body;
-
+    
     // ၁။ User အချက်အလက်များကို Update လုပ်ခြင်း
     const userSql = `UPDATE users SET name=?, phone=?, email=?, nrc=?, address=?, dob=?, driver_license=?, driver_year=? WHERE id=?`;
     db.query(userSql, [fullName, phone, email, nrc, address, dob, driverLicense, drivingYear, userId], (err) => {
@@ -507,4 +508,47 @@ app.put('/api/update-user/:id', (req, res) => {
         });
     });
 });
+// Policy Number တူမတူ စစ်ဆေးရန် API
+/*app.get("/api/check-policy", (req, res) => {
+  const { number } = req.query;
+  const sql = "SELECT COUNT(*) AS count FROM policies WHERE policy_number = ?";
+  
+  db.query(sql, [number], (err, results) => {
+    if (err) return res.status(500).json({ message: "Database Error" });
+    
+    // count > 0 
+    const isUsed = results[0].count > 0;
+    res.json({ isUsed });
+  });
+});*/
+
+app.get("/api/check-duplicate", (req, res) => {
+  const { field, value, userId } = req.query; // userId ကိုပါ ထည့်စစ်မယ်
+
+  const allowedFields = ['email', 'phone', 'nrc', 'driver_license' , 'policy_number', 'vehicle_number'];
+  if (!allowedFields.includes(field)) return res.status(400).json({ message: "Invalid field" });
+
+  let sql = "";
+  let params = [value];
+
+  // Logic: ကိုယ့် ID မဟုတ်တဲ့ တခြား record တွေထဲမှာ ဒီ value ရှိနေလား စစ်မယ်
+  if (field === 'policy_number') {
+      sql = `SELECT COUNT(*) AS count FROM policies WHERE policy_number = ? AND user_id != ?`;
+      params.push(userId || 0); 
+  } else if (field === 'vehicle_number') {
+      // Vehicle တွေမှာ policy_id (သို့) user_id ဆက်စပ်မှုအပေါ်မူတည်ပြီး စစ်ပါ
+      sql = `SELECT COUNT(*) AS count FROM vehicles WHERE vehicle_number = ? AND vehicle_id NOT IN (SELECT vehicle_id FROM policies WHERE user_id = ?)`;
+      params.push(userId || 0);
+  } else {
+      // Users table အတွက်
+      sql = `SELECT COUNT(*) AS count FROM users WHERE ${field} = ? AND id != ?`;
+      params.push(userId || 0);
+  }
+  
+  db.query(sql, params, (err, results) => {
+    if (err) return res.status(500).json({ message: "Database Error" });
+    res.json({ isUsed: results[0].count > 0 });
+  });
+});
+
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));

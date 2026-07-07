@@ -8,11 +8,9 @@ function AddUser() {
   const isEditMode = !!id;
   const [errors, setErrors] = useState({});
   const [coverageOptions, setCoverageOptions] = useState([]); // Database မှလာမည့် Coverage များ
-  
-   
-  
   // Consistent yellow border style
   const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
+  
   //validation
 const validate = () => {
   let newErrors = {};
@@ -22,7 +20,7 @@ const validate = () => {
   const phoneRegex = /^09\d{9}$/;
   const licenseRegex = /^[A-D]\/[A-Z]{2,4}-\d{5,6}$/;
   const vehicleNoRegex = /^[0-9]{1,2}[A-Z]-[0-9]{4,5}$/;
-  const policyRegex = /^POL-\d{4}$/;
+  const policyRegex = /^POL-\d+$/;
   // Full Name 
   if (!formData.fullName.trim()) {
     newErrors.fullName = "Full Name is required";
@@ -129,7 +127,7 @@ const [formData, setFormData] = useState({
     vehicleNumber: "", modelYear: "", policyNumber: "", 
     coverage: [], startDate: "", endDate: "", coverageLimit: ""
   });
- 
+
  // Fetch coverage options
   useEffect(() => {
     fetch("http://localhost:3000/api/coverage_types")
@@ -145,9 +143,12 @@ const [formData, setFormData] = useState({
         // NRC Parsing
           let nrcS = "", nrcT = "", nrcTy = "N", nrcN = "";
           if (data.nrc) {
-            const match = data.nrc.match(/(\d+)\/([a-zA-Z]+)\(([A-Z])\)(\d+)/);
+            const match = data.nrc.match(/([^\/]*)\/([a-zA-Z-]+)\(([a-zA-Z])\)(\d+)/);
             if (match) { [nrcS, nrcT, nrcTy, nrcN] = [match[1], match[2], match[3], match[4]]; }
           }
+          const coverageIds = data.coverageTypeIds 
+        ? data.coverageTypeIds.split(',').map(id => Number(id.trim())) 
+        : [];
         // Map the database response to your formData state
         setFormData({
             fullName: data.name || "",
@@ -165,7 +166,7 @@ const [formData, setFormData] = useState({
             vehicleNumber: data.vehicleNumber || "",
             modelYear: data.model_year || "",
             policyNumber: data.policyNumber || "",
-            coverage: data.coverage ? data.coverage.split(',').map(Number) : [],
+            coverage: coverageIds,
             startDate: data.startDate ? data.startDate.split('T')[0] : "",
             endDate: data.endDate ? data.endDate.split('T')[0] : "",
             coverageLimit: data.coverageLimit || ""
@@ -186,11 +187,48 @@ const [formData, setFormData] = useState({
   };
   const handleCheckboxChange = (id) => {
     setFormData(prev => {
-      const coverage = prev.coverage.includes(id) 
-        ? prev.coverage.filter(c => c !== id) 
-        : [...prev.coverage, id];
-      return { ...prev, coverage };
+      const newCoverage = prev.coverage.includes(id) 
+      ? prev.coverage.filter(c => c !== id) 
+      : [...prev.coverage, id];
+
+    // ၂။ ရွေးထားတဲ့ Coverage အားလုံးအတွက် Limit စုစုပေါင်းကို တွက်ချက်ခြင်း
+    let newTotalLimit = 0;
+    newCoverage.forEach(cId => {
+      const option = coverageOptions.find(o => Number(o.coverage_type_id) === Number(cId));
+      if (option && option.coverage_limit) {
+        newTotalLimit += Number(option.coverage_limit);
+      }
     });
+
+    return { 
+      ...prev, 
+      coverage: newCoverage,
+      coverageLimit: newTotalLimit // တွက်ပြီးသား Limit ကို Auto ထည့်ပေးခြင်း
+    };
+    });
+  };
+  const checkPolicyExists = async (policyNum) => {
+    if (!policyNum) return;
+    
+    // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် အထူးစစ်ဆေးရန်
+    if (isEditMode) return; 
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/check-policy?number=${policyNum}`);
+      const data = await response.json();
+      
+      if (data.isUsed) {
+        setErrors(prev => ({ ...prev, policyNumber: "Your policy no is already in use!" }));
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.policyNumber;
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      console.error("Policy check error:", error);
+    }
   };
    const handleSave = async () => {
   if (validate()) {
@@ -198,9 +236,28 @@ const [formData, setFormData] = useState({
         alert("Please select at least one coverage type.");
         return;
       }
+
       const fullNrc = `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`;   
-    const dataToSend = {
-      ...formData,
+      console.log("Current Form NRC :", fullNrc);
+      // ဥပမာ - Email တစ်ခုတည်းကိုပဲ စစ်မယ်ဆိုရင်
+const checkDuplicate = async (field, value) => {
+    const res = await fetch(`http://localhost:3000/api/check-duplicate?field=${field}&value=${value}&userId=${id}`);
+    const data = await res.json();
+    if (data.isUsed) {
+        setErrors(prev => ({ ...prev, [field]: `This ${field} is already registered!` }));
+        return true; // ရှိနေကြောင်း ပြန်ပြောမယ်
+    }
+    return false;
+};
+
+// သုံးတဲ့အခါ
+if (await checkDuplicate('email', formData.email)) return;
+if (await checkDuplicate('phone', formData.phone)) return;
+if (await checkDuplicate('driver_license', formData.driver_license)) return;
+if (await checkDuplicate('policy_number', formData.policyNumber)) return;
+// ... စသဖြင့် ဆက်စစ်သွားလို့ရပါတယ်
+      const dataToSend = {
+      ...formData,   
       nrc: fullNrc 
     };
     const url = isEditMode ? `http://localhost:3000/api/update-user/${id}` : "http://localhost:3000/api/add-user";
@@ -290,7 +347,7 @@ const [formData, setFormData] = useState({
               </select>
               <input name="nrcNumber" type="text" className="form-control form-control-sm" value={formData.nrcNumber} onChange={handleInputChange} maxLength={6} style={inputStyle} />
             </div>
-          ))}
+          ), errors.nrcNumber)}
 
           {renderRow("Address", <input name="address" value={formData.address} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} /> , errors.address)}
 
@@ -307,7 +364,7 @@ const [formData, setFormData] = useState({
 
         <div className="col-md-6">
           <SectionHeader icon="🛡" title="Policy Information" />
-          {renderRow("Policy Number", <input name="policyNumber" value={formData.policyNumber} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} /> , errors.policyNumber)}
+          {renderRow("Policy Number", <input name="policyNumber" value={formData.policyNumber} onChange={handleInputChange} onBlur={(e) => checkPolicyExists(e.target.value)}className="form-control form-control-sm" style={inputStyle} /> , errors.policyNumber)}
           
           <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
             <label className="col-sm-4 col-form-label fw-bold">Coverage Type</label>
@@ -317,7 +374,7 @@ const [formData, setFormData] = useState({
       <input 
         className="form-check-input" 
         type="checkbox" 
-        checked={formData.coverage.includes(item.coverage_type_id)} 
+        checked={formData.coverage.includes(Number(item.coverage_type_id))} 
         onChange={() => handleCheckboxChange(item.coverage_type_id)} 
       />
       <label className="form-check-label">{item.coverage_type}</label>

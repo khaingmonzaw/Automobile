@@ -1,5 +1,39 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import * as mmNrc from "mm-nrc";
+// 🛠 Clean NRC ပြောင်းပေးမည့် Helper Function
+const getCleanNrc = (rawNrc) => {
+  if (!rawNrc) return "-";
+  
+  const match = rawNrc.match(/([^\/]*)\/([a-zA-Z-]+)\(([a-zA-Z])\)(\d+)/);
+  if (!match) return rawNrc; 
+  
+  const stateId = match[1];   
+  const townshipCode = match[2];  
+  const type = match[3];      
+  const number = match[4];    
+  
+  let stateNumber = stateId; 
+  
+  if (stateId) {
+    const states = mmNrc.getNrcStates();
+    const matchedState = states.find(s => s.id === stateId);
+    
+    if (matchedState) {
+      stateNumber = matchedState.number?.en || matchedState.number || stateId;
+    }
+  } else {
+    stateNumber = ""; 
+  }
+  let townshipDisplay = townshipCode;
+  const townships = mmNrc.getNrcTownships(); 
+  const matchedTownship = townships.find(t => t.code === townshipCode);
+  if (matchedTownship) {
+    townshipDisplay = matchedTownship.short.en; // ကိုက်ညီတာတွေ့ရင် "HAPANA" ကို ယူပါမယ်
+  }
+
+  return `${stateNumber ? stateNumber : ''}/${townshipDisplay}(${type})${number}`;
+};
 
 function UserDetail() {
   const { id } = useParams();
@@ -50,7 +84,7 @@ function UserDetail() {
           <tr><td style={{ fontWeight: "bold" }}>Date of Birth</td><td>:</td><td>{user.dob}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Driver License</td><td>:</td><td>{user.driver_license}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Driving Year</td><td>:</td><td>{user.driver_year}</td></tr>
-          <tr><td style={{ fontWeight: "bold" }}>NRC</td><td>:</td><td>{user.nrc}</td></tr>
+          <tr><td style={{ fontWeight: "bold" }}>NRC</td><td>:</td><td>{getCleanNrc(user.nrc)}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Address</td><td>:</td><td>{user.address}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Policy Number</td><td>:</td><td>{user.policyNumber || "-"}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Coverage Type</td><td>:</td><td>{user.coverageType || "-"}</td></tr>
