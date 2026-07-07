@@ -48,37 +48,46 @@ function ClaimStatusAction() {
 
 
   // Submit decision (Approve/Reject)
-  const handleSubmit = async () => {
-    if (!decision) {
-      alert('Please select Approve or Reject.');
-      return;
-    }
-    setSubmitting(true);
-    try {
-      const response = await fetch(`http://localhost:3000/api/admin/claims/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+ const handleSubmit = async () => {
+  if (!decision) {
+    alert("Please select Approve or Reject.");
+    return;
+  }
+
+  setSubmitting(true);
+
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/admin/claims/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           status: decision,
-          remark: remarkInput  
+          remark: remarkInput
         }),
-      });
-      if (!response.ok) {
-        throw new Error('Update failed');
       }
-      navigate(-1);
-    //     if (decision === 'REJECTED') {
-    //   navigate('/Admin/Claims'); // 👈 your claim list page
-    // } else if (decision === 'APPROVED') {
-    //   navigate(`/Admin/NextPage/${id}`); // 👈 change to your next page
-    // }
-    } catch (err) {
-      alert('Error updating claim: ' + err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    );
 
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    alert(data.message);
+
+    // return to all claims page
+    navigate("/Admin/Claims");
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  } finally {
+    setSubmitting(false);
+  }
+};
   // Helper Row Component - now displays as a single row in one column
   const Row = ({ label, value, isStatus = false }) => {
     let statusClass = '';

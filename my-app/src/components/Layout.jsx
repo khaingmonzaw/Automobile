@@ -38,7 +38,7 @@ const navigate = useNavigate();
 };
   return (
     <div className="d-flex ">
-
+ 
       {/* Sidebar */}
       <div
         className=" d-flex flex-column bg-white border-end shadow-sm position-fixed text-start "
@@ -275,7 +275,7 @@ const navigate = useNavigate();
           </li>
         </ul>
       </div>
-
+ 
       {/* Right Side */}
       <div
         style={{
@@ -325,15 +325,15 @@ const navigate = useNavigate();
           </div>
 
         </nav>
-
+ 
         {/* Page Content */}
         <div className="container-fluid p-4 " style={{ minHeight: "100vh", backgroundColor: "F2F9FF" }}>
           <Outlet />
         </div>
       </div>
-
+ 
     </div>
   );
 }
-
+ 
 export default Layout;

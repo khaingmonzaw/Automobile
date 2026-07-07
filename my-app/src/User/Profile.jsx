@@ -8,7 +8,8 @@ const Profile = () => {
   const [error, setError] = useState(null);
 
   // 💡 ပြင်ဆင်ချက် - localStorage ထဲက လက်ရှိဝင်ထားတဲ့ User ID ကို ယူသုံးခြင်း
-  const userId = localStorage.getItem("userId"); 
+   const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
 
   useEffect(() => {
     // အကယ်၍ အကြောင်းအမျိုးမျိုးကြောင့် login ဝင်မထားရင် အလုပ်မလုပ်စေရန်

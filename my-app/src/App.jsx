@@ -17,12 +17,16 @@ import Profile from './User/Profile.jsx';
 import CoverageTypes from './Admin/CoverageTypes.jsx';
 import NewCoverage from './Admin/NewCoverage.jsx';
 import CoverageUpdate from './Admin/CoverageUpdate.jsx';
+import ClaimStatusAction from './Admin/ClaimStatusAction';
+
 
 // import ClaimDetailApproved from './Admin/ClaimDetailApproved'
 import PasswordChangeUser from './User/PasswordChangeUser.jsx';
 import PasswordChangeAdmin from './Admin/PasswordChangeAdmin.jsx';
-import ClaimStatusAction from './Admin/ClaimStatusAction';
-import Projected from "./Projected.jsx"
+import Projected from "./Projected.jsx";
+import Adduser from "./Admin/Adduser";
+import UserDetail from "./Admin/UserDetail";
+import Userlist from "./Admin/Userlist"
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
@@ -66,12 +70,12 @@ function App() {
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
         {/* <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} /> */}
         <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
-        <Route path="ClaimStatusAction/:id" element={< ClaimStatusAction />} />
-
-        {/* <Route path="Adduser" element={<Adduser />} />
+        <Route path="Adduser" element={<Adduser />} />
         <Route path="Adduser/:id" element={<Adduser />} />
         <Route path="UserDetail/:id" element={<UserDetail />} />
-         <Route path="Users" element={<Userlist/>} /> */}
+         <Route path="Users" element={<Userlist/>} /> 
+         <Route path="ClaimStatusAction/:id" element={< ClaimStatusAction />} />
+
       </Route>
 
 
