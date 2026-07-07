@@ -455,14 +455,20 @@ app.get('/api/admin/ClaimStatus/:id', (req, res) => {
   const sql = `
     SELECT 
       claim_id, 
-      user_id, 
-      policy_id, 
+      c.user_id, 
+      u.name,
+      c.policy_id, 
       accident_type, 
       accident_date, 
       claimed_amount, 
-      status,
+      c.status,
+      v.vehicle_number,
+    v.vehicle_model,
       remark
-    FROM claims
+    FROM claims c
+    JOIN users u ON u.id=c.user_id
+    JOIN policies p ON p.policy_id=c.policy_id
+    JOIN vehicles v ON v.vehicle_id=p.vehicle_id
     WHERE claim_id = ?
   `;
 //[06/07/2026 13:42] Myoyadanar: 
@@ -504,6 +510,8 @@ app.put("/api/admin/claims/:id", (req, res) => {
     c.claimed_amount,
     c.compensation_amount,
     p.total_premium,
+  
+
     r.risk_level,
     r.risk_percentage
 FROM claims c

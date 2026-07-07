@@ -105,7 +105,21 @@ function ClaimDetails() {
 
                                         <tr>
                                             <th>Status</th>
-                                            <td>{claim.status}</td>
+                                             <td>
+    <span
+      className={`badge ${
+        claim.status === "PENDING"
+          ? "bg-warning text-dark"
+          : claim.status === "REJECTED"
+          ? "bg-danger"
+          : claim.status === "APPROVED"
+          ? "bg-success"
+          : "bg-secondary"
+      }`}
+    >
+      {claim.status}
+    </span>
+  </td>
                                         </tr>
 
                                         <tr>

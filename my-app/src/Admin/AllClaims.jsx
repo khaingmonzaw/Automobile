@@ -86,16 +86,19 @@ const AllClaims = () => {
   return (
     <div className="container-fluid p-4 bg-light">
       
-      {/* Top Title & Header Row */}
-      <div className="mb-4">
-        <h2 className="fs-1 fw-bold text-dark mb-1">All Claims</h2>
-      </div>
+   
 
       {/* Main Content Card Container */}
       <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
-        
+           {/* Top Title & Header Row */}
+     
         {/* Controls Section: Filter */}
-        <div className="row g-3 mb-4 justify-content-end">
+        <div className="d-flex g-3 mb-4 justify-content-between px-4 pt-3">
+
+
+           <div className="mb-4">
+        <h2 className="fs-2 fw-bold text-dark ">All Claims</h2>
+      </div>
           <div className="col-md-3">
             <div className="d-flex align-items-center rounded-pill border px-3 py-1 bg-white shadow-sm" style={{ backgroundColor: "rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important" }}>
               <FontAwesomeIcon icon={faFilter} className="text-warning-emphasis opacity-75 me-2" />
@@ -106,25 +109,25 @@ const AllClaims = () => {
                 style={{ boxShadow: "none", cursor: "pointer" }}
               >
                 <option value="All" className="text-dark bg-white">All</option>
-                <option value="Approved" className="text-dark bg-white">APPROVED</option>
-                <option value="Pending" className="text-dark bg-white">PENDING</option>
-                <option value="Rejected" className="text-dark bg-white">REJECTED</option>
+                <option value="APPROVED" className="text-dark bg-white">APPROVED</option>
+                <option value="PENDING" className="text-dark bg-white">PENDING</option>
+                <option value="REJECTED" className="text-dark bg-white">REJECTED</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Data Table */}
-        <div className="table-responsive rounded-3 ">
-          <table className="table table-hover align-middle mb-0">
+        <div className=" rounded-3 ">
+          <table className="table table-hover align-middle mb-0 w-100 "  style={{ tableLayout: "fixed" }}>
             <thead style={{ backgroundColor: "rgb(255, 237, 146)" }} className="text-warning-emphasis border-bottom">
-              <tr className="text-dark small uppercase fw-bold align-middle">
-                <th className="py-3 px-3" style={{ width: "15%", backgroundColor: "inherit" }}>Claim ID</th>
-                <th className="py-3" style={{ width: "25%", backgroundColor: "inherit" }}>Claimed Amount</th>
-                <th className="py-3" style={{ width: "18%", backgroundColor: "inherit" }}>Accident Date</th>
-                <th className="py-3 text-center" style={{ width: "14%", backgroundColor: "inherit" }}>Status</th>
-                <th className="py-3 text-center" style={{ width: "14%", backgroundColor: "inherit" }}>Risk Level</th>
-                <th className="py-3 text-center" style={{ width: "14%", backgroundColor: "inherit" }}>Action</th>
+              <tr className="text-dark  uppercase fw-bold align-middle  ">
+                <th className="py-3" style={{ backgroundColor: "inherit" }}>Claim ID</th>
+                <th className="py-3" style={{  backgroundColor: "inherit" }}>Claimed Amount</th>
+                <th className="py-3" style={{backgroundColor: "inherit" }}>Accident Date</th>
+                <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Status</th>
+                <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Risk Level</th>
+                <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -141,7 +144,7 @@ const AllClaims = () => {
                         {claim.date ? new Date(claim.date).toLocaleDateString('en-GB') : '-'}
                       </td>
                       <td className="py-3 text-center">
-                        <span className={`badge ${config.badge} px-3 py-2 border rounded-pill fw-semibold`} style={{ minWidth: "95px", fontSize: "0.8rem" }}>
+                        <span className={`badge ${config.badge} border rounded-pill fw-semibold`}>
                           {claim.status}
                         </span>
                       </td>
@@ -149,7 +152,7 @@ const AllClaims = () => {
                         <span className={`fw-bold small ${config.riskClass}`}>{config.risk}</span>
                       </td>
                    <td className="py-3 text-center">
-  <Link to={`/Admin/ClaimStatusAction/${claim.id}`}>
+  <Link to={`/Admin/AllClaims/ClaimStatusAction/${claim.id}`}>
     <button className="btn btn-warning border text-dark">
       <FontAwesomeIcon icon={faEye} />
     </button>
@@ -170,7 +173,7 @@ const AllClaims = () => {
         {/* Pagination Buttons */}
         <div className="d-flex justify-content-center mt-4">
           <button
-            className="btn btn-sm btn-outline-warning me-2 fw-semibold px-3 rounded-pill shadow-sm"
+            className="btn btn-outline-warning me-2 fw-semibold px-3 "
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => prev - 1)}
           >
@@ -182,7 +185,7 @@ const AllClaims = () => {
           </span>
 
           <button
-            className="btn btn-sm btn-outline-warning ms-2 fw-semibold px-3 rounded-pill shadow-sm"
+            className="btn btn-outline-warning ms-2 fw-semibold px-3 "
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(prev => prev + 1)}
           >

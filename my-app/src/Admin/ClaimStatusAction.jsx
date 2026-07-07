@@ -120,7 +120,7 @@ function ClaimStatusAction() {
       {/* Back Button */}
       <div className="back-button-wrapper">
         <button className="btn-back" onClick={() => navigate(-1)}>
-          <FontAwesomeIcon icon={faCircleLeft} /> Back
+          <FontAwesomeIcon icon={faCircleLeft} /> 
         </button>
       </div>
 
@@ -135,18 +135,23 @@ function ClaimStatusAction() {
     <tbody>
       <tr>
         <td>Claim ID</td>
-        <td>CLM-{claim.claim_id}</td>
+        <td className='text-primary'>CLM-{claim.claim_id}</td>
       </tr>
 
+   <tr>
+        <td>Policy Number</td>
+        <td>PLC-{claim.policy_id}</td>
+      </tr>
       <tr>
         <td>User ID</td>
         <td>{claim.user_id}</td>
       </tr>
-
       <tr>
-        <td>Policy Number</td>
-        <td>PLC-{claim.policy_id}</td>
+        <td>User Name</td>
+        <td>{claim.name}</td>
       </tr>
+
+   
 
       <tr>
         <td>Accident Type</td>
@@ -155,9 +160,20 @@ function ClaimStatusAction() {
 
       <tr>
         <td>Accident Date</td>
-        <td>{claim.accident_date}</td>
-      </tr>
+ <td>
+    {claim.accident_date
+      ? new Date(claim.accident_date).toLocaleDateString("en-GB")
+      : "-"}
+  </td>      </tr>
 
+ <tr>
+        <td>Vehicle Number</td>
+        <td>{claim.vehicle_number}</td>
+      </tr>
+       <tr>
+        <td>Vehicle Model</td>
+        <td>{claim.vehicle_model}</td>
+      </tr>
       <tr>
         <td>Claim Amount</td>
         <td>
@@ -263,7 +279,7 @@ function ClaimStatusAction() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: 100vh;
+          
           padding: 40px 20px;
           background: #F2F9FF;
           font-family: 'Roboto', sans-serif;
@@ -281,8 +297,8 @@ function ClaimStatusAction() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 10px 24px;
-          background-color: #F3D955;
+          padding: 10px 20px;
+          background-color: #f4cc09;
           color: #000000;
           font-size: 18px;
           font-weight: 600;
@@ -372,7 +388,7 @@ function ClaimStatusAction() {
 
         .decision-label {
           display: block;
-          font-size: 24px;
+          font-size: 20px;
           font-weight: 400;
           color: #000000;
           margin-bottom: 12px;
@@ -382,7 +398,7 @@ function ClaimStatusAction() {
           display: flex;
           flex-wrap: wrap;
           gap: 30px 50px;
-          font-size: 24px;
+          font-size: 16px;
         }
 
         .radio-option {

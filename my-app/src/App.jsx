@@ -60,7 +60,14 @@ function App() {
 
 
 
-      <Route path="/Admin" element={<Layout />}>
+      <Route
+        path="/Admin"
+        element={
+          <Projected role="admin">
+            <Layout />
+          </Projected>
+        }
+      >
         <Route index element={<Navigate to="ClaimDetailApproved" replace />} />
         <Route path="AdminDashboard" element={<AdminDashboard />} />
         <Route path="AllClaims" element={<AllClaims />} />
@@ -70,11 +77,11 @@ function App() {
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
         {/* <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} /> */}
         <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
-        <Route path="Adduser" element={<Adduser />} />
+        <Route path="Users/Adduser" element={<Adduser />} />
         <Route path="Adduser/:id" element={<Adduser />} />
-        <Route path="UserDetail/:id" element={<UserDetail />} />
+        <Route path="Users/UserDetail/:id" element={<UserDetail />} />
          <Route path="Users" element={<Userlist/>} /> 
-         <Route path="ClaimStatusAction/:id" element={< ClaimStatusAction />} />
+         <Route path="AllClaims/ClaimStatusAction/:id" element={< ClaimStatusAction />} />
 
       </Route>
 
