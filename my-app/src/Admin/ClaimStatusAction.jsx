@@ -103,7 +103,7 @@ function ClaimStatusAction() {
     return <div className="text-center py-5">Data is Loading...…</div>;
   }
   if (error || !claim) {
-    return <div className="text-center py-5 text-danger">{error || "Claim မတွေ့ပါ။"}</div>;
+    return <div className="text-center py-5 text-danger">{error || "Claim NOT Found"}</div>;
   }
 
   return (
@@ -228,7 +228,7 @@ function ClaimStatusAction() {
                   <input
                     type="radio"
                     name="decision"
-                    value="Reject"
+                    value="REJECTED"
                     checked={decision === 'Reject'}
                     onChange={(e) => setDecision(e.target.value)}
                     className='text-danger'
@@ -413,7 +413,7 @@ function ClaimStatusAction() {
 
         .remarks-label {
           display: block;
-          font-size: 24px;
+         
           font-weight: 400;
           color: #000000;
         }
