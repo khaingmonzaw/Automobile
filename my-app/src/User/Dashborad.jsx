@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import { Link } from "react-router-dom";
 
 
 function Dashboard() {
+
+    const [claims, setClaims] = useState([]);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user?.id
+
+    const recentClaim = claims.slice(0, 5);
+
+    useEffect(() => {
+        fetch(`http://localhost:3000/api/claims/user/${userId}`)
+            .then(res => res.json())
+            .then(data => setClaims(data))
+            .catch(err => console.log(err));
+    }, []);
+
+    const total = claims.length;
+    const pending = claims.filter(c => c.status === "PENDING").length;
+    const rejected = claims.filter(c => c.status === "REJECTED").length;
+    const approved = claims.filter(c => c.status === "APPROVED").length;
+
     return (
         <>
 
@@ -14,7 +34,7 @@ function Dashboard() {
 
                             <div className="card-body">
                                 <h5 className="card-title">Total</h5>
-                                <h5>1</h5>
+                                <h5>{total}</h5>
                             </div>
 
                         </div>
@@ -24,7 +44,7 @@ function Dashboard() {
                         <div className="card shadow-sm border-0 h-100" style={{ backgroundColor: "#aff6ba" }}>
                             <div className="card-body">
                                 <h5 className="card-title">Pending</h5>
-                                <h5>2</h5>
+                                <h5>{pending}</h5>
 
                             </div>
 
@@ -35,7 +55,7 @@ function Dashboard() {
                         <div className="card shadow-sm border-0 h-100 " style={{ backgroundColor: "#84ebfd" }}>
                             <div className="card-body">
                                 <h5 className="card-title">Approved</h5>
-                                <h5>3</h5>
+                                <h5>{approved}</h5>
                             </div>
 
                         </div>
@@ -45,7 +65,7 @@ function Dashboard() {
                         <div className="card shadow-sm border-0 h-100" style={{ backgroundColor: "#9bccfe" }}>
                             <div className="card-body">
                                 <h5 className="card-title">Rejected</h5>
-                                <h5>3</h5>
+                                <h5>{rejected}</h5>
                             </div>
 
                         </div>
@@ -54,13 +74,13 @@ function Dashboard() {
 
                 {/* Recent Claim List */}
 
-                <div className="row my-4 bg-white ">
+                <div className="row my-4 bg-white px-3 rounded">
 
                     {/* Header */}
                     <div className="col-11">
-                        <div className="d-flex justify-content-between align-items-center my-3 px-3">
-                            <h5 className="mb-0">Recent Claims</h5>
-                            <button className="btn btn-warning ">View All</button>
+                        <div className="d-flex justify-content-between align-items-center my-3 px-3 ">
+                            <h4 className="mb-0">Recent Claims</h4>
+                            <button className="btn btn-warning "><Link to="../MyClaims" className="text-decoration-none text-dark">All</Link></button>
                         </div>
                     </div>
 
@@ -78,15 +98,19 @@ function Dashboard() {
                         </thead>
 
                         <tbody>
-                            <tr>
-                                <td>1234</td>
+                            {recentClaim.slice(0, 5).map((c) => (
+                                <tr key={c.claim_id}>
 
-                                <td>John Smith</td>
-                                <td>$1,000</td>
-                                <td>Approved</td>
-                            </tr>
+
+                                    <td>CLM-{c.claim_id}</td>
+                                    <td>{c.accident_date.split("T")[0]}</td>
+                                    <td>{c.status}</td>
+                                    <td>{c.claimed_amount}</td>
+                                </tr>
+                            ))}
                         </tbody>
-                    </table><a href=""></a>
+                    </table>
+                    <a href=""></a>
                 </div>
             </div>
 
