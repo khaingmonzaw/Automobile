@@ -16,7 +16,7 @@ router.get('/api/coverageupdate/:id', (req, res) => {
   const { id } = req.params;
   console.log("Backend received a request for ID:", id); // Check terminal console
   
-  const query = 'SELECT coverage_type, description, status, base_rate, coverage_limit FROM coverage_types WHERE coverage_type_id = ?';
+  const query = 'SELECT coverage_type, description, status, coverage_limit FROM coverage_types WHERE coverage_type_id = ?';
   
   db.query(query, [id], (err, results) => {
     if (err) {
@@ -36,15 +36,15 @@ router.get('/api/coverageupdate/:id', (req, res) => {
 // 2. PUT ROUTE: Matches your frontend form submission URL perfectly
 router.put('/api/coverageupdate/:id', (req, res) => {
   const { id } = req.params;
-  const { coverageType, description, baseRate, coverageLimit, status } = req.body;
+  const { coverageType, description, coverageLimit, status } = req.body;
   
   const query = `
     UPDATE coverage_types 
-    SET coverage_type = ?, description = ?, base_rate = ?, coverage_limit = ?, status = ? 
+    SET coverage_type = ?, description = ?, coverage_limit = ?, status = ? 
     WHERE coverage_type_id = ?
   `;
   
-  db.query(query, [coverageType, description, baseRate, coverageLimit, status, id], (err, result) => {
+  db.query(query, [coverageType, description, coverageLimit, status, id], (err, result) => {
     if (err) {
       console.error('MySQL update error:', err);
       return res.status(500).json({ error: 'Failed to update database record' });

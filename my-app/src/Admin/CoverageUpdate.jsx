@@ -7,7 +7,6 @@ const CoverageUpdate = () => {
   
   // Form values state
   const [coverageType, setCoverageType] = useState('');
-  const [baseRate, setBaseRate] = useState('');
   const [coverageLimit, setCoverageLimit] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('Active');
@@ -18,7 +17,6 @@ const CoverageUpdate = () => {
   // Validation errors state tracking individual fields
   const [errors, setErrors] = useState({
     coverageType: false,
-    baseRate: false,
     coverageLimit: false,
     description: false
   });
@@ -35,7 +33,6 @@ const CoverageUpdate = () => {
           
           // Populate fields
           setCoverageType(data.coverage_type || '');
-          setBaseRate(data.base_rate || '');
           setCoverageLimit(data.coverage_limit || '');
           setDescription(data.description || '');
           setStatus(data.status || 'Active');
@@ -60,7 +57,6 @@ const CoverageUpdate = () => {
   const handleCancelReset = () => {
     if (originalData) {
       setCoverageType(originalData.coverage_type || '');
-      setBaseRate(originalData.base_rate || '');
       setCoverageLimit(originalData.coverage_limit || '');
       setDescription(originalData.description || '');
       setStatus(originalData.status || 'Active');
@@ -68,7 +64,6 @@ const CoverageUpdate = () => {
     // Clear any active red validation labels
     setErrors({
       coverageType: false,
-      baseRate: false,
       coverageLimit: false,
       description: false
     });
@@ -80,7 +75,6 @@ const CoverageUpdate = () => {
     // Check empty inputs to toggle validation errors visually
     const newErrors = {
       coverageType: !coverageType.toString().trim(),
-      baseRate: !baseRate.toString().trim(),
       coverageLimit: !coverageLimit.toString().trim(),
       description: !description.toString().trim()
     };
@@ -88,13 +82,12 @@ const CoverageUpdate = () => {
     setErrors(newErrors);
 
     // Stop execution if any validation fails
-    if (newErrors.coverageType || newErrors.baseRate || newErrors.coverageLimit || newErrors.description) {
+    if (newErrors.coverageType || newErrors.coverageLimit || newErrors.description) {
       return;
     }
 
     const updatedForm = { 
-      coverageType: coverageType.trim(), 
-      baseRate: Number(baseRate), 
+      coverageType: coverageType.trim(),  
       coverageLimit: Number(coverageLimit), 
       description: description.trim(), 
       status 
@@ -176,38 +169,6 @@ const CoverageUpdate = () => {
                 </div>
                 {errors.coverageType && (
                   <div className="text-danger small mt-1 text-start fw-medium">*Coverage Type is required.</div>
-                )}
-              </div>
-            </div>
-
-            {/* Base Rate Input */}
-            <div className="row my-3">
-              <div className="col-sm-4 d-flex align-items-center">
-                <label htmlFor="base-rate" className="form-label text-secondary fw-semibold mb-0">
-                  Base Rate
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="input-group position-relative">
-                  <input 
-                    id="base-rate"
-                    type="number"
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.baseRate ? 'border-danger' : 'border-secondary-subtle'}`}
-                    placeholder="10,000" 
-                    value={baseRate}
-                    onChange={(e) => {
-                      setBaseRate(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, baseRate: false}));
-                    }}
-                    style={{ borderRadius: "8px", paddingRight: errors.baseRate ? "65px" : "65px", fontSize: "14px" }}
-                  />
-                  <span className={`position-absolute top-50 translate-middle-y small fw-bold z-3 ${errors.baseRate ? 'text-danger' : 'text-secondary'}`} style={{ right: errors.baseRate ? "40px" : "15px", pointerEvents: "none" }}>
-                    MMK
-                  </span>
-                  {errors.baseRate && <ErrorIcon />}
-                </div>
-                {errors.baseRate && (
-                  <div className="text-danger small mt-1 text-start fw-medium">*Base Rate is required.</div>
                 )}
               </div>
             </div>

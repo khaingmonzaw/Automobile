@@ -19,10 +19,12 @@ const db = mysql.createConnection({
 const newCoverageRouter = require("./Admin/NewCoverage");
 const coverageTypesRouter = require("./Admin/CoverageTypes");
 const coverageUpdateRouter = require("./Admin/CoverageUpdate");
+const pendingRouter = require("./Admin/Pending");
 
 app.use(newCoverageRouter);
 app.use(coverageTypesRouter);
 app.use(coverageUpdateRouter);
+app.use(pendingRouter);
 
 // Login API
 app.post("/api/login", (req, res) => {
@@ -447,7 +449,6 @@ LIMIT 1;
 //     res.status(200).json(results);
 //   });
 // });
-
 // ✅ NEW: Get all claims from the database
 app.get('/api/admin/ClaimStatus/:id', (req, res) => {
   const claim_id = req.params.id; // 
@@ -487,235 +488,6 @@ db.query(sql, [claim_id], (err, results) => {
     res.status(200).json(results[0]);
   });
 });
-
-// =============================================
-// 2. PUT Update Claim Status (Approve/Reject လုပ်ဖို့)
-// =============================================
-app.put("/api/admin/claims/:id", (req, res) => {
-
-  const claim_id = req.params.id;
-  const { status, remark } = req.body;
-
-
-  // =========================
-  // APPROVED PROCESS
-  // =========================
-  if(status === "APPROVED") {
-
-
-    // Get all calculation data
-    const getClaimSql = `
-    SELECT 
-    c.claim_id,
-    c.claimed_amount,
-    c.compensation_amount,
-    p.total_premium,
-  
-
-    r.risk_level,
-    r.risk_percentage
-FROM claims c
-JOIN policies p 
-    ON c.policy_id = p.policy_id
-JOIN users u
-    ON c.user_id = u.id
-JOIN risks r
-    ON r.user_id = u.id
-WHERE c.claim_id = ?
-    `;
-
-
-    db.query(getClaimSql,[claim_id],(err,result)=>{
-
-
-      if(err){
-        return res.status(500).json({
-          message:"Database error",
-          error:err
-        });
-      }
-
-
-      if(result.length === 0){
-        return res.status(404).json({
-          message:"Claim not found"
-        });
-      }
-
-
-
-      const claimed_amount = result[0].claimed_amount;
-      const total_premium = result[0].total_premium;
-      const risk_level = result[0].risk_level;
-      const risk_percentage = result[0].risk_percentage;
-      const compensation_amount=result[0].compensation_amount;
-
-
-
-      console.log(
-        claimed_amount,
-        total_premium,
-        risk_level,
-        risk_percentage,
-        compensation_amount,
-      );
-
-
-
-      // =========================
-      // CALL COBOL
-      // =========================
-
-      const cobolProg = path.join(
-        __dirname,
-        "calculate.exe"
-      );
-
-
-      const command =
-      `"${cobolProg}" "${claimed_amount}" "${total_premium}" "${risk_level}" "${risk_percentage}" "${compensation_amount}"`;
-
-
-
-      console.log("COBOL COMMAND:",command);
-
-
-
-      exec(command,(error,stdout,stderr)=>{
-
-
-        if(error){
-
-          console.log("COBOL ERROR:",error);
-
-          return res.status(500).json({
-            message:"COBOL calculation failed"
-          });
-
-        }
-
-
-
-        console.log("COBOL OUTPUT:",stdout);
-
-
-
-        /*
-          COBOL OUTPUT example:
-
-          COMPENSATION:750000
-
-        */
-
-
-        // const compensation_amount =
-        //   stdout.split(":")[1].trim();
-
-
-
-        // =========================
-        // SAVE RESULT
-        // =========================
-
-
-        const updateSql = `
-          UPDATE claims
-          SET
-            status=?,
-            remark=?,
-            compensation_amount=?
-          WHERE claim_id=?
-        `;
-
-
-        db.query(
-          updateSql,
-          [
-            "APPROVED",
-            remark,
-            compensation_amount,
-            claim_id
-          ],
-          (err,result)=>{
-
-
-            if(err){
-              return res.status(500).json({
-                message:"Update failed",
-                error:err
-              });
-            }
-
-
-            res.json({
-
-              message:"Claim approved successfully",
-
-              compensation_amount
-
-            });
-
-
-          }
-        );
-
-
-      });
-
-
-    });
-
-
-  }
-
-
-
-  // =========================
-  // REJECT PROCESS
-  // =========================
-  else if(status==="REJECTED"){
-
-
-    const sql=`
-      UPDATE claims
-      SET
-        status=?,
-        remark=?
-      WHERE claim_id=?
-    `;
-
-
-    db.query(
-      sql,
-      [
-        "REJECTED",
-        remark,
-        claim_id
-      ],
-      (err,result)=>{
-
-
-        if(err){
-          return res.status(500).json({
-            message:"Update failed"
-          });
-        }
-
-
-        res.json({
-          message:"Claim rejected successfully"
-        });
-
-
-      }
-    );
-
-  }
-
-
-});
-//myo's code end
-
 
 // Change Password API
 app.put("/api/change-password", (req, res) => {

@@ -32,15 +32,15 @@ router.get('/api/coverage/:type', (req, res) => {
 
 // Change app.post to router.post
 router.post('/api/coverage', (req, res) => {
- const { coverageType, baseRate, coverageLimit, description } = req.body;
+ const { coverageType, coverageLimit, description } = req.body;
   
   // FIX: Cleaned up duplicate 'description' column inside the parentheses
   const query = `
-    INSERT INTO coverage_types (coverage_type, base_rate, coverage_limit, description) 
-    VALUES (?, ?, ?, ?)
+    INSERT INTO coverage_types (coverage_type, coverage_limit, description) 
+    VALUES (?, ?, ?)
   `;
   
-  const values = [coverageType, baseRate, coverageLimit, description];
+  const values = [coverageType, coverageLimit, description];
 
   db.query(query, values, (err, result) => {
     if (err) {
