@@ -1,41 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
+ 
 const AdminDashboard = () => {
   // State Variables သတ်မှတ်ခြင်း
   const [claimsData, setClaimsData] = useState([]);
+  
+  // ✨ Backend API မှလာမည့် Risk Level ဒေတာအတွက် State 
+  const [riskStats, setRiskStats] = useState({ low: 0, medium: 0, high: 0 });
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Backend API မှ ဒေတာဆွဲထုတ်ခြင်း
+ 
+  // Backend API များမှ ဒေတာဆွဲထုတ်ခြင်း
   useEffect(() => {
-    const fetchClaims = async () => {
+    let isMounted = true; // Memory Leak ကာကွယ်ရန်
+ 
+    const fetchDashboardData = async () => {
       try {
-        // Node.js Backend URL သို့ လှမ်းခေါ်ခြင်း
-        const response = await fetch('http://localhost:3000/api/admin/claims');
-        
-        if (!response.ok) {
-          throw new Error('ဒေတာဆွဲထုတ်ရာတွင် အမှားအယွင်းရှိနေပါသည်။');
+        // API နှစ်ခုလုံးကို ပြိုင်တူ လှမ်းခေါ်ခြင်း
+        const [claimsRes, riskRes] = await Promise.all([
+          fetch('http://localhost:3000/api/admin/claims'),
+          fetch('http://localhost:3000/api/admin/risk-stats') 
+        ]);
+ 
+        if (!claimsRes.ok  && !riskRes.ok) {
+          throw new Error('Data Fetching Error.');
         }
-        
-        const data = await response.json();
-        setClaimsData(data);
-        setLoading(false);
+ 
+        const claims = await claimsRes.json();
+        const risk = await riskRes.json();
+ 
+        if (isMounted) {
+          setClaimsData(Array.isArray(claims) ? claims : []);
+          
+          // Backend ကလာတဲ့ Risk Object ကို ထည့်သွင်းခြင်း (မတော်တဆ null ဖြစ်ခဲ့ရင် error မတက်အောင်ပါ ကာကွယ်ထားသည်)
+          setRiskStats(risk ? {
+            low: risk.low ?? 0,
+            medium: risk.medium ?? 0,
+            high: risk.high ?? 0
+          } : { low: 0, medium: 0, high: 0 });
+ 
+          setLoading(false);
+        }
       } catch (err) {
-        setError(err.message);
-        setLoading(false);
+        if (isMounted) {
+          setError(err.message);
+          setLoading(false);
+        }
       }
     };
-
-    fetchClaims();
+ 
+    fetchDashboardData();
+ 
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  // ကောင်တာများကို ဝင်လာသော ဒေတာပေါ်မူတည်ပြီး Dynamic တွက်ချက်ခြင်း
+ 
+  // ကောင်တာများကို Dynamic တွက်ချက်ခြင်း
   const totalClaims = claimsData.length;
-  const pendingClaims = claimsData.filter(c => c.status?.toUpperCase() === 'PENDING').length;
-  const approvedClaims = claimsData.filter(c => c.status?.toUpperCase() === 'APPROVED').length;
-  const rejectedClaims = claimsData.filter(c => c.status?.toUpperCase() === 'REJECTED').length;
-
+  const pendingClaims = claimsData.filter(c => c?.status?.toUpperCase() === 'PENDING').length;
+  const approvedClaims = claimsData.filter(c => c?.status?.toUpperCase() === 'APPROVED').length;
+  const rejectedClaims = claimsData.filter(c => c?.status?.toUpperCase() === 'REJECTED').length;
+ 
   // Status အလိုက် Badge အရောင်ပြောင်းရန် Function
   const getBadgeClass = (status) => {
     switch (status?.toUpperCase()) {
@@ -49,8 +76,8 @@ const AdminDashboard = () => {
         return 'bg-secondary-subtle text-secondary';
     }
   };
-
-  // Loading ပြသမည့် UI
+ 
+  // Loading UI
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -60,8 +87,8 @@ const AdminDashboard = () => {
       </div>
     );
   }
-
-  // Error ပြသမည့် UI
+ 
+  // Error UI
   if (error) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -69,56 +96,55 @@ const AdminDashboard = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="container-fluid min-vh-100 p-0 bg-light d-flex">
-      
-      {/* Main Content Area */}
       <div className="flex-grow-1 p-4">
         
         {/* Metrics/Counter Grid Section */}
         <div className="row g-3 mb-4">
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
-              <span className="fw-semibold mb-1 small text-uppercase tracking-wider text-muted">Total </span>
-              <h3 className="fw-bold m-0" style={{ color: "#d63384", fontSize: "2.2rem" }}>{totalClaims}</h3>
+              <span className="fw-semibold mb-1 small text-uppercase tracking-wider text-muted">Total</span>
+              <h2 className="fw-bold m-0" style={{ color: "#d63384", fontSize: "2.2rem" }}>{totalClaims}</h2>
             </div>
           </div>
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
               <span className="text-warning fw-semibold mb-1 small text-uppercase tracking-wider">Pending</span>
-              <h3 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{pendingClaims}</h3>
-            </div>
+              <h2 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{pendingClaims}</h2>
+ 
+</div>
           </div>
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
               <span className="text-success fw-semibold mb-1 small text-uppercase tracking-wider">Approved</span>
-              <h3 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{approvedClaims}</h3>
+              <h2 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{approvedClaims}</h2>
             </div>
           </div>
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
               <span className="text-danger fw-semibold mb-1 small text-uppercase tracking-wider">Rejected</span>
-              <h3 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{rejectedClaims}</h3>
+              <h2 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{rejectedClaims}</h2>
             </div>
           </div>
         </div>
-
-        {/* Bottom Main Data Layout Grid */}
+ 
+        {/* Bottom Layout Grid */}
         <div className="row g-4">
           
           {/* Left Block: Recent Claims Table */}
           <div className="col-lg-9">
             <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 className="fs-2 fw-bold text-dark mb-0">Recent Claims</h3>
+                <h3 className="fs-5 fw-bold text-dark mb-0">Recent Claims</h3>
                 <Link to="/Admin/AllClaims">
-                  <button className="btn btn-warning btn-sm border-0 fw-semibold py-2 px-3 text-dark rounded me-3 shadow-sm">
+                  <button className="btn btn-warning btn-sm border-0 fw-semibold px-3 text-dark rounded me-3 shadow-sm">
                      All
                   </button>
                 </Link>
               </div>
-
+ 
               <div className="table-responsive rounded-3 overflow-hidden">
                 <table className="table table-hover align-middle mb-0">
                   <thead style={{ backgroundColor: "rgb(255, 237, 146)" }} className="text-warning-emphasis border-bottom">
@@ -129,62 +155,77 @@ const AdminDashboard = () => {
                       <th className="py-3 text-end px-3" style={{ width: "25%", backgroundColor: "inherit" }}>Amount (MMK)</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {claimsData.length === 0 ? (
-                      <tr>
-                        <td colSpan="4" className="text-center py-4 text-muted">ဒေတာမရှိသေးပါ။</td>
-                      </tr>
-                    ) : (
-                      // နောက်ဆုံးတင်ထားတဲ့ Claims ထဲကမှ အခု ၇ ခုပဲ ဇယားမှာ ပြသရန် Slice လုပ်ထားခြင်း
-                      claimsData.slice(0, 7).map((claim, index) => (
-                        <tr key={claim.id || index} className="align-middle border-bottom">
-                          <td className="py-3 px-3 fw-semibold text-primary">CLM{String(claim.id).padStart(4, '0')}</td>
-                          <td className="py-3 text-secondary small">
-                            {claim.date ? new Date(claim.date).toLocaleDateString('en-GB') : '-'}
-                          </td>
-                          <td className="py-3 text-center">
-                            <span className={`badge ${getBadgeClass(claim.status)} px-3 py-2 border rounded-pill fw-semibold`} style={{ minWidth: "100px", fontSize: "0.8rem" }}>
-                              {claim.status}
-                            </span>
-                          </td>
-                          <td className="py-3 text-end px-3 fw-bold text-dark">
-                            {claim.amount ? Number(claim.amount).toLocaleString() : '0'}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
+                <tbody>
+  {claimsData.length === 0 ? (
+    <tr>
+      <td colSpan="4" className="text-center py-4 text-muted">
+        No claims found.
+      </td>
+    </tr>
+  ) : (
+    claimsData.slice(0, 7).map((claim, index) => (
+      <tr key={claim.claim_id || index}>
+        <td className="py-3 px-3 fw-semibold text-primary">
+          {`CLM${String(claim.claim_id).padStart(4, "0")}`}
+        </td>
+
+        <td className="py-3 text-secondary small">
+          {claim.accident_date
+            ? new Date(claim.accident_date).toLocaleDateString("en-GB")
+            : "-"}
+        </td>
+
+        <td className="py-3 text-center">
+          <span
+            className={`badge ${getBadgeClass(
+              claim.status
+            )} px-3 py-2 border rounded-pill fw-semibold`}
+            style={{ minWidth: "100px", fontSize: "0.8rem" }}
+          >
+            {claim.status}
+          </span>
+        </td>
+
+        <td className="py-3 text-end px-3 fw-bold text-dark">
+          {(claim.claimed_amount || 0)}
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
                 </table>
               </div>
             </div>
           </div>
-
-          {/* Right Block: Risk Level Sidebar Card */}
+ 
+{/* Right Block: Risk Level Sidebar Card */}
           <div className="col-lg-3">
             <div className="card bg-white border-0 rounded-4 shadow-sm p-4 text-start h-100">
               <h3 className="fs-5 fw-bold text-dark mb-4">Risk Level</h3>
               <div className="d-flex flex-column gap-3">
                 <div className="d-flex justify-content-between align-items-center border-bottom pb-2">
                   <span className="text-success fw-semibold small">Low Risk</span>
-                  <span className="fw-bold text-dark fs-5">3</span>
+                  {/*  Backend API ရဲ့ တွက်ချက်မှုအတိုင်း ကိန်းဂဏန်းများ တိုက်ရိုက်ပြပါမည် */}
+                  <span className="fw-bold text-dark fs-5">{riskStats.low}</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center border-bottom pb-2">
                   <span className="text-warning fw-semibold small">Medium Risk</span>
-                  <span className="fw-bold text-dark fs-5">5</span>
+                  <span className="fw-bold text-dark fs-5">{riskStats.medium}</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center border-bottom pb-2">
                   <span className="text-danger fw-semibold small">High Risk</span>
-                  <span className="fw-bold text-dark fs-5">4</span>
+                  <span className="fw-bold text-dark fs-5">{riskStats.high}</span>
                 </div>
               </div>
             </div>
           </div>
-
+ 
         </div>
-
+ 
       </div>
     </div>
   );
 };
-
+ 
 export default AdminDashboard;
+ 

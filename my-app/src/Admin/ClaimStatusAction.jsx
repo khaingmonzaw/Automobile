@@ -140,7 +140,7 @@ function ClaimStatusAction() {
 
    <tr>
         <td>Policy Number</td>
-        <td>PLC-{claim.policy_id}</td>
+        <td>{claim.policy_id}</td>
       </tr>
       <tr>
         <td>User ID</td>

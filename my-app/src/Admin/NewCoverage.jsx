@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 const NewCoverage = () => {
   const navigate = useNavigate();
   const [coverageType, setCoverageType] = useState('');
-  const [baseRate, setBaseRate] = useState('');
   const [coverageLimit, setCoverageLimit] = useState('');
   const [description, setDescription] = useState('');
 
@@ -13,7 +12,6 @@ const NewCoverage = () => {
 
   const handleReset = () => {
     setCoverageType('');
-    setBaseRate('');
     setCoverageLimit('');
     setDescription('');
     setValidated(false);
@@ -27,7 +25,7 @@ const NewCoverage = () => {
     setIsDuplicate(false);
 
     // 1. Front-end Validation Check
-    if (!coverageType || !baseRate || !coverageLimit || !description) {
+    if (!coverageType || !coverageLimit || !description) {
       return; 
     }
 
@@ -51,8 +49,7 @@ const NewCoverage = () => {
 
     // 3. Match keys with backend requirements and sanitize values
     const formData = {
-      coverageType: coverageType.trim(),
-      baseRate: Number(baseRate),        
+      coverageType: coverageType.trim(),      
       coverageLimit: Number(coverageLimit), 
       description: description.trim()
     };
@@ -135,36 +132,6 @@ const NewCoverage = () => {
                     *This Coverage Type already exists in the database.
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Base Rate */}
-            <div className="row align-items-start my-3">
-              <div className="col-sm-4 pt-2">
-                <label htmlFor="base-rate" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Base Rate
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="input-group has-validation">
-                  <input 
-                    id="base-rate"
-                    type="number" 
-                    step="any"
-                    className={`form-control border-secondary-subtle py-2 px-3 text-dark fw-medium ${validated && !baseRate ? 'is-invalid' : ''}`}
-                    placeholder="10,000" 
-                    value={baseRate}
-                    onChange={(e) => setBaseRate(e.target.value)}
-                    style={{ borderRadius: "8px", paddingRight: "65px", fontSize: "14px" }}
-                    required
-                  />
-                  <span className="position-absolute end-0 top-50 translate-middle-y me-5 text-secondary small fw-bold z-3" style={{ pointerEvents: "none" }}>
-                    MMK
-                  </span>
-                  <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *Base Rate is required.
-                  </div>
-                </div>
               </div>
             </div>
 

@@ -13,21 +13,20 @@ function MyClaims() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.id;
 
-  useEffect(() => {
-    if (!userId) return;
+ useEffect(() => {
+  if (!userId) return;
 
-    fetch(`http://localhost:3000/api/claims/user/${userId}`)
-      .then(async (res) => {
-        const text = await res.text();
-        console.log("RAW RESPONSE:", text);
-
-        return JSON.parse(text);
-      })
-      .then(data => setClaims(data))
-      .catch(err => console.log(err));
-
-  }, [userId]);
-
+  fetch(`http://localhost:3000/api/claims/user/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log("Claims:", data);
+      setClaims(Array.isArray(data) ? data : []);
+    })
+    .catch(err => {
+      console.log(err);
+      setClaims([]);
+    });
+}, [userId]);
   const handleSelect = (value) => {
     setStatus(value);
     setCurrentPage(1); 
