@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
  
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from './LoginPage';
-import Dashboard from './User/Dashborad';
+import Dashboard from "./User/Dashborad";
 import NewClaim from './User/NewClaim';
 import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
