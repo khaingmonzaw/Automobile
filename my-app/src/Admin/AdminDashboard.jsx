@@ -80,26 +80,26 @@ const AdminDashboard = () => {
         <div className="row g-3 mb-4">
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
-              <span className="fw-semibold mb-1 small text-uppercase tracking-wider text-muted">Total Claims</span>
-              <h2 className="fw-bold m-0" style={{ color: "#d63384", fontSize: "2.2rem" }}>{totalClaims}</h2>
+              <span className="fw-semibold mb-1 small text-uppercase tracking-wider text-muted">Total </span>
+              <h3 className="fw-bold m-0" style={{ color: "#d63384", fontSize: "2.2rem" }}>{totalClaims}</h3>
             </div>
           </div>
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
               <span className="text-warning fw-semibold mb-1 small text-uppercase tracking-wider">Pending</span>
-              <h2 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{pendingClaims}</h2>
+              <h3 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{pendingClaims}</h3>
             </div>
           </div>
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
               <span className="text-success fw-semibold mb-1 small text-uppercase tracking-wider">Approved</span>
-              <h2 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{approvedClaims}</h2>
+              <h3 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{approvedClaims}</h3>
             </div>
           </div>
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">
               <span className="text-danger fw-semibold mb-1 small text-uppercase tracking-wider">Rejected</span>
-              <h2 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{rejectedClaims}</h2>
+              <h3 className="fw-bold text-dark m-0" style={{ fontSize: "2.2rem" }}>{rejectedClaims}</h3>
             </div>
           </div>
         </div>
@@ -111,9 +111,9 @@ const AdminDashboard = () => {
           <div className="col-lg-9">
             <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 className="fs-5 fw-bold text-dark mb-0">Recent Claims</h3>
+                <h3 className="fs-2 fw-bold text-dark mb-0">Recent Claims</h3>
                 <Link to="/Admin/AllClaims">
-                  <button className="btn btn-warning btn-sm border-0 fw-semibold px-3 text-dark rounded me-3 shadow-sm">
+                  <button className="btn btn-warning btn-sm border-0 fw-semibold py-2 px-3 text-dark rounded me-3 shadow-sm">
                      All
                   </button>
                 </Link>

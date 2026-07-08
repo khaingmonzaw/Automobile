@@ -9,7 +9,8 @@ import {
   faFileInvoiceDollar,
   faHouseChimney,
   faUsers,
-  faShieldHalved
+  faShieldHalved,
+  faKey
 } from "@fortawesome/free-solid-svg-icons";
 function Layout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -192,7 +193,7 @@ const navigate = useNavigate();
           )}
         </NavLink>
       </li>
-        <li className="mb-2">
+        {/* <li className="mb-2">
   <NavLink
     to="/admin/claims" 
     className={({ isActive }) =>
@@ -210,13 +211,12 @@ const navigate = useNavigate();
       </>
     )}
   </NavLink>
-</li>
+</li> */}
 
 {/* ❌ အဟောင်း: /Admin/ClaimListExample သို့သွားထားသည် */}
-{/* 💡 ပြင်ရန်: Users နှိပ်လျှင်လည်း ClaimListexample သို့မဟုတ် သက်ဆိုင်ရာ လမ်းကြောင်းမှန်ဆီသွားရန် */}
 <li className="mb-2">
   <NavLink
-    to="" 
+    to="/Admin/Users" 
     className={({ isActive }) =>
       `d-block p-3 rounded text-decoration-none ${
         isActive ? "bg-warning text-white" : "text-dark"
@@ -303,7 +303,7 @@ const navigate = useNavigate();
               </button>
 
               {open && (
-                <ul className="dropdown-menu show"
+                <ul className="dropdown-menu show "
                   style={{
                     position: "absolute",
                     right: 0,
@@ -311,14 +311,15 @@ const navigate = useNavigate();
                   }}
                 >
                   <li>
-                    <button className="dropdown-item">{user?.name}</button>
+                    <button className="dropdown-item">UserName : {user?.name}</button>
                   </li>
                   <li>
-                    <button className="dropdown-item">{user?.email}</button>
+                    <button className="dropdown-item">Email : {user?.email}</button>
                   </li>
                   <hr />
                   <li>
-                    <button className="dropdown-item" onClick={handleChangePassword}>Change Password</button>
+                    <button className="dropdown-item " onClick={handleChangePassword}><FontAwesomeIcon icon={faKey} style={{color: "rgb(7, 27, 42)",}} />
+ Change Password</button>
                   </li>
                 </ul>
               )}

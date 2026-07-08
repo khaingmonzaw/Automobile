@@ -62,7 +62,13 @@ const CoverageTypes = () => {
       `}</style>
 
       {/* Top Header Row - Fully responsive stacking using standard Bootstrap utilities */}
-      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 w-100">
+     
+
+      {/* Table Main Wrapper Card Container */}
+      <div className="card bg-white border border-secondary-subtle rounded-4 shadow-sm w-100  p-4">
+
+
+         <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 w-100">
         <h2 className="mb-0 fw-bold fs-3 text-dark">Coverage Types</h2>
         <button 
           className="btn btn-warning d-flex align-items-center justify-content-center fw-bold fs-4 text-dark shadow-sm align-self-start align-self-sm-auto" 
@@ -73,41 +79,39 @@ const CoverageTypes = () => {
           +
         </button>
       </div>
-
-      {/* Table Main Wrapper Card Container */}
-      <div className="card bg-white border border-secondary-subtle rounded-4 shadow-sm w-100 overflow-hidden">
         {/* Bootstrap table-responsive class guarantees scrollability without compressing grid layout items */}
-        <div className="table-responsive p-1 p-md-3">
-          <table className="table table-hover align-middle mb-0 text-start" style={{ minWidth: "850px" }}>
+        <div className="">
+          <table className="table table-hover align-middle mb-0 text-start w-100"
+          style={{ tableLayout: "fixed" }} >
             <thead>
               <tr>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "10%" }}>Coverage ID</th>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "20%" }}>Coverage Type</th>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "30%" }}>Description</th>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "15%" }}>Base Rate (MMK)</th>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "15%" }}>Coverage Limit (MMK)</th>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3 text-center" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "10%" }}>Status</th>
-                <th className="border-bottom-0 text-dark fw-bold px-3 py-3 text-center" style={{ fontSize: "14px", backgroundColor: "#ffed92", width: "10%" }}>Action</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92" }}>Coverage ID</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Coverage Type</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Description</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92",  }}>Base Rate (MMK)</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Coverage Limit (MMK)</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3 text-center" style={{  backgroundColor: "#ffed92" }}>Status</th>
+                <th className="border-bottom-0 text-dark fw-bold  py-3 text-center" style={{  backgroundColor: "#ffed92" }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {
                 currentRecords.map((coverage) => (
                   <tr key={coverage.coverage_type_id} className="border-bottom border-light-subtle">
-                    <td className="px-3 py-3 text-dark fw-semibold" style={{ fontSize: "14px" }}>{coverage.coverage_type_id}</td>
-                    <td className="px-3 py-3 text-dark fw-semibold" style={{ fontSize: "14px" }}>{coverage.coverage_type}</td>
-                    <td className="px-3 py-3 text-dark fw-semibold" style={{ fontSize: "14px", lineHeight: "1.4", wordBreak: "break-word" }}>
+                    <td className="py-3 text-dark fw-semibold" >{coverage.coverage_type_id}</td>
+                    <td className="py-3 text-dark fw-semibold" >{coverage.coverage_type}</td>
+                    <td className="py-3 text-dark fw-semibold" style={{ fontSize: "14px", lineHeight: "1.4", wordBreak: "break-word" }}>
                       {coverage.description}
                     </td>
-                    <td className="px-3 py-3 text-dark fw-semibold" style={{ fontSize: "14px" }}>
+                    <td className="py-3 text-dark fw-semibold" >
                       {Number(coverage.base_rate).toLocaleString()}
                     </td>
-                    <td className="px-3 py-3 text-dark fw-semibold" style={{ fontSize: "14px" }}>
+                    <td className="py-3 text-dark fw-semibold" >
                       {Number(coverage.coverage_limit).toLocaleString()}
                     </td>
-                    <td className="px-3 py-3 text-center">
+                    <td className="py-3 text-center">
                       {coverage.status === 'active' ? (
-                        <span className="badge rounded-pill fw-bold text-info-emphasis bg-info-subtle px-3 py-2" style={{ fontSize: "13px" }}>
+                        <span className="badge rounded-pill fw-bold text-info-emphasis bg-success-subtle px-3 py-2" style={{ fontSize: "13px" }}>
                           Active
                         </span>
                       ) : (
@@ -136,67 +140,25 @@ const CoverageTypes = () => {
           </table>
         </div>
 
-        {/* Responsive Wrap-Friendly Bootstrap Pagination Layout Footer Container */}
-        {/* --- UPDATED: MAXIMUM DARKNESS & THICKNESS FOR ARROWS --- */}
-        <div className="d-flex flex-wrap justify-content-center align-items-center gap-2 py-4 px-2 bg-light border-top border-light-subtle">
+        {/* Pagination */}
+        <div className="d-flex justify-content-center my-5">
+
           <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
+          className="btn btn-outline-warning me-2"
+          onClick={()=>setCurrentPage(prev=>prev-1)}
+          >Prev</button>
+
+          <span className='px-3 py-1'>
+
+            Page {currentPage} of {totalPages}
+          </span>
+          <button className="btn btn-outline-warning"
+          disabled={currentPage==totalPages}
+
+          onClick={()=>setCurrentPage(prev=>prev+1)}
           >
-            &lt;&lt;
-          </button>
-          <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center me-2 shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </button>
-          
-          <div className="d-flex flex-wrap gap-2 align-items-center">
-            {Array.from({ length: totalPages }, (_, index) => {
-              const pageNum = index + 1;
-              const isActive = currentPage === pageNum;
-              return (
-                <button 
-                  key={pageNum}
-                  className={isActive ? "btn text-white fw-bold d-flex align-items-center justify-content-center mx-0 shadow-sm" : "btn custom-pag-btn text-dark border fw-semibold d-flex align-items-center justify-content-center mx-0 shadow-sm"} 
-                  style={{ 
-                    fontSize: "16px", 
-                    width: "40px", 
-                    height: "40px", 
-                    borderRadius: "8px",
-                    backgroundColor: isActive ? "#40a9ff" : "#ffffff",
-                    borderColor: isActive ? "#40a9ff" : "#dee2e6",
-                    borderStyle: "solid",
-                    borderWidth: "1px"
-                  }}
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-          </div>
-          
-          <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center ms-2 shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            &gt;
-          </button>
-          <button 
-            className="btn custom-pag-btn border d-flex align-items-center justify-content-center shadow-sm" 
-            style={{ fontSize: "16px", width: "40px", height: "40px", borderRadius: "8px", backgroundColor: "#ffffff", color: "#000000", fontWeight: "900" }}
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            &gt;&gt;
+
+            Next
           </button>
         </div>
       </div>

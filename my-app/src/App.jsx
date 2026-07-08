@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
  
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from './LoginPage';
-import Dashboard from './User/Dashborad';
+import Dashboard from "./User/Dashborad";
 import NewClaim from './User/NewClaim';
 import MyClaims from './User/MyClaims';
 import Layout from './components/Layout';
@@ -13,12 +13,14 @@ import AdminDashboard from './Admin/AdminDashboard.jsx';
 import AllClaims from './Admin/AllClaims.jsx';
 import Profile from './User/Profile.jsx';
 
-import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
+// import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
 import CoverageTypes from './Admin/CoverageTypes.jsx';
 import NewCoverage from './Admin/NewCoverage.jsx';
 import CoverageUpdate from './Admin/CoverageUpdate.jsx';
+import ClaimStatusAction from './Admin/ClaimStatusAction';
 
-import ClaimDetailApproved from './Admin/ClaimDetailApproved'
+
+// import ClaimDetailApproved from './Admin/ClaimDetailApproved'
 import PasswordChangeUser from './User/PasswordChangeUser.jsx';
 import PasswordChangeAdmin from './Admin/PasswordChangeAdmin.jsx';
 import Projected from "./Projected.jsx";
@@ -58,20 +60,29 @@ function App() {
 
 
 
-      <Route path="/Admin" element={<Layout />}>
+      <Route
+        path="/Admin"
+        element={
+          <Projected role="admin">
+            <Layout />
+          </Projected>
+        }
+      >
         <Route index element={<Navigate to="ClaimDetailApproved" replace />} />
         <Route path="AdminDashboard" element={<AdminDashboard />} />
         <Route path="AllClaims" element={<AllClaims />} />
-        <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} />
+        {/* <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} /> */}
         <Route path="CoverageTypes" element={<CoverageTypes />} />
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
-        <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
+        {/* <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} /> */}
         <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
-        <Route path="Adduser" element={<Adduser />} />
+        <Route path="Users/Adduser" element={<Adduser />} />
         <Route path="Adduser/:id" element={<Adduser />} />
-        <Route path="UserDetail/:id" element={<UserDetail />} />
+        <Route path="Users/UserDetail/:id" element={<UserDetail />} />
          <Route path="Users" element={<Userlist/>} /> 
+         <Route path="AllClaims/ClaimStatusAction/:id" element={< ClaimStatusAction />} />
+
       </Route>
 
 

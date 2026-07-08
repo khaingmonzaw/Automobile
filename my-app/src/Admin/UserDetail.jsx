@@ -50,21 +50,34 @@ function UserDetail() {
   if (!user) return <div className="text-center mt-5">Loading...</div>;
 
   return (
+
+    <>
+      <div className="mb-2 text-start">
+        <button
+          className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0"
+          style={{ width: "40px", height: "36px", borderRadius: "8px" }}
+          onClick={() => navigate('/Admin/Users')}
+          aria-label="Back to coverage list"
+        >
+          {/* Centered, Bold/Thick Vector Arrow Icon */}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+      </div>
     <div className="container mt-4 bg-white p-4 shadow-sm rounded" style={{ fontSize: '0.85rem' }}>
       {/* Header with Back and Edit buttons */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fw-bold m-0">User Information</h4>
+        <h4 className="fs-3 fw-bold m-0">User Information</h4>
         <div className="d-flex gap-2">
+        
+
+
+          
           <button 
-            className="btn btn-sm fw-bold" 
-            style={{ backgroundColor: '#F3D955', color: '#000', border: 'none' }} 
-            onClick={() => navigate(-1)}
-          >
-            ← Back
-          </button>
-          <button 
-            className="btn btn-sm fw-bold" 
-            style={{ backgroundColor: '#F3D955', color: '#000', border: 'none' }} 
+            className="btn fw-bold btn-warning" 
+
             onClick={() => navigate(`/Admin/Adduser/${user.id}`)}
           >
             Edit
@@ -95,6 +108,7 @@ function UserDetail() {
         </tbody>
       </table>
     </div>
+    </>
   );
 }
 

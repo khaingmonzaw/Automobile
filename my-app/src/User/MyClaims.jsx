@@ -56,9 +56,9 @@ function MyClaims() {
     
 
       {/* Table */}
-      <div className="row bg-white">
+      <div className="row bg-white border rounded">
         
-        <div className="col-12 py-5 px-4">
+        <div className="col-12 p-5">
 
 
 
@@ -76,16 +76,16 @@ function MyClaims() {
           <ul className="dropdown-menu">
 
             <li><button className="dropdown-item" onClick={() => handleSelect("All")}>All</button></li>
-            <li><button className="dropdown-item" onClick={() => handleSelect("PENDING")}>Pending</button></li>
-            <li><button className="dropdown-item" onClick={() => handleSelect("APPROVED")}>Approved</button></li>
-            <li><button className="dropdown-item" onClick={() => handleSelect("REJECTED")}>Rejected</button></li>
+            <li><button className="dropdown-item" onClick={() => handleSelect("PENDING")}>PENDINF</button></li>
+            <li><button className="dropdown-item" onClick={() => handleSelect("APPROVED")}>APPROVED</button></li>
+            <li><button className="dropdown-item" onClick={() => handleSelect("REJECTED")}>REJECTED</button></li>
 
           </ul>
 
         </div>
       </div>
         <div className=" table-responsive">
-            <table className="table table-bordered ">
+            <table className="table table-bordered w-100 ">
             <thead>
               <tr>
                 <th style={{ backgroundColor: "#ffed92" }}>Claim ID</th>
@@ -112,7 +112,9 @@ function MyClaims() {
                     <td>{c.accident_date ? new Date(c.accident_date).toISOString().split("T")[0] : "-"}</td>
                     <td>{c.status}</td>
                     <td>{c.claimed_amount}</td>
-                    <td> {c.description}</td>
+                    <td style={{ whiteSpace: "normal", wordBreak: "break-word", maxWidth: "250px" }}>
+  {c.description}
+</td>
                     <td>
                       <Link to={`../MyClaims/ClaimDetails/${c.claim_id}`}>
                         <button className="btn btn-warning">
