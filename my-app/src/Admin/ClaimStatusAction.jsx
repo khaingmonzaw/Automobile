@@ -14,80 +14,63 @@ function ClaimStatusAction() {
   const [remarkInput, setRemarkInput] = useState('');
 
   // Fetch claim data
-  useEffect(() => {
-    const fetchClaim = async () => {
-      try {
-        console.log("Fetching claim:", id);
-
-        setLoading(true);
-
-        const response = await fetch(`http://localhost:3000/api/admin/ClaimStatus/${id}`);
-
-        console.log("Response status:", response.status);
-
-        const data = await response.json();
-
-        console.log("Data:", data);
-
-        if (!response.ok) {
-          throw new Error(data.message || "Claim not found");
-        }
-
+const fetchClaimData = async () => {
+    try {
+      setLoading(true);
+      setError(null); // Clear any old errors
+      
+      const response = await fetch(`http://localhost:3000/api/admin/ClaimStatus/${id}`);
+      const data = await response.json();
+      
+      if (response.ok) {
         setClaim(data);
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        console.log("Finished loading");
-        setLoading(false);
+      } else {
+        throw new Error(data.message || "Failed to fetch claim details.");
       }
-    };
-
-    if (id) fetchClaim();
-  }, [id]);
-
-
-  // Submit decision (Approve/Reject)
- const handleSubmit = async () => {
-  if (!decision) {
-    alert("Please select Approve or Reject.");
-    return;
-  }
-
-  setSubmitting(true);
-
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/admin/claims/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: decision,
-          remark: remarkInput
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message);
+    } catch (err) {
+      console.error("Error fetching claim:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    alert(data.message);
+  useEffect(() => {
+    fetchClaimData();
+  }, [id]); // Triggers reload when self-navigating with identical ID
 
-    // return to all claims page
-    navigate("/Admin/Claims");
+  const handleSubmitDecision = async (e) => {
+    e.preventDefault();
+    if (!decision) return alert("Please select an action (Approve or Reject)");
+    
+    setSubmitting(true);
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/claims/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: decision, remark: remarkInput })
+      });
 
-  } catch (error) {
-    alert("Error: " + error.message);
-  } finally {
-    setSubmitting(false);
-  }
-};
+      const resData = await response.json();
+
+      if (response.ok) {
+        if (decision === 'APPROVED') {
+          // Navigate to ApprovalDetails with calculation data package
+          navigate('/Admin/ClaimApprovalDetails', { state: { dataBundle: { ...resData, claim_id: id } } });
+        } else {
+          // If rejected, navigate to itself to refresh table variables with updated status
+          alert("Claim rejected successfully.");
+          fetchClaimData(); 
+        }
+      } else {
+        alert(resData.message || "An execution error occurred.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
   // Helper Row Component - now displays as a single row in one column
   const Row = ({ label, value, isStatus = false }) => {
     let statusClass = '';
@@ -119,7 +102,7 @@ function ClaimStatusAction() {
     <div className="claim-detail-container">
       {/* Back Button */}
       <div className="back-button-wrapper">
-        <button className="btn-back" onClick={() => navigate(-1)}>
+        <button className="btn-back" onClick={() => navigate('/Admin/AllClaims') }>
           <FontAwesomeIcon icon={faCircleLeft} /> 
         </button>
       </div>
@@ -140,7 +123,7 @@ function ClaimStatusAction() {
 
    <tr>
         <td>Policy Number</td>
-        <td>PLC-{claim.policy_id}</td>
+        <td>{claim.policy_id}</td>
       </tr>
       <tr>
         <td>User ID</td>
@@ -254,7 +237,7 @@ function ClaimStatusAction() {
                     type="radio"
                     name="decision"
                     value="REJECTED"
-                    checked={decision === 'Reject'}
+                    checked={decision === 'REJECTED'}
                     onChange={(e) => setDecision(e.target.value)}
                     className='text-danger'
                   />
@@ -263,7 +246,7 @@ function ClaimStatusAction() {
               </div>
             </div>
             <div className="d-flex justify-content-center">
-              <button className="btn btn-warning me-2" onClick={handleSubmit} disabled={submitting}>
+              <button className="btn btn-warning me-2" onClick={handleSubmitDecision} disabled={submitting}>
                 {submitting ? 'Submitting...' : 'Continue' }
               </button>
               <button className="btn btn-danger ms-2" onClick={() => navigate(-1)}>Cancel</button>

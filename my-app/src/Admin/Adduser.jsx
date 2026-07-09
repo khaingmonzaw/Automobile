@@ -19,7 +19,7 @@ function AddUser() {
     const emailRegex = /^[^0-9][a-zA-Z0-9._%+-]+@[a-zA-Z]{4,}\.[a-zA-Z]{3,}$/;
     const phoneRegex = /^09\d{9}$/;
     const licenseRegex = /^[A-D]\/[A-Z]{2,4}-\d{5,6}$/;
-    const vehicleNoRegex = /^[0-9]{1,2}[A-Z]-[0-9]{4,5}$/;
+    const vehicleNoRegex = /^[0-9]{1,2}[A-Z]-[0-9]{4}$/;
     const policyRegex = /^POL-\d+$/;
     // Full Name 
     if (!formData.fullName.trim()) {
@@ -64,6 +64,8 @@ function AddUser() {
       newErrors.driverLicense = "*Driver License is required";
     } else if (!licenseRegex.test(formData.driverLicense.toUpperCase())) {
       newErrors.driverLicense = "*Format error! Example: A/YGN-123456";
+    } else if (formData.driverLicense.length < 10) {
+      newErrors.driverLicense = "*Driver License must be at least 10 characters";
     }
 
     // ၂။ Driving Duration check
@@ -82,8 +84,6 @@ function AddUser() {
     // Address
     if (!formData.address.trim()) {
       newErrors.address = "*Address is required";
-    } else if (!nameRegex.test(formData.address)) {
-      newErrors.address = "*Address must not contain digits or special characters";
     }
     //Vehicle
     if (!formData.vehicleModel.trim()) {
@@ -91,31 +91,37 @@ function AddUser() {
     }
     if (!formData.vehicleNumber.trim()) {
       newErrors.vehicleNumber = "*Vehicle Number is required";
-    } else {
-      //  ( 1A/1234)
-      if (!vehicleNoRegex.test(formData.vehicleNumber.toUpperCase())) {
-        newErrors.vehicleNumber = "*Invalid format. Use (e.g., 1Y-1234)";
-      }
+    } else if (!vehicleNoRegex.test(formData.vehicleNumber.toUpperCase())) {
+      newErrors.vehicleNumber = "*Invalid format. Example: 1Y-1234";
     }
     //Policy
     if (!formData.policyNumber.trim()) {
       newErrors.policyNumber = "*Policy Number is required";
     } else if (!policyRegex.test(formData.policyNumber)) {
       newErrors.policyNumber = "*Invalid format! Example: POL-0001";
-    }/*else {
-    ၂။ Database ထဲမှာ ရှိ/မရှိ စစ်ဆေးခြင်း
-    try {
-      const response = await fetch(`/api/check-policy?number=${policyValue}`);
-      const data = await response.json();
-      
-      if (data.isUsed) {
-        newErrors.policyNumber = "This policy has already been used!";
-      }
-    } catch (error) {
-      console.error("Database check failed:", error);
-      newErrors.policyNumber = "Error checking policy. Please try again.";
     }
-  }*/
+
+    else if (formData.policyNumber.length < 8) {
+      newErrors.policyNumber = "*Policy Number must be at least 8 characters";
+    }
+
+    // Start Date
+    if (!formData.startDate) {
+      newErrors.startDate = "*Start Date is required";
+    }
+
+    // End Date
+    if (!formData.endDate) {
+      newErrors.endDate = "*End Date is required";
+    } else if (formData.startDate) {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(formData.endDate);
+
+      if (endDate <= startDate) {
+        newErrors.endDate = "*End Date must be greater than Start Date";
+      }
+    }
+
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -151,6 +157,7 @@ function AddUser() {
             : [];
           // Map the database response to your formData state
           setFormData({
+            
             fullName: data.name || "",
             email: data.email || "",
             phone: data.phone || "",
@@ -178,8 +185,13 @@ function AddUser() {
   const states = mmNrc.getNrcStates();
   const types = mmNrc.getNrcTypes();
   const allTownships = mmNrc.getNrcTownships();
-  const townships = formData.nrcState ? mmNrc.getNrcTownshipsByStateId(formData.nrcState) : allTownships;
+  const selectedState = states.find(
+    state => state.number.en === formData.nrcState
+  );
 
+  const townships = selectedState
+    ? mmNrc.getNrcTownshipsByStateId(selectedState.id)
+    : [];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -207,10 +219,41 @@ function AddUser() {
       };
     });
   };
+  //   const checklicenseExists = async (driverLicense) => {
+  //     if (!driverLicense) return;
+
+  //     // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် စစ်ဆေးရန်
+  //     if (isEditMode) return;
+
+  //     try {
+  // const response = await fetch(
+  //   `http://localhost:3000/api/check-driverlicense?driverLicense=${encodeURIComponent(driverLicense)}`
+  // );      const data = await response.json();
+
+  //       if (data.isUsed) {
+  //         setErrors(prev => ({ ...prev, driverLicense: "This License no is already in use!" }));
+  //       } else {
+  //         setErrors(prev => {
+  //           const newErrors = { ...prev };
+  //           delete newErrors.driverLicense;
+  //           return newErrors;
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error("License check error:", error);
+  //     }
+
+
+
+
+
+  //   };
+
+
   const checkPolicyExists = async (policyNum) => {
     if (!policyNum) return;
 
-    // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် အထူးစစ်ဆေးရန်
+    // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် စစ်ဆေးရန်
     if (isEditMode) return;
 
     try {
@@ -229,6 +272,41 @@ function AddUser() {
     } catch (error) {
       console.error("Policy check error:", error);
     }
+
+
+
+
+
+  };
+
+
+  const checkVehicleExists = async (vehicleNumber) => {
+    if (!vehicleNumber) return;
+
+    // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် စစ်ဆေးရန်
+    if (isEditMode) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/check-vehicle?vehicle_number=${vehicleNumber}`);
+      const data = await response.json();
+
+      if (data.isUsed) {
+        setErrors(prev => ({ ...prev, vehicleNumber: "The Vehicle number is already in use!" }));
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.vehicleNumber;
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      console.error("Policy check error:", error);
+    }
+
+
+
+
+
   };
   const handleSave = async () => {
     if (validate()) {
@@ -240,21 +318,37 @@ function AddUser() {
       const fullNrc = `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`;
       console.log("Current Form NRC :", fullNrc);
       // ဥပမာ - Email တစ်ခုတည်းကိုပဲ စစ်မယ်ဆိုရင်
-      const checkDuplicate = async (field, value) => {
-        const res = await fetch(`http://localhost:3000/api/check-duplicate?field=${field}&value=${value}&userId=${id}`);
-        const data = await res.json();
-        if (data.isUsed) {
-          setErrors(prev => ({ ...prev, [field]: `This ${field} is already registered!` }));
-          return true; // ရှိနေကြောင်း ပြန်ပြောမယ်
-        }
-        return false;
-      };
+      // const checkDuplicate = async (field, value) => {
+
+      //   if (!value) return false;
+
+      //   const res = await fetch(
+      //     `http://localhost:3000/api/check-duplicate?field=${field}&value=${encodeURIComponent(value)}&userId=${id || ""}`
+      //   );
+
+      //   const data = await res.json();
+
+      //   if (data.isUsed) {
+
+      //     setErrors(prev => ({
+      //       ...prev,
+      //       [field]: `This ${field.replace("_", " ")} is already registered`
+      //     }));
+
+      //     return true;
+      //   }
+
+      //   return false;
+      // };
 
       // သုံးတဲ့အခါ
-      if (await checkDuplicate('email', formData.email)) return;
-      if (await checkDuplicate('phone', formData.phone)) return;
-      if (await checkDuplicate('driver_license', formData.driver_license)) return;
-      if (await checkDuplicate('policy_number', formData.policyNumber)) return;
+      // if (await checkDuplicate('email', formData.email)) return;
+      // if (await checkDuplicate('phone', formData.phone)) return;
+      // if (await checkDuplicate("driver_license", formData.driverLicense)) return;
+
+      // if (await checkDuplicate("vehicle_number", formData.vehicleNumber)) return;
+
+      // if (await checkDuplicate("policy_number", formData.policyNumber)) return;
       // ... စသဖြင့် ဆက်စစ်သွားလို့ရပါတယ်
       const dataToSend = {
         ...formData,
@@ -272,18 +366,23 @@ function AddUser() {
           body: JSON.stringify(dataToSend),
         });
         const result = await response.json();
-        if (response.ok) {
-          alert("Success");
-          navigate('/Admin/Users'); //  List page 
-        } else {
-          const errorData = await response.json().catch(() => ({ message: "Unknown Server Error" }));
-          alert("Error: " + (result.message || "Failed to save"));
-        }
+
+if (response.ok) {
+
+  alert(result.message || "Success");
+  navigate('/Admin/Users');
+
+} else {
+
+  alert("Error: " + result.message);
+
+}
       } catch (error) {
         console.error("Error:", error);
         alert("Connection Error to Sever");
       }
     }
+    
   };
   const renderRow = (label, input, error) => (
     <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
@@ -329,31 +428,25 @@ function AddUser() {
         <div className="row ">
           <div className="col-md-6 ">
             <SectionHeader icon="👤" title="User Information" />
-            {renderRow("Full Name", <input name="fullName" value={formData.fullName} onChange={handleInputChange}className={`form-control form-control-sm ${
-    errors.fullName ? "is-invalid" : ""
-  }`} style={inputStyle} />,
+            {renderRow("Full Name", <input name="fullName" value={formData.fullName} onChange={handleInputChange} className={`form-control form-control-sm ${errors.fullName ? "is-invalid" : ""
+              }`} style={inputStyle} />,
               errors.fullName)}
-            {renderRow("Email", <input name="email" value={formData.email} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.email ? "is-invalid" : ""
-  }`} style={inputStyle} />,
+            {renderRow("Email", <input name="email" value={formData.email} onChange={handleInputChange} className={`form-control form-control-sm ${errors.email ? "is-invalid" : ""
+              }`} style={inputStyle} />,
               errors.email)}
-            {renderRow("Phone", <input name="phone" value={formData.phone} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.phone ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.phone)}
-            {renderRow("DOB", <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.dob ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.dob)}
-            {renderRow("Driver License", <input name="driverLicense" value={formData.driverLicense} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.driverLicense ? "is-invalid" : ""
-  }`} style={inputStyle} placeholder="A/YGN-123456" />, errors.driverLicense)}
-            {renderRow("Driving Year", <input name="drivingYear" type="number" value={formData.drivingYear} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.driver_year ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.drivingYear)}
+            {renderRow("Phone", <input name="phone" value={formData.phone} onChange={handleInputChange} className={`form-control form-control-sm ${errors.phone ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.phone)}
+            {renderRow("DOB", <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`form-control form-control-sm ${errors.dob ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.dob)}
+            {renderRow("Driver License", <input name="driverLicense" value={formData.driverLicense} onChange={handleInputChange} className={`form-control form-control-sm ${errors.driverLicense ? "is-invalid" : ""
+              }`} style={inputStyle} placeholder="A/YGN-123456" />, errors.driverLicense)}
+            {renderRow("Driving Year", <input name="drivingYear" type="number" value={formData.drivingYear} onChange={handleInputChange} className={`form-control form-control-sm ${errors.driver_year ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.drivingYear)}
             {renderRow("NRC", (
               <div className="d-flex gap-1">
                 <select name="nrcState" className="form-select form-select-sm" value={formData.nrcState} onChange={handleInputChange} style={inputStyle}>
                   <option value="">Select</option>
-                  {states.map((s) => <option key={s.id} value={s.id}>{s.number.en}</option>)}
+                  {states.map((s) => <option key={s.id} value={s.number.en}>{s.number.en}</option>)}
                 </select>
                 <select name="nrcTownship" className="form-select form-select-sm" value={formData.nrcTownship} onChange={handleInputChange} style={inputStyle}>
                   <option value="">Select</option>
@@ -366,17 +459,14 @@ function AddUser() {
               </div>
             ), errors.nrcNumber)}
 
-            {renderRow("Address", <input name="address" value={formData.address} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.address ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.address)}
+            {renderRow("Address", <input name="address" value={formData.address} onChange={handleInputChange} className={`form-control form-control-sm ${errors.address ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.address)}
 
             <SectionHeader icon="🚗" title="Vehicle Information" />
-            {renderRow("Vehicle Model", <input name="vehicleModel" value={formData.vehicleModel} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.vehicleModel ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.vehicleModel)}
-            {renderRow("Vehicle Number", <input name="vehicleNumber" value={formData.vehicleNumber} onChange={handleInputChange} className={`form-control form-control-sm ${
-    errors.vehicleNumber ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.vehicleNumber)}
+            {renderRow("Vehicle Model", <input name="vehicleModel" value={formData.vehicleModel} onChange={handleInputChange} className={`form-control form-control-sm ${errors.vehicleModel ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.vehicleModel)}
+            {renderRow("Vehicle Number", <input name="vehicleNumber" value={formData.vehicleNumber} onChange={handleInputChange} onBlur={(e) => checkVehicleExists(e.target.value)} className={`form-control form-control-sm ${errors.vehicleNumber ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.vehicleNumber)}
             {renderRow("Model Year", (
               <select name="modelYear" className="form-select form-select-sm" value={formData.modelYear} onChange={handleInputChange} style={inputStyle}>
                 <option value="">▼ Select Year</option>
@@ -387,9 +477,8 @@ function AddUser() {
 
           <div className="col-md-6">
             <SectionHeader icon="🛡" title="Policy Information" />
-            {renderRow("Policy Number", <input name="policyNumber" value={formData.policyNumber} onChange={handleInputChange} onBlur={(e) => checkPolicyExists(e.target.value)} className={`form-control form-control-sm ${
-    errors.policyNumber ? "is-invalid" : ""
-  }`} style={inputStyle} />, errors.policyNumber)}
+            {renderRow("Policy Number", <input name="policyNumber" value={formData.policyNumber} onChange={handleInputChange} onBlur={(e) => checkPolicyExists(e.target.value)} className={`form-control form-control-sm ${errors.policyNumber ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.policyNumber)}
 
             <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
               <label className="col-sm-4 col-form-label fw-bold">Coverage Type</label>
@@ -408,9 +497,33 @@ function AddUser() {
               </div>
             </div>
 
-            {renderRow("Start Date", <input name="startDate" type="date" value={formData.startDate} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
-            {renderRow("End Date", <input name="endDate" type="date" value={formData.endDate} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
-            {renderRow("Coverage Limit", <input name="coverageLimit" value={formData.coverageLimit} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
+            {renderRow(
+              "Start Date",
+              <input
+                name="startDate"
+                type="date"
+                value={formData.startDate}
+                onChange={handleInputChange}
+                className={`form-control form-control-sm ${errors.startDate ? "is-invalid" : ""
+                  }`}
+                style={inputStyle}
+              />,
+              errors.startDate
+            )}{renderRow(
+              "End Date",
+              <input
+                name="endDate"
+                type="date"
+                value={formData.endDate}
+                onChange={handleInputChange}
+                min={formData.startDate}
+                disabled={!formData.startDate}
+                className={`form-control form-control-sm ${errors.endDate ? "is-invalid" : ""
+                  }`}
+                style={inputStyle}
+              />,
+              errors.endDate
+            )}       {renderRow("Coverage Limit", <input name="coverageLimit" value={formData.coverageLimit} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
           </div>
         </div>
 

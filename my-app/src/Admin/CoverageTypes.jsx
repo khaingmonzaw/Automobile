@@ -88,24 +88,26 @@ const CoverageTypes = () => {
                 <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92" }}>Coverage ID</th>
                 <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Coverage Type</th>
                 <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Description</th>
-                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92",  }}>Base Rate (MMK)</th>
                 <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Coverage Limit (MMK)</th>
                 <th className="border-bottom-0 text-dark fw-bold  py-3 text-center" style={{  backgroundColor: "#ffed92" }}>Status</th>
                 <th className="border-bottom-0 text-dark fw-bold  py-3 text-center" style={{  backgroundColor: "#ffed92" }}>Action</th>
               </tr>
             </thead>
             <tbody>
-              {
+              {currentRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-5 text-muted fw-semibold fs-5">
+                    No data available
+                  </td>
+                </tr>
+              ) : (
                 currentRecords.map((coverage) => (
                   <tr key={coverage.coverage_type_id} className="border-bottom border-light-subtle">
                     <td className="py-3 text-dark fw-semibold" >{coverage.coverage_type_id}</td>
                     <td className="py-3 text-dark fw-semibold" >{coverage.coverage_type}</td>
                     <td className="py-3 text-dark fw-semibold" style={{ fontSize: "14px", lineHeight: "1.4", wordBreak: "break-word" }}>
                       {coverage.description}
-                    </td>
-                    <td className="py-3 text-dark fw-semibold" >
-                      {Number(coverage.base_rate).toLocaleString()}
-                    </td>
+                    </td>                    
                     <td className="py-3 text-dark fw-semibold" >
                       {Number(coverage.coverage_limit).toLocaleString()}
                     </td>
@@ -135,32 +137,36 @@ const CoverageTypes = () => {
                     </td>
                   </tr>
                 ))
-              }
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        <div className="d-flex justify-content-center my-5">
+        {coverageData.length > 0 && (
+          <div className="d-flex justify-content-center my-5">
 
-          <button 
-          className="btn btn-outline-warning me-2"
-          onClick={()=>setCurrentPage(prev=>prev-1)}
-          >Prev</button>
+            <button 
+              className="btn btn-outline-warning me-2"
+              disabled={currentPage === 1} // <-- ADD THIS LINE
+              onClick={() => setCurrentPage(prev => prev - 1)}
+            >
+              Prev
+            </button>
 
-          <span className='px-3 py-1'>
-
-            Page {currentPage} of {totalPages}
-          </span>
-          <button className="btn btn-outline-warning"
-          disabled={currentPage==totalPages}
-
-          onClick={()=>setCurrentPage(prev=>prev+1)}
-          >
-
-            Next
-          </button>
-        </div>
+            <span className='px-3 py-1'>
+              Page {currentPage} of {totalPages}
+            </span>
+            
+            <button 
+              className="btn btn-outline-warning"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

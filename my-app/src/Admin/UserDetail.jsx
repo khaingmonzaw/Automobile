@@ -78,7 +78,7 @@ function UserDetail() {
           <button 
             className="btn fw-bold btn-warning" 
 
-            onClick={() => navigate(`/Admin/Adduser/${user.id}`)}
+            onClick={() => navigate(`/Admin/Users/Adduser/${user.policy_id}`)}
           >
             Edit
           </button>

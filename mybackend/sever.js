@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const { exec } = require("child_process"); // Call COBOL
 const path = require("path"); // for Path
+const bcrypt=require ("bcrypt");
 
 const app = express();
 app.use(cors());
@@ -16,15 +17,44 @@ const db = mysql.createConnection({
   database: "auto_assurance_db",
 });
 
+const seedAdmin=require("./seedAdmin");
+const authController = require("./controllers/authController");
+const passwordController=require("./ChangePassword")
+const adminClaims=require("./Admin/AdminDashboardClaim");
+const adminRisks=require("./Admin/AdminDashboardRisk");
 const newCoverageRouter = require("./Admin/NewCoverage");
 const coverageTypesRouter = require("./Admin/CoverageTypes");
 const coverageUpdateRouter = require("./Admin/CoverageUpdate");
+const addUser=require("./Admin/AddUser");
+const updateUser=require("./Admin/UpdateUser");
+const checkPolicy=require("./Admin/checkPolicy");
+const checkVehicle=require("./Admin/checkVehicle");
+const checkLicense=require("./Admin/checkLicense");
+const checkDuplicate=require("./Admin/checkDuplicate");
+const claimStatusAction=require("./Admin/ClaimStatusAction");
+const userLists=require("./Admin/UserList");
+const userDetails=require("./Admin/UserDetail");
+const PendingRouter=require("./Admin/Pending");
 
+
+
+const profileUser=require("./User/Profile");
+const getPolicy=require("./User/GetPolicy");
+const getCoverageByPolicy=require("./User/GetCoverageByPolicy");
+const submitClaim=require("./User/SubmitClaim");
+const userClaim=require("./User/UserClaim");
+const userClaimDetail=require("./User/UserClaimDetail");
+const getActiveCoverageType=require("./User/GetActiveCoverageType");
+const { get } = require("http");
 app.use(newCoverageRouter);
 app.use(coverageTypesRouter);
 app.use(coverageUpdateRouter);
+app.use(PendingRouter);
 
+
+seedAdmin(db);
 // Login API
+<<<<<<< HEAD
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -751,282 +781,73 @@ WHERE c.claim_id = ?
 });
 //myo's code end
 
+=======
+app.post("/api/login",authController.login(db));
+>>>>>>> refs/remotes/origin/development
 
 // Change Password API
-app.put("/api/change-password", (req, res) => {
-  const { id, currentPassword, newPassword } = req.body;
+app.put("/api/change-password",passwordController.changePassword(db));
 
-  if (!id || !currentPassword || !newPassword) {
-    return res.status(400).json({
-      message: "All fields are required",
-    });
-  }
+//Adduser 
+app.post("/api/add-user", addUser.addUser(db));
+ 
 
-  // Check current password
-  const checkSql =
-    "SELECT * FROM users WHERE id = ? AND password = ?";
+//update
+app.put('/api/update-user/:id', updateUser.updateUser(db));
 
-  db.query(checkSql, [id, currentPassword], (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({
-        message: "Database Error",
-      });
-    }
+// Policy Number တူမတူ စစ်ဆေးရန် API
+app.get("/api/check-policy",checkPolicy.checkPolicy(db));
+ 
+// Vehicle Number တူမတူ စစ်ဆေးရန် API
+app.get("/api/check-vehicle",checkVehicle.checkVehicle(db));
 
-    if (results.length === 0) {
-      return res.status(400).json({
-        message: "Current password is incorrect",
-      });
-    }
+// License Number တူမတူ စစ်ဆေးရန် API
+app.get("/api/check-driverlicense", checkLicense.checkLicense(db));
 
-    // Update password
-    const updateSql =
-      "UPDATE users SET password = ? WHERE id = ?";
+app.get("/api/check-duplicate", checkDuplicate.checkDuplicate(db));
 
-    db.query(updateSql, [newPassword, id], (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({
-          message: "Failed to update password",
-        });
-      }
+/* ================= [ထည့်ရမည့်နေရာ] GET ALL CLAIMS FOR ADMIN DASHBOARD ================= */
+app.get("/api/admin/claims", adminClaims.adminClaims(db));
 
-      res.json({
-        message: "Password changed successfully",
-      });
-    });
-  });
-});
+app.get("/api/admin/risk-stats",adminRisks.adminRisks(db));
 
+// ✅ NEW: Get all claims from the database
+app.get('/api/admin/ClaimStatus/:id',claimStatusAction.claimStatusAction(db));
 
+/* ================= GET USER PROFILE FULL DETAILS ================= */
+app.get("/api/user/profile/:userId",profileUser.profile(db));
 
 
 // Admin all user(userlists)(kmz)
-app.get('/api/users', (req, res) => {
-  const sql = `
-    SELECT 
-        u.id AS User_ID, 
-        u.name AS User_Name, 
-        p.policy_number AS Policy_Number, 
-        u.claimed_frequency AS Claimed_Freq, 
-        u.status 
-    FROM users u
-    LEFT JOIN policies p ON u.id = p.user_id
-    WHERE u.role = 'user'  -- <--- Move Admin 
-  `;
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
-});
- 
+app.get('/api/users',userLists.userLists(db));
+
+
 // Admin User Detail 
-app.get('/api/users/:id', (req, res) => {
-  const userId = req.params.id;
-  if (!userId || userId === 'undefined') {
-    return res.status(400).json({ message: "Invalid User ID" });
-  }
- 
-  const sql = `
-    SELECT 
-        u.id, 
-        u.name, 
-        u.email, 
-        u.phone, 
-        u.dob,               
-        u.driver_license,     
-        u.driver_year,       
-        u.nrc,                
-        u.address,            
-        p.policy_number AS policyNumber, 
-        p.status AS policyStatus, 
-        p.start_date AS startDate, 
-        p.end_date AS endDate,
-        v.vehicle_number AS vehicleNumber, 
-        v.vehicle_model AS vehicleModel,
-        v.model_year,
-        GROUP_CONCAT(ct.coverage_type_id) AS coverageTypeIds,
-        GROUP_CONCAT(ct.coverage_type SEPARATOR ', ') AS coverageType,
-        GROUP_CONCAT(ct.coverage_limit SEPARATOR ', ') AS coverageLimit
-    FROM users u
-    LEFT JOIN policies p ON u.id = p.user_id
-    LEFT JOIN vehicles v ON p.vehicle_id = v.vehicle_id
-    LEFT JOIN coverage_policies cp ON p.policy_id = cp.policy_id
-    LEFT JOIN coverage_types ct ON cp.coverage_type_id = ct.coverage_type_id
-    WHERE u.id = ?
-    GROUP BY u.id, p.policy_id
-  `;
-  db.query(sql, [userId], (err, results) => {
-    if (err) {
-        console.error("SQL Error:" ,err);
-        return res.status(500).json(err);
-    }
-    if (results.length === 0) return res.status(404).json({ message: "User not found" });
-    res.json(results[0]); 
-  });
-});
-//Coverage types
-app.get("/api/coverage_types", (req, res) => {
-    db.query("SELECT coverage_type_id, coverage_type, coverage_limit FROM coverage_types WHERE status = 'active'", (err, results) => {
-        if (err){
-          console.error("Database Error:", err);
-         return res.status(500).json(err);
-        }
-        res.json(results);
-    });
-});
-//Adduser 
-app.post("/api/add-user", (req, res) => {
-    const { 
-        fullName, email, phone, dob, nrc,
-        address, driverLicense, drivingYear, vehicleModel, vehicleNumber, 
-        modelYear, policyNumber, coverage, startDate, endDate 
-    } = req.body;
- 
-    
-    console.log("NRC Value to save:", nrc);
-    // Adduser
-   const userSql = `INSERT INTO users (name, phone, email, nrc, address, dob, driver_license, driver_year, role, password) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'user', 'password123')`;
-   db.query(userSql, [
-    fullName,    // name
-    phone,       // phone
-    email,       // email
-    nrc,         // nrc
-    address,     // address
-    dob,         // dob
-    driverLicense,// driver_license
-    drivingYear   // driver_year
-], (err, userResult) => {
-    if (err) {
-        console.error("Database Error:", err); // Error ကို console မှာ ကြည့်ပါ
-        return res.status(500).json(err.sqlMessage);
-    }
-    const userId = userResult.insertId;
- 
-        // Vehicle 
-        const vehicleSql = "INSERT INTO vehicles (vehicle_number, vehicle_model, model_year) VALUES (?, ?, ?)";
-        db.query(vehicleSql, [vehicleNumber, vehicleModel, modelYear], (err, vResult) => {
-            if (err) return res.status(500).json(err);
-            const vehicleId = vResult.insertId;
- 
-            // Policy 
-            const policySql = "INSERT INTO policies (policy_number, user_id, vehicle_id, start_date, end_date) VALUES (?, ?, ?, ?, ?)";
-            db.query(policySql, [policyNumber, userId, vehicleId, startDate, endDate], (err, pResult) => {
-                if (err) return res.status(500).json(err);
-                const policyId = pResult.insertId;
- 
-                // Coverage Policies 
-                let count = 0;
-                if (coverage.length === 0) {
-                     res.json({ message: "User and Policy successfully created!" });
-                } else {
-                    coverage.forEach(cTypeId => {
-                        db.query("INSERT INTO coverage_policies (coverage_type_id, policy_id) VALUES (?, ?)", [cTypeId, policyId], (err) => {
-                            count++;
-                            if (count === coverage.length) {
-                                res.json({ message: "User and all data saved successfully!" });
-                            }
-                        });
-                    });
-                }
-            });
-        });
-    });
-});
- 
-//update
-app.put('/api/update-user/:id', (req, res) => {
-    const userId = req.params.id;
-    const { 
-        fullName, phone, email, nrc, address, dob, driverLicense, drivingYear, 
-        vehicleNumber, vehicleModel, modelYear, 
-        policyNumber, startDate, endDate, coverage 
-    } = req.body;
-    // ၁။ User အချက်အလက်များကို Update လုပ်ခြင်း
-    const userSql = `UPDATE users SET name=?, phone=?, email=?, nrc=?, address=?, dob=?, driver_license=?, driver_year=? WHERE id=?`;
-    db.query(userSql, [fullName, phone, email, nrc, address, dob, driverLicense, drivingYear, userId], (err) => {
-        if (err) return res.status(500).json({ message: "Update User Error", error: err });
- 
-        // ၂။ User နဲ့ ဆက်စပ်နေတဲ့ Policy နှင့် Vehicle ID များကို ရှာဖွေခြင်း
-        db.query("SELECT policy_id, vehicle_id FROM policies WHERE user_id = ?", [userId], (err, pResult) => {
-            if (err || pResult.length === 0) return res.status(500).json({ message: "Policy not found" });
-            const { policy_id, vehicle_id } = pResult[0];
- 
-            // ၃။ Vehicle Update လုပ်ခြင်း
-            const vehicleSql = "UPDATE vehicles SET vehicle_number=?, vehicle_model=?, model_year=? WHERE vehicle_id=?";
-            db.query(vehicleSql, [vehicleNumber, vehicleModel, modelYear, vehicle_id], (err) => {
-                if (err) return res.status(500).json({ message: "Update Vehicle Error", error: err });
- 
-                // ၄။ Policy Update လုပ်ခြင်း
-                const policySql = "UPDATE policies SET policy_number=?, start_date=?, end_date=? WHERE policy_id=?";
-                db.query(policySql, [policyNumber, startDate, endDate, policy_id], (err) => {
-                    if (err) return res.status(500).json({ message: "Update Policy Error", error: err });
- 
-                    // ၅။ Coverage Policies ကို အရင် Delete လုပ်ပြီး အသစ်ပြန်ထည့်ခြင်း (အလွယ်ဆုံးနည်းလမ်း)
-                    db.query("DELETE FROM coverage_policies WHERE policy_id = ?", [policy_id], (err) => {
-                        if (err) return res.status(500).json({ message: "Coverage Cleanup Error", error: err });
- 
-                        if (!coverage || coverage.length === 0) {
-                            return res.json({ message: "User data updated successfully!" });
-                        }
- 
-                        // Coverage အသစ်များ ထည့်ခြင်း
-                        const coverageSql = "INSERT INTO coverage_policies (coverage_type_id, policy_id) VALUES (?, ?)";
-                        let count = 0;
-                        coverage.forEach(cTypeId => {
-                            db.query(coverageSql, [cTypeId, policy_id], () => {
-                                count++;
-                                if (count === coverage.length) {
-                                    res.json({ message: "User data and coverage updated successfully!" });
-                                }
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-});
-// Policy Number တူမတူ စစ်ဆေးရန် API
-/*app.get("/api/check-policy", (req, res) => {
-  const { number } = req.query;
-  const sql = "SELECT COUNT(*) AS count FROM policies WHERE policy_number = ?";
-  db.query(sql, [number], (err, results) => {
-    if (err) return res.status(500).json({ message: "Database Error" });
-    // count > 0 
-    const isUsed = results[0].count > 0;
-    res.json({ isUsed });
-  });
-});*/
- 
-app.get("/api/check-duplicate", (req, res) => {
-  const { field, value, userId } = req.query; // userId ကိုပါ ထည့်စစ်မယ်
- 
-  const allowedFields = ['email', 'phone', 'nrc', 'driver_license' , 'policy_number', 'vehicle_number'];
-  if (!allowedFields.includes(field)) return res.status(400).json({ message: "Invalid field" });
- 
-  let sql = "";
-  let params = [value];
- 
-  // Logic: ကိုယ့် ID မဟုတ်တဲ့ တခြား record တွေထဲမှာ ဒီ value ရှိနေလား စစ်မယ်
-  if (field === 'policy_number') {
-      sql = `SELECT COUNT(*) AS count FROM policies WHERE policy_number = ? AND user_id != ?`;
-      params.push(userId || 0); 
-  } else if (field === 'vehicle_number') {
-      // Vehicle တွေမှာ policy_id (သို့) user_id ဆက်စပ်မှုအပေါ်မူတည်ပြီး စစ်ပါ
-      sql = `SELECT COUNT(*) AS count FROM vehicles WHERE vehicle_number = ? AND vehicle_id NOT IN (SELECT vehicle_id FROM policies WHERE user_id = ?)`;
-      params.push(userId || 0);
-  } else {
-      // Users table အတွက်
-      sql = `SELECT COUNT(*) AS count FROM users WHERE ${field} = ? AND id != ?`;
-      params.push(userId || 0);
-  }
-  db.query(sql, params, (err, results) => {
-    if (err) return res.status(500).json({ message: "Database Error" });
-    res.json({ isUsed: results[0].count > 0 });
-  });
-});
+app.get('/api/users/:id',userDetails.userDetails(db));
+
+
+/* ================= GET POLICIES BY USER ================= */
+app.get("/api/policies/:userId",getPolicy.getPolicy(db));
+
+/* ================= GET COVERAGES BY POLICY USER================= */
+app.get("/api/coverages/:policyId", getCoverageByPolicy.getCoverageByPolicy(db)
+);
+// Submit New Claim
+app.post("/api/claims",submitClaim.submitClaim(db));
+
+// User Claim API
+app.get("/api/claims/user/:userId",userClaim.userClaim(db));
+
+
+// Claim Details User API
+app.get("/api/claims/:id", userClaimDetail.userClaimDetail(db));
+
+
+//Active Coverage types
+app.get("/api/coverage_types",getActiveCoverageType.getActiveCoverageType(db));
+
+//Pending router
+
+
 
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
