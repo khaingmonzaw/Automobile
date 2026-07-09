@@ -4,9 +4,9 @@
               DATA DIVISION.
               WORKING-STORAGE SECTION.
               *> Storage containers to hold the 7 input arguments from Node.js
-              01  claim_amt            PIC 9(8).
-              01  total_premium        PIC 9(8).
-              01  assessed_amt         PIC 9(8).
+              01  claim_amt            PIC 9(10).
+              01  total_premium        PIC 9(10).
+              01  assessed_amt         PIC 9(10).
               01  risk_lvl             PIC X(10).
               01  dob                  PIC X(10).
               01  driver_year          PIC 99.
@@ -50,6 +50,7 @@
                   ACCEPT model_year FROM ARGUMENT-VALUE.
        
                   *> 2. Business Logic Evaluation
+                IF claim_amt < assessed_amt THEN 
                   IF claim_amt > deductible_amt THEN
                       MOVE FUNCTION UPPER-CASE(risk_lvl) TO risk_lvl
                       
@@ -79,7 +80,16 @@
                      MOVE "Claim amount less than deductible. Rejected." 
                         TO Remark_msg
                      GO TO OUT-PARA
-                  END-IF.
+                  END-IF
+                ELSE 
+                     MOVE "REJECTED" TO WS-STATUS
+                     MOVE 0 TO compensation_amt
+                     MOVE 0 TO assessed_amt
+                     STRING "Cliam amount is greater than our limit. "
+                     delimited by size "Claim is rejected." INTO
+                     Remark_msg
+                     GO TO OUT-PARA
+                END-IF.
        
               OUT-PARA.
                   *> 3. Send comma-separated output directly back to Node's stdout split engine

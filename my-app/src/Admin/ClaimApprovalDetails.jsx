@@ -22,7 +22,7 @@ const ClaimApprovalDetails = () => {
   if (!data) return null;
 
   const handleFinalSubmit = async () => {
-    const confirmSubmit=window.confirm("Do You want to submit this decision details?"
+    const confirmSubmit=window.confirm("Are you sure you want to submit this decision details?"
     );
     if (!confirmSubmit) return ;
     setSubmitting(true);
@@ -68,7 +68,7 @@ const ClaimApprovalDetails = () => {
     <div className="container-fluid py-3">
       {/* Page Header Area */}
       <div className="d-flex align-items-center gap-3 mb-4">
-        <Link to="/Admin/AllClaims" className="text-decoration-none">
+        <Link to={`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`}  className="text-decoration-none">
           <button 
             className="btn btn-warning d-flex align-items-center justify-content-center fw-bold text-dark" 
             style={{ width: "40px", height: "36px", borderRadius: "8px" }}
