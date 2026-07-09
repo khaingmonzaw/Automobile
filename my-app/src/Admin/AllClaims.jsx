@@ -152,7 +152,7 @@ const AllClaims = () => {
                         <span className={`fw-bold small ${config.riskClass}`}>{config.risk}</span>
                       </td> */}
                    <td className="py-3 text-center">
-  <Link to={`/Admin/AllClaims/ClaimStatusAction/${claim.id}`}>
+  <Link to={`/Admin/AllClaims/ClaimStatusAction/${claim.claim_id}`}>
     <button className="btn btn-warning border text-dark">
       <FontAwesomeIcon icon={faEye} />
     </button>
