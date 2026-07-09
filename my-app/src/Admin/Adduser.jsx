@@ -382,7 +382,7 @@ if (response.ok) {
         alert("Connection Error to Sever");
       }
     }
-    alert("Finish")
+    
   };
   const renderRow = (label, input, error) => (
     <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
