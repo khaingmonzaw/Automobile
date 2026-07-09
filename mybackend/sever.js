@@ -228,6 +228,40 @@ app.get("/api/claims/user/:userId", (req, res) => {
   });
 });
 
+//myo code start
+ 
+  // =============================================
+// ✅ Check Pending Claim (Duplicate Check)
+// =============================================
+app.get("/api/claims/check-pending", (req, res) => {
+  const { policy_id, accident_type, user_id } = req.query;
+
+  // Parameter အကုန်ပါမပါ စစ်ဆေးခြင်း
+  if (!policy_id || !accident_type || !user_id) {
+    return res.status(400).json({ error: "Missing required parameters" });
+  }
+
+  const sql = `
+    SELECT COUNT(*) AS count
+    FROM claims
+    WHERE user_id = ?
+      AND policy_id = ?
+      AND accident_type = ?
+      AND status = 'PENDING'
+  `;
+
+  db.query(sql, [user_id, policy_id, accident_type], (err, results) => {
+    if (err) {
+      console.error("Check pending error:", err);
+      return res.status(500).json({ message: "Database Error" });
+    }
+
+    const hasPending = results[0].count > 0;
+    res.json({ hasPending });
+  });
+
+});
+//myo code end
 
 // Claim Details User API
 app.get("/api/claims/:id", (req, res) => {
@@ -447,6 +481,7 @@ LIMIT 1;
 //     res.status(200).json(results);
 //   });
 // });
+
 
 // ✅ NEW: Get all claims from the database
 app.get('/api/admin/ClaimStatus/:id', (req, res) => {
