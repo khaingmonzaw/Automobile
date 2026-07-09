@@ -35,13 +35,13 @@ const AllClaims = () => {
   // Status အလိုက် Badge အရောင်ပြောင်းရန် Function
   const getBadgeConfig = (status) => {
     switch (status?.toUpperCase()) {
-      case 'APPROVED': 
+      case 'APPROVED':
         return { badge: 'bg-success-subtle text-success border-success-subtle', risk: 'Low', riskClass: 'text-success' };
-      case 'PENDING': 
+      case 'PENDING':
         return { badge: 'bg-warning-subtle text-warning-emphasis border-warning-subtle', risk: 'Medium', riskClass: 'text-info' };
-      case 'REJECTED': 
+      case 'REJECTED':
         return { badge: 'bg-danger-subtle text-danger border-danger-subtle', risk: 'High', riskClass: 'text-danger' };
-      default: 
+      default:
         return { badge: 'bg-secondary-subtle text-secondary', risk: 'Unknown', riskClass: 'text-muted' };
     }
   };
@@ -85,25 +85,25 @@ const AllClaims = () => {
 
   return (
     <div className="container-fluid p-4 bg-light">
-      
-   
+
+
 
       {/* Main Content Card Container */}
       <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
-           {/* Top Title & Header Row */}
-     
+        {/* Top Title & Header Row */}
+
         {/* Controls Section: Filter */}
         <div className="d-flex g-3 mb-4 justify-content-between px-4 pt-3">
 
 
-           <div className="mb-4">
-        <h2 className="fs-2 fw-bold text-dark ">All Claims</h2>
-      </div>
+          <div className="mb-4">
+            <h2 className="fs-2 fw-bold text-dark ">All Claims</h2>
+          </div>
           <div className="col-md-3">
             <div className="d-flex align-items-center rounded-pill border px-3 py-1 bg-white shadow-sm" style={{ backgroundColor: "rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important" }}>
               <FontAwesomeIcon icon={faFilter} className="text-warning-emphasis opacity-75 me-2" />
-              <select 
-                className="form-select bg-transparent border-0  small fw-semibold text-warning-emphasis" 
+              <select
+                className="form-select bg-transparent border-0  small fw-semibold text-warning-emphasis"
                 value={statusFilter}
                 onChange={handleFilterChange}
                 style={{ boxShadow: "none", cursor: "pointer" }}
@@ -119,12 +119,12 @@ const AllClaims = () => {
 
         {/* Data Table */}
         <div className=" rounded-3 ">
-          <table className="table table-hover align-middle mb-0 w-100 "  style={{ tableLayout: "fixed" }}>
+          <table className="table table-hover align-middle mb-0 w-100 " style={{ tableLayout: "fixed" }}>
             <thead style={{ backgroundColor: "rgb(255, 237, 146)" }} className="text-warning-emphasis border-bottom">
               <tr className="text-dark  uppercase fw-bold align-middle  ">
                 <th className="py-3" style={{ backgroundColor: "inherit" }}>Claim ID</th>
-                <th className="py-3" style={{  backgroundColor: "inherit" }}>Claimed Amount</th>
-                <th className="py-3" style={{backgroundColor: "inherit" }}>Accident Date</th>
+                <th className="py-3" style={{ backgroundColor: "inherit" }}>Claimed Amount</th>
+                <th className="py-3" style={{ backgroundColor: "inherit" }}>Accident Date</th>
                 <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Status</th>
                 <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Risk Level</th>
                 <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Action</th>
@@ -148,16 +148,27 @@ const AllClaims = () => {
                           {claim.status}
                         </span>
                       </td>
-                      {/* <td className="py-3 text-center">
-                        <span className={`fw-bold small ${config.riskClass}`}>{config.risk}</span>
-                      </td> */}
-                   <td className="py-3 text-center">
-  <Link to={`/Admin/AllClaims/ClaimStatusAction/${claim.claim_id}`}>
-    <button className="btn btn-warning border text-dark">
-      <FontAwesomeIcon icon={faEye} />
-    </button>
-  </Link>
-</td>
+                      <td className="py-3 text-center">
+                        <span
+                          className={`fw-bold small ${claim.risk_level === "low"
+                              ? "text-success"
+                              : claim.risk_level === "medium"
+                                ? "text-warning"
+                                : claim.risk_level === "high"
+                                  ? "text-danger"
+                                  : ""
+                            }`}
+                        >
+                          {claim.risk_level}
+                        </span>
+                      </td>
+                      <td className="py-3 text-center">
+                        <Link to={`/Admin/AllClaims/ClaimStatusAction/${claim.claim_id}`}>
+                          <button className="btn btn-warning border text-dark">
+                            <FontAwesomeIcon icon={faEye} />
+                          </button>
+                        </Link>
+                      </td>
                     </tr>
                   );
                 })
