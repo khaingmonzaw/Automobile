@@ -13,7 +13,7 @@ import AdminDashboard from './Admin/AdminDashboard.jsx';
 import AllClaims from './Admin/AllClaims.jsx';
 import Profile from './User/Profile.jsx';
 
-// import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
+import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
 import CoverageTypes from './Admin/CoverageTypes.jsx';
 import NewCoverage from './Admin/NewCoverage.jsx';
 import CoverageUpdate from './Admin/CoverageUpdate.jsx';
@@ -75,7 +75,7 @@ function App() {
         <Route path="CoverageTypes" element={<CoverageTypes />} />
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
-        {/* <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} /> */}
+        <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
         <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
         <Route path="Users/Adduser" element={<Adduser />} />
         <Route path="Users/Adduser/:id" element={<Adduser />} />

@@ -112,7 +112,7 @@ const CoverageTypes = () => {
                       {Number(coverage.coverage_limit).toLocaleString()}
                     </td>
                     <td className="py-3 text-center">
-                      {coverage.status === 'Active' ? (
+                      {coverage.status === 'active' ? (
                         <span className="badge rounded-pill fw-bold text-info-emphasis bg-success-subtle px-3 py-2" style={{ fontSize: "13px" }}>
                           Active
                         </span>
