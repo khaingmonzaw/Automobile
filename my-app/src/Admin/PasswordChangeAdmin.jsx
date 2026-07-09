@@ -7,7 +7,7 @@ const PasswordChange = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
 
-  // 👁️ Font Awesome Icon တွေကို အဖွင့်/အပိတ် လုပ်ပေးမယ့် State များ
+  // Font Awesome Icon တွေကို အဖွင့်/အပိတ် လုပ်ပေးမယ့် State များ
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -18,6 +18,7 @@ const PasswordChange = () => {
 
   let newErrors = {};
 
+  
   if (!currentPassword) {
     newErrors.currentPassword = "Current password is required";
   }
@@ -25,6 +26,15 @@ const PasswordChange = () => {
   if (!newPassword) {
     newErrors.newPassword = "New password is required";
   }
+
+  if (newPassword) {
+  if (newPassword.length < 8) {
+    newErrors.newPassword = "Password must be at least 8 characters";
+  } 
+  else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+    newErrors.newPassword = "Password must contain at least one letter and one digit";
+  }
+}
 
   if (!confirmPassword) {
     newErrors.confirmPassword = "Confirm password is required";
@@ -62,15 +72,12 @@ const PasswordChange = () => {
   handleCancel();
   setErrors({});
 } else {
-  if (data.message === "Current password is incorrect") {
+  
+    
     setErrors({
       currentPassword: data.message,
     });
-  } else {
-    setErrors({
-      form: data.message,
-    });
-  }
+  
 }
   } catch (error) {
     console.error(error);

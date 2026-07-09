@@ -9,14 +9,17 @@ function Dashboard() {
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?.id
 
-    const recentClaim = claims.slice(0, 5);
-
+const recentClaim = Array.isArray(claims) ? claims.slice(0, 5) : [];
     useEffect(() => {
-        fetch(`http://localhost:3000/api/claims/user/${userId}`)
-            .then(res => res.json())
-            .then(data => setClaims(data))
-            .catch(err => console.log(err));
-    }, []);
+  fetch(`http://localhost:3000/api/claims/user/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      console.log(Array.isArray(data));
+      setClaims(Array.isArray(data) ? data : []);
+    })
+    .catch(err => console.log(err));
+}, [userId]);
 
     const total = claims.length;
     const pending = claims.filter(c => c.status === "PENDING").length;
@@ -97,18 +100,24 @@ function Dashboard() {
                             </tr>
                         </thead>
 
-                        <tbody>
-                            {recentClaim.slice(0, 5).map((c) => (
-                                <tr key={c.claim_id}>
-
-
-                                    <td>CLM-{c.claim_id}</td>
-                                    <td>{c.accident_date.split("T")[0]}</td>
-                                    <td>{c.status}</td>
-                                    <td>{c.claimed_amount}</td>
-                                </tr>
-                            ))}
-                        </tbody>
+                       <tbody>
+  {recentClaim.length === 0 ? (
+    <tr>
+      <td colSpan="4" className="text-center">
+        No claims found.
+      </td>
+    </tr>
+  ) : (
+    recentClaim.map((c) => (
+      <tr key={c.claim_id}>
+        <td>CLM-{c.claim_id}</td>
+        <td>{c.accident_date.split("T")[0]}</td>
+        <td>{c.status}</td>
+        <td>{c.claimed_amount}</td>
+      </tr>
+    ))
+  )}
+</tbody>
                     </table>
                     <a href=""></a>
                 </div>

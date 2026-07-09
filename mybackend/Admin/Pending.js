@@ -36,7 +36,7 @@ router.put("/api/admin/claims/:id", (req, res) => {
         p.vehicle_id, 
         p.status AS policy_status, 
         p.total_premium, 
-        p.assessed_amt,
+        p.remaining_balance as assessed_amt,
         r.risk_level,
         u.id AS user_id,
         u.name, 
@@ -142,7 +142,7 @@ router.put('/api/resultupdate/:id', (req, res) => {
 
     const policyUpdateSql = `
     UPDATE policies 
-    SET assessed_amt = ?
+    SET remaining_balance = ?
     WHERE user_id = ?
   `;
 

@@ -14,15 +14,19 @@ const db = mysql.createConnection({
 });
 
 // --- ADD THIS GET ROUTE HANDLER ---
-router.get('/api/coverages', (req, res) => {
-  const query = 'SELECT coverage_type_id, coverage_type, description, coverage_limit, status FROM coverage_types';
-  
+router.get("/api/coverages", (req, res) => {
+  const query =
+    "SELECT coverage_type_id, coverage_type, description, coverage_limit, status FROM coverage_types";
+
   db.query(query, (err, results) => {
     if (err) {
-      console.error('MySQL retrieval error:', err);
-      return res.status(500).json({ error: 'Failed to retrieve coverage data' });
+      console.error("MySQL retrieval error:", err);
+      return res
+        .status(500)
+        .json({ error: "Failed to retrieve coverage data" });
     }
     return res.status(200).json(results);
   });
 });
 module.exports = router;
+//Nandar Lin Lin Tun

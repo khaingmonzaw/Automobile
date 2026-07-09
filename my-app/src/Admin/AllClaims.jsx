@@ -135,7 +135,7 @@ const AllClaims = () => {
                 currentItems.map((claim, index) => {
                   const config = getBadgeConfig(claim.status);
                   return (
-                    <tr key={claim.id || index} className="border-bottom">
+                    <tr key={claim.claim_id || index} className="border-bottom">
                       <td className="py-3 px-3 fw-bold text-primary small">CLM{String(claim.id).padStart(4, '0')}</td>
                       <td className="py-3 text-dark small fw-bold">
                         {claim.amount ? `${Number(claim.amount).toLocaleString()} MMK` : '0 MMK'}

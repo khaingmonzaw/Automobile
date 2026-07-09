@@ -22,7 +22,11 @@ const ClaimApprovalDetails = () => {
   if (!data) return null;
 
   const handleFinalSubmit = async () => {
+    const confirmSubmit=window.confirm("Do You want to submit this decision details?"
+    );
+    if (!confirmSubmit) return ;
     setSubmitting(true);
+
     const user = JSON.parse(localStorage.getItem("user"));
     const staffId = user?.id;
     try {
@@ -51,6 +55,9 @@ const ClaimApprovalDetails = () => {
   };
 
   const handleCancel = () => {
+    const confirmCancel=window.confirm("Are you sure you want to cancel?"
+    );
+    if (!confirmCancel) return ;
     // Navigate back directly WITHOUT database modification updates
     navigate(`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`);
   };
