@@ -136,21 +136,21 @@ const AllClaims = () => {
                   const config = getBadgeConfig(claim.status);
                   return (
                     <tr key={claim.claim_id || index} className="border-bottom">
-                      <td className="py-3 px-3 fw-bold text-primary small">CLM{String(claim.id).padStart(4, '0')}</td>
+                      <td className="py-3 px-3 fw-bold text-primary small">CLM{String(claim.claim_id).padStart(4, '0')}</td>
                       <td className="py-3 text-dark small fw-bold">
-                        {claim.amount ? `${Number(claim.amount).toLocaleString()} MMK` : '0 MMK'}
+                        {claim.claimed_amount ? `${Number(claim.claimed_amount).toLocaleString()} MMK` : '0 MMK'}
                       </td>
                       <td className="py-3 text-secondary small">
-                        {claim.date ? new Date(claim.date).toLocaleDateString('en-GB') : '-'}
+                        {claim.accident_date ? new Date(claim.accident_date).toLocaleDateString('en-GB') : '-'}
                       </td>
                       <td className="py-3 text-center">
                         <span className={`badge ${config.badge} border rounded-pill fw-semibold`}>
                           {claim.status}
                         </span>
                       </td>
-                      <td className="py-3 text-center">
+                      {/* <td className="py-3 text-center">
                         <span className={`fw-bold small ${config.riskClass}`}>{config.risk}</span>
-                      </td>
+                      </td> */}
                    <td className="py-3 text-center">
   <Link to={`/Admin/AllClaims/ClaimStatusAction/${claim.id}`}>
     <button className="btn btn-warning border text-dark">

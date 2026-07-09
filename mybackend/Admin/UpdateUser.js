@@ -1,10 +1,11 @@
-//Adduser
-
-const bcrypt = require("bcrypt");
+// updateUser.js
 
 exports.updateUser = (db) => {
   return async (req, res) => {
-    const userId = req.params.id;
+
+    const policyId = req.params.id;   
+console.log("POLICY ID:", policyId);
+console.log("BODY:", req.body);
     const {
       fullName,
       phone,
@@ -14,113 +15,243 @@ exports.updateUser = (db) => {
       dob,
       driverLicense,
       drivingYear,
+
       vehicleNumber,
       vehicleModel,
       modelYear,
+
       policyNumber,
       startDate,
       endDate,
-      coverage,
+
+      coverage
     } = req.body;
-    // ၁။ User အချက်အလက်များကို Update လုပ်ခြင်း
-    const userSql = `UPDATE users SET name=?, phone=?, email=?, nrc=?, address=?, dob=?, driver_license=?, driver_year=? WHERE id=?`;
+
+
+    // 1. Get user_id and vehicle_id from policy_id
     db.query(
-      userSql,
-      [
-        fullName,
-        phone,
-        email,
-        nrc,
-        address,
-        dob,
-        driverLicense,
-        drivingYear,
-        userId,
-      ],
-      (err) => {
-        if (err)
-          return res
-            .status(500)
-            .json({ message: "Update User Error", error: err });
+      `
+      SELECT user_id, vehicle_id
+      FROM policies
+      WHERE policy_id = ?
+      `,
+      [policyId],
+      (err, policyResult) => {
 
-        // ၂။ User နဲ့ ဆက်စပ်နေတဲ့ Policy နှင့် Vehicle ID များကို ရှာဖွေခြင်း
+        if(err){
+          return res.status(500).json({
+            message:"Find policy error",
+            error:err
+          });
+        }
+
+
+        if(policyResult.length === 0){
+          return res.status(404).json({
+            message:"Policy not found"
+          });
+        }
+
+
+        const userId = policyResult[0].user_id;
+        const vehicleId = policyResult[0].vehicle_id;
+
+
+
+        // 2. Update User table
+        const userSql = `
+          UPDATE users SET
+          name=?,
+          phone=?,
+          email=?,
+          nrc=?,
+          address=?,
+          dob=?,
+          driver_license=?,
+          driver_year=?
+          WHERE id=?
+        `;
+
+
         db.query(
-          "SELECT policy_id, vehicle_id FROM policies WHERE user_id = ?",
-          [userId],
-          (err, pResult) => {
-            if (err || pResult.length === 0)
-              return res.status(500).json({ message: "Policy not found" });
-            const { policy_id, vehicle_id } = pResult[0];
+          userSql,
+          [
+            fullName,
+            phone,
+            email,
+            nrc,
+            address,
+            dob,
+            driverLicense,
+            drivingYear,
+            userId
+          ],
+          (err)=>{
 
-            // ၃။ Vehicle Update လုပ်ခြင်း
-            const vehicleSql =
-              "UPDATE vehicles SET vehicle_number=?, vehicle_model=?, model_year=? WHERE vehicle_id=?";
+            if(err){
+              return res.status(500).json({
+                message:"Update user error",
+                error:err
+              });
+            }
+
+
+
+            // 3. Update Vehicle table
+            const vehicleSql = `
+              UPDATE vehicles SET
+              vehicle_number=?,
+              vehicle_model=?,
+              model_year=?
+              WHERE vehicle_id=?
+            `;
+
+
             db.query(
               vehicleSql,
-              [vehicleNumber, vehicleModel, modelYear, vehicle_id],
-              (err) => {
-                if (err)
-                  return res
-                    .status(500)
-                    .json({ message: "Update Vehicle Error", error: err });
+              [
+                vehicleNumber,
+                vehicleModel,
+                modelYear,
+                vehicleId
+              ],
+              (err)=>{
 
-                // ၄။ Policy Update လုပ်ခြင်း
-                const policySql =
-                  "UPDATE policies SET policy_number=?, start_date=?, end_date=? WHERE policy_id=?";
+                if(err){
+                  return res.status(500).json({
+                    message:"Update vehicle error",
+                    error:err
+                  });
+                }
+
+
+
+                // 4. Update Policy table
+                const policySql = `
+                  UPDATE policies SET
+                  policy_number=?,
+                  start_date=?,
+                  end_date=?
+                  WHERE policy_id=?
+                `;
+
+
                 db.query(
                   policySql,
-                  [policyNumber, startDate, endDate, policy_id],
-                  (err) => {
-                    if (err)
-                      return res
-                        .status(500)
-                        .json({ message: "Update Policy Error", error: err });
+                  [
+                    policyNumber,
+                    startDate,
+                    endDate,
+                    policyId
+                  ],
+                  (err)=>{
 
-                    // ၅။ Coverage Policies ကို အရင် Delete လုပ်ပြီး အသစ်ပြန်ထည့်ခြင်း (အလွယ်ဆုံးနည်းလမ်း)
+                    if(err){
+                      return res.status(500).json({
+                        message:"Update policy error",
+                        error:err
+                      });
+                    }
+
+
+
+                    // 5. Remove old coverage
                     db.query(
-                      "DELETE FROM coverage_policies WHERE policy_id = ?",
-                      [policy_id],
-                      (err) => {
-                        if (err)
-                          return res
-                            .status(500)
-                            .json({
-                              message: "Coverage Cleanup Error",
-                              error: err,
-                            });
+                      `
+                      DELETE FROM coverage_policies
+                      WHERE policy_id=?
+                      `,
+                      [policyId],
+                      (err)=>{
 
-                        if (!coverage || coverage.length === 0) {
-                          return res.json({
-                            message: "User data updated successfully!",
+                        if(err){
+                          return res.status(500).json({
+                            message:"Delete coverage error",
+                            error:err
                           });
                         }
 
-                        // Coverage အသစ်များ ထည့်ခြင်း
-                        const coverageSql =
-                          "INSERT INTO coverage_policies (coverage_type_id, policy_id) VALUES (?, ?)";
-                        let count = 0;
-                        coverage.forEach((cTypeId) => {
-                          db.query(coverageSql, [cTypeId, policy_id], () => {
-                            count++;
-                            if (count === coverage.length) {
-                              res.json({
-                                message:
-                                  "User data and coverage updated successfully!",
-                              });
-                            }
+
+
+                        // no coverage selected
+                        if(!coverage || coverage.length===0){
+
+                          return res.json({
+                            message:"User updated successfully"
                           });
+
+                        }
+
+
+
+                        // 6. Insert new coverage
+                        const coverageSql = `
+                          INSERT INTO coverage_policies
+                          (coverage_type_id, policy_id)
+                          VALUES (?,?)
+                        `;
+
+
+                        let count = 0;
+
+
+                        coverage.forEach((coverageId)=>{
+
+
+                          db.query(
+                            coverageSql,
+                            [
+                              coverageId,
+                              policyId
+                            ],
+                            (err)=>{
+
+
+                              if(err){
+                                console.log(err);
+                                return;
+                              }
+
+
+                              count++;
+
+
+                              if(count === coverage.length){
+
+                                res.json({
+                                  message:
+                                  "User, Vehicle, Policy and Coverage updated successfully"
+                                });
+
+                              }
+
+
+                            }
+                          );
+
+
                         });
-                      },
+
+
+                      }
                     );
-                  },
+
+
+                  }
                 );
-              },
+
+
+              }
             );
-          },
+
+
+          }
         );
-      },
+
+
+      }
     );
+
+
   };
 };
-
-//Khaing Mon Mon Zaw

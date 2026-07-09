@@ -357,9 +357,76 @@ WHERE c.claim_id = ?
 
 
 
+app.get("/api/users/:id", (req, res) => {
+
+  const policyId = req.params.id;
+
+  const sql = `
+    SELECT 
+      u.id,
+      u.name,
+      u.email,
+      u.phone,
+      u.dob,
+      u.nrc,
+      u.address,
+      u.driver_license,
+      u.driver_year,
+
+      v.vehicle_model AS vehicleModel,
+      v.vehicle_number AS vehicleNumber,
+      v.model_year,
+
+      p.policy_id,
+      p.policy_number AS policyNumber,
+      p.start_date AS startDate,
+      p.end_date AS endDate,
+
+      GROUP_CONCAT(cp.coverage_id) AS coverageTypeIds,
+      SUM(ct.coverage_limit) AS coverageLimit
+
+    FROM policies p
+
+    JOIN users u
+      ON p.user_id = u.id
+
+    LEFT JOIN vehicles v
+      ON p.vehicle_id = v.vehicle_id
+
+    LEFT JOIN coverage_policies cp
+      ON p.policy_id = cp.policy_id
+
+    LEFT JOIN coverage_types ct
+      ON cp.coverage_id = ct.coverage_type_id
+
+    WHERE p.policy_id = ?
+
+    GROUP BY p.policy_id
+  `;
 
 
+  db.query(sql, [policyId], (err, result) => {
 
+    if (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Database error"
+      });
+    }
+
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        message: "Policy not found"
+      });
+    }
+
+
+    res.json(result[0]);
+
+  });
+
+});
 
 
 

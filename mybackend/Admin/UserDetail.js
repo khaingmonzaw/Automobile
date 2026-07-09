@@ -22,6 +22,7 @@ exports.userDetails = (db) => {
         u.address,            
         p.policy_number AS policyNumber, 
         p.status AS policyStatus, 
+        p.policy_id,
         p.start_date AS startDate, 
         p.end_date AS endDate,
         v.vehicle_number AS vehicleNumber, 
