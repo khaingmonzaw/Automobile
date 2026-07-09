@@ -102,7 +102,7 @@ const fetchClaimData = async () => {
     <div className="claim-detail-container">
       {/* Back Button */}
       <div className="back-button-wrapper">
-        <button className="btn-back" onClick={() => navigate(-1)}>
+        <button className="btn-back" onClick={() => navigate('/Admin/AllClaims') }>
           <FontAwesomeIcon icon={faCircleLeft} /> 
         </button>
       </div>
