@@ -62,7 +62,7 @@ function Layout() {
 
           {collapsed ? (
             <button
-              className="btn "
+              className="btn me-2 "
               onClick={() => setCollapsed(!collapsed)}
             >
               ☰
@@ -265,27 +265,23 @@ function Layout() {
 
         </ul>
 
-        <ul className="list-unstyled p-3 mt-auto border-top ">
-          <li className="mb-2">
-            <NavLink
-              to="/LoginPage"
-              className={({ isActive }) =>
-                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
-                }`
-              }
-            >
-              {collapsed ? <FontAwesomeIcon icon={faRightFromBracket} />
-                :
-                <><FontAwesomeIcon icon={faRightFromBracket} className="me-3" /><button
-                  className="btn p-0 border-0 bg-transparent"
-                  type="button"
-                  onClick={handleClick}
-                >
-                  Logout
-                </button></>
-              }
-            </NavLink>
-          </li>
+        <ul className="d-flex align-items-center list-unstyled py-1 px-3 mt-auto border-top ">
+          <li >
+    <div
+        className="d-block p-3 rounded text-dark"
+        style={{ cursor: "pointer" }}
+        onClick={handleClick}
+    >
+        {collapsed ? (
+            <FontAwesomeIcon icon={faRightFromBracket} />
+        ) : (
+            <>
+                <FontAwesomeIcon icon={faRightFromBracket} className="me-3" />
+                Logout
+            </>
+        )}
+    </div>
+</li>
         </ul>
       </div>
 
