@@ -92,11 +92,12 @@ function Layout() {
 
         </div>
 
-        <ul className="list-unstyled p-3">
+        
 
           {user?.role === "user" && (
             <>
-              <li className="mb-2">
+            <ul className="list-unstyled p-3">
+              <li className="mb-2 ">
                 <NavLink
                   to="/User/Dashboard"
                   className={({ isActive }) =>
@@ -171,10 +172,11 @@ function Layout() {
                   )}
                 </NavLink>
               </li>
+              </ul>
             </>
           )}
 
-        </ul>
+       
 
 
 
