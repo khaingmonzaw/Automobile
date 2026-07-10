@@ -162,12 +162,11 @@ router.put('/api/resultupdate/:id', (req, res) => {
             if (err) {
               return res.status(500).json({ message: "Final submission database update failed" });
             }
-            res.json({ message: "Claim completely processed and approved!" });
           });
 
         });
     } 
-
+     res.json({ message: "Claim completely processed and approved!" });
  });
 
 });
