@@ -10,80 +10,92 @@ const PasswordChange = () => {
   // Font Awesome Icon တွေကို အဖွင့်/အပိတ် လုပ်ပေးမယ့် State များ
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [message, setMessage] = useState("");
   // Handlers
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  let newErrors = {};
+    let newErrors = {};
 
-  
-  if (!currentPassword) {
-    newErrors.currentPassword = "Current password is required";
-  }
 
-  if (!newPassword) {
-    newErrors.newPassword = "New password is required";
-  }
+    if (!currentPassword) {
+      newErrors.currentPassword = "Current password is required";
+    }
 
-  if (newPassword) {
-  if (newPassword.length < 8) {
-    newErrors.newPassword = "Password must be at least 8 characters";
-  } 
-  else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
-    newErrors.newPassword = "Password must contain at least one letter and one digit";
-  }
-}
+    if (!newPassword) {
+      newErrors.newPassword = "New password is required";
+    }
 
-  if (!confirmPassword) {
-    newErrors.confirmPassword = "Confirm password is required";
-  }
+    if (newPassword) {
+      if (newPassword.length < 8) {
+        newErrors.newPassword = "Password must be at least 8 characters";
+      }
+      else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+        newErrors.newPassword = "Password must contain at least one letter and one digit";
+      }
+    }
 
-  if (newPassword && confirmPassword && newPassword !== confirmPassword) {
-    newErrors.confirmPassword = "Passwords do not match";
-  }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required";
+    }
 
-  setErrors(newErrors);
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
 
-  if (Object.keys(newErrors).length > 0) return;
+    setErrors(newErrors);
 
-  const loggedInUser = JSON.parse(localStorage.getItem("user"));
-  if (!loggedInUser || !loggedInUser.id) {
-    alert("Please login first");
-    return;
-  }
+    if (Object.keys(newErrors).length > 0) return;
 
-  try {
-    const response = await fetch("http://localhost:3000/api/change-password", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: loggedInUser.id,
-        currentPassword,
-        newPassword,
-      }),
-    });
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    if (!loggedInUser || !loggedInUser.id) {
+      alert("Please login first");
+      return;
+    }
+    setShowConfirmModal(true);
+  };
 
-    const data = await response.json();
+  const confirmSubmit = async () => {
+    setShowConfirmModal(false);
 
-    if (response.ok) {
-  alert(data.message);
-  handleCancel();
-  setErrors({});
-} else {
-  
-    
-    setErrors({
-      currentPassword: data.message,
-    });
-  
-}
-  } catch (error) {
-    console.error(error);
-    alert("Server error");
-  }
-};
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+
+    try {
+      const response = await fetch("http://localhost:3000/api/change-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: loggedInUser.id,
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(data.message);
+        setShowSuccess(true);
+
+        handleCancel();
+        setErrors({});
+      } else {
+        setErrors({
+          currentPassword: data.message,
+        });
+      }
+    } catch (error) {
+      setMessage("Server Error");
+      setShowSuccess(true);
+    }
+  };
 
   const handleCancel = () => {
     setCurrentPassword('');
@@ -91,42 +103,87 @@ const PasswordChange = () => {
     setConfirmPassword('');
     setShowCurrent(false);
     setShowNew(false);
-    setShowConfirm(false);
-  };
+setShowConfirmPassword(false);  };
 
   return (
+<>
+       {showSuccess && (
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          {message}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowSuccess(false)}
+          ></button>
+        </div>
+      )}
     <div className="d-flex justify-content-center align-items-center py-5">
+
+
+   
+
+      {showConfirmModal && (
+        <div
+          className="modal fade show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">Confirm Change Password</h5>
+                <button
+                  className="btn-close"
+                   onClick={() => setShowConfirmModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body text-center">
+                <p>Are you sure you want to Change this password?</p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button className="btn btn-warning" onClick={confirmSubmit}>
+                  Submit
+                </button>
+                <button
+                  className="btn btn-danger"
+  onClick={() => setShowConfirmModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="card shadow border-0 p-4 p-md-5" style={{ width: '100%', maxWidth: '600px', borderRadius: '20px' }}>
         <h2 className="text-center mb-4 fw-bold text-dark">Change Password</h2>
 
         <form onSubmit={handleSubmit}>
-          
+
           {/* Current Password */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Current Password</label>
             <div className="input-group">
               <input
-                type={showCurrent ? "text" : "password"} 
-               className={`form-control form-control-lg bg-light ${
-    errors.currentPassword ? "is-invalid" : ""
-  }`}
+                type={showCurrent ? "text" : "password"}
+                className={`form-control form-control-lg bg-light ${errors.currentPassword ? "is-invalid" : ""
+                  }`}
                 placeholder="**********"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
               />
-              <span 
-                className="input-group-text bg-light border-start-0 text-secondary" 
+              <span
+                className="input-group-text bg-light border-start-0 text-secondary"
                 style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
-                onClick={() => setShowCurrent(!showCurrent)} 
+                onClick={() => setShowCurrent(!showCurrent)}
               >
                 <i className={showCurrent ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
 
               </span>
-            
+
             </div>
-              {errors.currentPassword && (
-  <small className="text-danger">{errors.currentPassword}</small>
-)}
+            {errors.currentPassword && (
+              <small className="text-danger">{errors.currentPassword}</small>
+            )}
           </div>
 
           {/* New Password */}
@@ -135,26 +192,25 @@ const PasswordChange = () => {
             <div className="input-group">
               <input
                 type={showNew ? "text" : "password"}
-               className={`form-control form-control-lg bg-light ${
-    errors.newPassword ? "is-invalid" : ""
-  }`}
+                className={`form-control form-control-lg bg-light ${errors.newPassword ? "is-invalid" : ""
+                  }`}
                 placeholder="**********"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
-              <span 
-                className="input-group-text bg-light border-start-0 text-secondary" 
+              <span
+                className="input-group-text bg-light border-start-0 text-secondary"
                 style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
                 onClick={() => setShowNew(!showNew)}
               >
                 <i className={showNew ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
               </span>
-            
+
             </div>
-          
+
             {errors.newPassword && (
-  <small className="text-danger">{errors.newPassword}</small>
-)}
+              <small className="text-danger">{errors.newPassword}</small>
+            )}
           </div>
 
           {/* Confirm Password */}
@@ -162,40 +218,49 @@ const PasswordChange = () => {
             <label className="form-label fw-semibold">Confirm Password</label>
             <div className="input-group">
               <input
-                type={showConfirm ? "text" : "password"}
-                className={`form-control form-control-lg bg-light ${
-    errors.confirmPassword ? "is-invalid" : ""
-  }`}
+               type={showConfirmPassword ? "text" : "password"}
+                className={`form-control form-control-lg bg-light ${errors.confirmPassword ? "is-invalid" : ""
+                  }`}
                 placeholder="**********"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              <span 
-                className="input-group-text bg-light border-start-0 text-secondary" 
+              <span
+                className="input-group-text bg-light border-start-0 text-secondary"
                 style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
-                onClick={() => setShowConfirm(!showConfirm)}
-              >
-                <i className={showConfirm ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
-              </span>
-              
+onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+>
+  <i className={showConfirmPassword ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
+  </span>
             </div>
             {errors.confirmPassword && (
-  <small className="text-danger">{errors.confirmPassword}</small>
-)}
+              <small className="text-danger">{errors.confirmPassword}</small>
+            )}
           </div>
 
           {/* Buttons */}
-          <div className="d-flex gap-3 justify-content-center mt-4">
-            <button type="submit" className="btn btn-warning btn-lg px-4 fw-semibold shadow-sm" style={{ minWidth: '130px' }}>
-              Change
-            </button>
-            <button type="button" className="btn btn-danger btn-lg px-4 fw-semibold shadow-sm" style={{ minWidth: '130px' }} onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
+     <div className="d-flex gap-3 justify-content-center mt-4">
+
+  <button
+    type="submit"
+    className="btn btn-warning px-4"
+  >
+    Change 
+  </button>
+
+  <button
+    type="button"
+    className="btn btn-danger px-4"
+    onClick={handleCancel}
+  >
+    Cancel
+  </button>
+
+</div>
         </form>
       </div>
     </div>
+    </>
   );
 };
 
