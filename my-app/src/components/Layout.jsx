@@ -62,7 +62,7 @@ function Layout() {
 
           {collapsed ? (
             <button
-              className="btn me-2"
+              className="btn "
               onClick={() => setCollapsed(!collapsed)}
             >
               ☰
@@ -143,7 +143,7 @@ function Layout() {
                   }
                 >
                   {collapsed ? (
-                    <FontAwesomeIcon icon={faFileInvoiceDollar}  />
+                    <FontAwesomeIcon icon={faFileInvoiceDollar} />
                   ) : (
                     <>
                       <FontAwesomeIcon icon={faFileInvoiceDollar} className="me-3" />
@@ -265,27 +265,27 @@ function Layout() {
 
         </ul>
 
-        <ul className="list-unstyled pt-3 px-3 mt-auto border-top ">
-        <li>
-  {collapsed ? (
-    <button
-      className="btn w-100"
-      type="button"
-      onClick={handleClick}
-    >
-      <FontAwesomeIcon icon={faRightFromBracket} />
-    </button>
-  ) : (
-    <button
-      className="btn d-flex align-items-center w-100 text-start"
-      type="button"
-      onClick={handleClick}
-    >
-      <FontAwesomeIcon icon={faRightFromBracket} className="me-3" />
-      Logout
-    </button>
-  )}
-</li>
+        <ul className="list-unstyled p-3 mt-auto border-top ">
+          <li className="mb-2">
+            <NavLink
+              to="/LoginPage"
+              className={({ isActive }) =>
+                `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
+                }`
+              }
+            >
+              {collapsed ? <FontAwesomeIcon icon={faRightFromBracket} />
+                :
+                <><FontAwesomeIcon icon={faRightFromBracket} className="me-3" /><button
+                  className="btn p-0 border-0 bg-transparent"
+                  type="button"
+                  onClick={handleClick}
+                >
+                  Logout
+                </button></>
+              }
+            </NavLink>
+          </li>
         </ul>
       </div>
 

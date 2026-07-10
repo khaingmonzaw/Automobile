@@ -42,13 +42,14 @@ const fetchClaimData = async () => {
   const handleSubmitDecision = async (e) => {
     e.preventDefault();
     if (!decision) return alert("Please select an action (Approve or Reject)");
-    
+    const user = JSON.parse(localStorage.getItem("user"));
+    const staffId = user?.id;
     setSubmitting(true);
     try {
       const response = await fetch(`http://localhost:3000/api/admin/claims/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: decision, remark: remarkInput })
+        body: JSON.stringify({ status: decision, remark: remarkInput, staffId: staffId })//Essential
       });
 
       const resData = await response.json();
