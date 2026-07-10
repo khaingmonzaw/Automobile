@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 
 const CoverageUpdate = () => {
   const { coverageId } = useParams(); 
@@ -14,12 +17,35 @@ const CoverageUpdate = () => {
   // Cache state to store database values for the Cancel button reset
   const [originalData, setOriginalData] = useState(null);
 
+  // Track duplicate validation state
+  const [isDuplicate, setIsDuplicate] = useState(false);
+
+   // --- NEW STATE VARIABLES FOR SYSTEM MODAL ---
+    const [showAlertModal, setShowAlertModal] = useState(false); // Controls the alert dialog visibility
+    const [modalMessage, setModalMessage] = useState('');         // Stores the alert text string
+    const [shouldRedirect, setShouldRedirect] = useState(false);   // Flag to navigate away after closing modal
+
   // Validation errors state tracking individual fields
   const [errors, setErrors] = useState({
     coverageType: false,
     coverageLimit: false,
     description: false
   });
+
+  // Utility to fire custom dialog alerts instead of window.alert
+  const triggerModalAlert = (msg, autoNavigate = false) => {
+    setModalMessage(msg);
+    setShouldRedirect(autoNavigate);
+    setShowAlertModal(true);
+  };
+
+  // Handles closing the modal window
+  const closeAlertModal = () => {
+    setShowAlertModal(false);
+    if (shouldRedirect) {
+      navigate('/Admin/CoverageTypes');
+    }
+  };
 
   useEffect(() => {
     const fetchCurrentCoverage = async () => {
@@ -61,16 +87,18 @@ const CoverageUpdate = () => {
       setDescription(originalData.description || '');
       setStatus(originalData.status || 'Active');
     }
-    // Clear any active red validation labels
+    // Clear any active red validation labels and duplicate flags
     setErrors({
       coverageType: false,
       coverageLimit: false,
       description: false
     });
+    setIsDuplicate(false);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setIsDuplicate(false);
 
     // Check empty inputs to toggle validation errors visually
     const newErrors = {
@@ -81,9 +109,25 @@ const CoverageUpdate = () => {
 
     setErrors(newErrors);
 
-    // Stop execution if any validation fails
+    // Stop execution if any basic field validation fails
     if (newErrors.coverageType || newErrors.coverageLimit || newErrors.description) {
       return;
+    }
+
+    // Duplicate Check Validation (Only run if the user actually modified the name text)
+    if (originalData && coverageType.trim().toLowerCase() !== originalData.coverage_type.trim().toLowerCase()) {
+      try {
+        const checkResponse = await fetch(`http://localhost:3000/api/coverage/${encodeURIComponent(coverageType.trim())}`);
+        const data = await checkResponse.json();
+        
+        if (data && data.coverage_type) {
+          setIsDuplicate(true);
+          setErrors(prev => ({ ...prev, coverageType: true }));
+          return; // CRITICAL: Stop submission if duplicate name exists elsewhere
+        }
+      } catch (error) {
+        console.error('Error verifying coverage type availability:', error);
+      }
     }
 
     const updatedForm = { 
@@ -101,13 +145,14 @@ const CoverageUpdate = () => {
       });
 
       if (response.ok) {
-        alert('Coverage updated successfully!');
-        navigate('/Admin/CoverageTypes'); 
+         triggerModalAlert('Coverage updated successfully!', true);
       } else {
-        alert('Failed to update coverage data records.');
+          const errorData = await response.json().catch(() => ({}));
+          triggerModalAlert(`Failed to update: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Network Error:', error);
+       triggerModalAlert('Could not connect to the backend server.');
     }
   };
 
@@ -123,18 +168,32 @@ const CoverageUpdate = () => {
 
   return (
     <div className="container-fluid py-3 text-start">
+       {/* Informative Dialog Alert Popup Component */}
+      {showAlertModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,.5)", zIndex: 1055 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">System Notification</h5>
+                <button type="button" className="btn-close" onClick={closeAlertModal}></button>
+              </div>
+              <div className="modal-body text-center py-4">
+                <p className="mb-0 fw-medium text-dark">{modalMessage}</p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button className="btn btn-warning fw-bold text-dark px-4" onClick={closeAlertModal}>
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mb-2 text-start">
-        <button 
-          type="button"
-          className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0" 
-          style={{ width: "40px", height: "36px", borderRadius: "8px" }}
-          onClick={() => navigate('/Admin/CoverageTypes')} 
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
+        <Link to="/Admin/CoverageTypes" className="text-decoration-none text-dark" >
+                    <button className='btn btn-warning'>
+                        <FontAwesomeIcon icon={faCircleLeft} />
+                    </button></Link>
       </div>
 
       <div className="row my-3">
@@ -148,7 +207,7 @@ const CoverageUpdate = () => {
             <div className="row my-3">
               <div className="col-sm-4 d-flex align-items-center">
                 <label htmlFor="coverage-type" className="form-label text-secondary fw-semibold mb-0">
-                  Coverage Type
+                  Coverage Type <span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -161,14 +220,18 @@ const CoverageUpdate = () => {
                     value={coverageType}
                     onChange={(e) => {
                       setCoverageType(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, coverageType: false}));
+                      if (isDuplicate) setIsDuplicate(false);
+                      if (e.target.value.trim()) setErrors(prev => ({...prev, coverageType: false}));
                     }}
                     style={{ borderRadius: "8px", fontSize: "14px", paddingRight: "40px" }}
                   />
                   {errors.coverageType && <ErrorIcon />}
                 </div>
-                {errors.coverageType && (
-                  <div className="text-danger small mt-1 text-start fw-medium">*Coverage Type is required.</div>
+                {errors.coverageType && !isDuplicate && (
+                  <div className="text-danger small mt-1 text-start fw-medium">Coverage Type is required.</div>
+                )}
+                {isDuplicate && (
+                  <div className="text-danger small mt-1 text-start fw-medium">This Coverage Type already exists in the database.</div>
                 )}
               </div>
             </div>
@@ -177,7 +240,7 @@ const CoverageUpdate = () => {
             <div className="row my-3">
               <div className="col-sm-4 d-flex align-items-center">
                 <label htmlFor="coverage-limit" className="form-label text-secondary fw-semibold mb-0">
-                  Coverage Limit
+                  Coverage Limit <span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -200,7 +263,7 @@ const CoverageUpdate = () => {
                   {errors.coverageLimit && <ErrorIcon />}
                 </div>
                 {errors.coverageLimit && (
-                  <div className="text-danger small mt-1 text-start fw-medium">*Coverage Limit is required.</div>
+                  <div className="text-danger small mt-1 text-start fw-medium">Coverage Limit is required.</div>
                 )}
               </div>
             </div>
@@ -209,7 +272,7 @@ const CoverageUpdate = () => {
             <div className="row my-3">
               <div className="col-sm-4 pt-1">
                 <label htmlFor="form-description" className="form-label text-secondary fw-semibold mb-0">
-                  Description
+                  Description <span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -233,7 +296,7 @@ const CoverageUpdate = () => {
                   )}
                 </div>
                 {errors.description && (
-                  <div className="text-danger small mt-1 text-start fw-medium">*Description is required.</div>
+                  <div className="text-danger small mt-1 text-start fw-medium">Description is required.</div>
                 )}
               </div>
             </div>
