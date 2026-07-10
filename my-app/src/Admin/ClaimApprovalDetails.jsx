@@ -58,13 +58,13 @@ const ClaimApprovalDetails = () => {
         setTimeout(() => {
           setShowSuccess(false);
           navigate(`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`);
-        }, 3000);
+        }, 5000);
       } else {
         setMessage("Failed to confirm final approvals.");
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
-        }, 3000);
+        }, 5000);
       }
     } catch (err) {
       console.error(err);
@@ -72,7 +72,7 @@ const ClaimApprovalDetails = () => {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-      }, 3000);
+      }, 5000);
     } finally {
       setSubmitting(false);
     }
