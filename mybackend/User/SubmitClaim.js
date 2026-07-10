@@ -73,10 +73,10 @@ exports.submitClaim = (db) => {
 
           // Increase claimed_frequency by 1
           const updateSql = `
-    UPDATE users
-    SET claimed_frequency = claimed_frequency + 1
-    WHERE id = ?
-  `;
+UPDATE users
+SET claimed_frequency = IFNULL(claimed_frequency, 0) + 1
+WHERE id = ?
+`;
 
           db.query(updateSql, [user_id], (err) => {
             if (err) {

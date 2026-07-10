@@ -17,6 +17,7 @@ exports.userClaimDetail = (db) => {
       c.location,
       c.status,
       c.remark,
+      p.policy_number,
       ct.coverage_type AS accident_type,
       v.vehicle_number AS v_number,
       v.vehicle_model AS v_model

@@ -55,11 +55,15 @@ function ClaimDetails() {
                                     <tbody>
 
                                         <tr>
-                                            <th>Claim ID</th>
-                                            <td>CLM-{claim.claim_id}</td>
+                                            <th >Claim ID</th>
+                                            <td className='text-primary'>CLM-{claim.claim_id}</td>
                                         </tr>
 
                                         <tr>
+                                            <th>Policy Number</th>
+                                            <td>{claim.policy_number}</td>
+                                        </tr>
+                                          <tr>
                                             <th>Claim Date</th>
                                             <td>{claim.created_at.split("T")[0]}</td>
                                         </tr>

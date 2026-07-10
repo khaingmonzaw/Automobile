@@ -157,7 +157,7 @@ if (checkData.hasPending) {
   setErrors(newErrors);
   return;
 }
-      //myo code end
+//       //myo code end
 
       // No pending claim → show confirmation modal
       setShowConfirm(true);
@@ -409,47 +409,42 @@ if (checkData.hasPending) {
             </div>
           </div>
 
-          <div className="col-md-6">
-            <div className="mb-4">
-              <label>
-                Description
-                <span className="text-danger">*</span>
-              </label>
-              <textarea
-                className={`form-control ${errors.description ? "is-invalid" : ""}`}
-                rows="5"
-                name="description"
-                value={formData.description}
-                onChange={handleData}
-              />
-              {errors.description && (
-                <small className="text-danger">{errors.description}</small>
-              )}
-            </div>
-          </div>
+                    <div className="col-md-6">
 
-          <div className="d-flex justify-content-center gap-3">
-            <button
-              className="btn btn-warning"
-              type="submit"
-              disabled={submit || isValidating}
-              style={{ width: "140px" }}
-            >
-              {isValidating ? "Checking..." : submit ? "Submitting" : "Submit"}
-            </button>
-            <button
-              className="btn btn-danger"
-              type="button"
-              onClick={handleReset}
-              style={{ width: "120px" }}
-            >
-              Reset
-            </button>
-          </div>
+                        <div className="mb-4">
+                            <label>Description</label>
+                            <textarea
+                                className={`form-control ${errors.description ? "is-invalid" : ""}`}
+                                rows="5"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleData}
+                            
+                            />
+                           
+                            {errors.description && (
+                                <small className="text-danger">
+                                    {errors.description}
+                                </small>
+                            )}
+                        </div>
+
+                    </div>
+                    <div className="d-flex justify-content-center gap-3">
+                        <button className="btn btn-warning" type="submit" disabled={submit}>
+                            {submit ? "Submitting" : "Submit"}
+                        </button>
+                        <button className="btn btn-danger" type="button" onClick={handleReset}>
+                            Reset
+                        </button>
+                    </div>
+
+                </div>
+
+
+            </form>
         </div>
-      </form>
-    </div>
-  );
+    );
 }
 
 export default NewClaim;
