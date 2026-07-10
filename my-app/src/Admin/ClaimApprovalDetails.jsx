@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 
 const ClaimApprovalDetails = () => {
   const location = useLocation();
@@ -9,7 +9,13 @@ const ClaimApprovalDetails = () => {
   
   const data = location.state?.dataBundle;
   const [remark, setRemark] = useState("");
-  const [submitting, setSubmitting] = useState(false); 
+  const [submitting, setSubmitting] = useState(false);
+
+  // --- STATE VARIABLES FOR SYSTEM MODAL & ALERTS ---
+  const [showConfirm, setShowConfirm] = useState(false); // Controls the confirm modal
+  const [showSuccess, setShowSuccess] = useState(false); // Controls the success banner
+  const [message, setMessage] = useState("");             // Stores the success/error text
+
   useEffect(() => {
     if (!data) {
       alert("No calculation record context found. Redirecting...");
@@ -21,14 +27,19 @@ const ClaimApprovalDetails = () => {
 
   if (!data) return null;
 
+  // --- TRIGGER DISPLAY FOR SUBMIT MODAL BOX ---
+  const triggerSubmitConfirm = () => {
+    setShowConfirm(true);
+  };
+
+  // --- CONFIRMED DELEGATION SUBMISSIONS ---
   const handleFinalSubmit = async () => {
-    const confirmSubmit=window.confirm("Are you sure you want to submit this decision details?"
-    );
-    if (!confirmSubmit) return ;
+    setShowConfirm(false); // Close Modal
     setSubmitting(true);
 
     const user = JSON.parse(localStorage.getItem("user"));
     const staffId = user?.id;
+
     try {
       const response = await fetch(`http://localhost:3000/api/resultupdate/${data.claim_id}`, {
         method: 'PUT',
@@ -41,45 +52,87 @@ const ClaimApprovalDetails = () => {
       });
 
       if (response.ok) {
-        alert("Claims table successfully updated!");
-        // Navigate back to view updated database status
-        navigate(`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`);
+        setMessage("Claims table successfully updated!");
+        setShowSuccess(true);
+        
+        setTimeout(() => {
+          setShowSuccess(false);
+          navigate(`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`);
+        }, 5000);
       } else {
-        alert("Failed to confirm final approvals.");
+        setMessage("Failed to confirm final approvals.");
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 5000);
       }
     } catch (err) {
       console.error(err);
+      setMessage("Failed to confirm final approvals.");
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 5000);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleCancel = () => {
-    const confirmCancel=window.confirm("Are you sure you want to cancel?"
-    );
-    if (!confirmCancel) return ;
-    // Navigate back directly WITHOUT database modification updates
+  // --- IMMEDIATE DIRECT REDIRECTION ---
+  const handleImmediateCancel = () => {
     navigate(`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`);
   };
-  
- //{`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`} 
 
   return (
     <div className="container-fluid py-3">
+      {/* Dynamic Top Banner Message Display */}
+      {showSuccess && (
+        <div className="alert alert-warning alert-dismissible fade show text-start" role="alert">
+          {message}
+          <button type="button" className="btn-close" onClick={() => setShowSuccess(false)}></button>
+        </div>
+      )}
+
+      {/* Styled Confirmation Dialog Box (Only used for Submit now) */}
+      {showConfirm && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,.5)" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">
+                  Confirm Submission
+                </h5>
+                <button type="button" className="btn-close" onClick={() => setShowConfirm(false)}></button>
+              </div>
+              <div className="modal-body text-center">
+                <p>Are you sure you want to submit this decision details?</p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button 
+                  className="btn btn-warning fw-bold text-dark" 
+                  onClick={handleFinalSubmit}
+                  disabled={submitting}
+                >
+                  Submit
+                </button>
+                <button className="btn btn-danger fw-bold text-white" onClick={() => setShowConfirm(false)}>
+                  No, Go Back
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Page Header Area */}
-      <div className="d-flex align-items-center gap-3 mb-4">
-        <Link to={`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`}  className="text-decoration-none">
-          <button 
-            className="btn btn-warning d-flex align-items-center justify-content-center fw-bold text-dark" 
-            style={{ width: "40px", height: "36px", borderRadius: "8px" }}
-            aria-label="Go back"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>
+        <div className="d-flex flex-column align-items-start gap-2 mb-4">  
+        <Link to={`/Admin/AllClaims/ClaimStatusAction/${data.claim_id}`}  className="text-decoration-none text-dark" >
+            <button className='btn  btn-warning'>
+              <FontAwesomeIcon icon={faCircleLeft} />
+            </button>
         </Link>
         <h2 className="mb-0 fw-bold fs-4 text-dark">Claim Approval Details</h2>
       </div>
-
       {/* Details White Layout Card */}
       <div className="card bg-white border-0 rounded-3 shadow-sm p-4 mx-auto w-100" style={{ maxWidth: "1150px" }}>
         
@@ -105,102 +158,75 @@ const ClaimApprovalDetails = () => {
           </div>
         </div>
 
-        {/* Gray Decorative Section Divider */}
         <hr className="my-4 text-secondary opacity-25 mx-2" />
 
         {/* Core Field Data Layout Grid */}
         <div className="row g-4 text-start px-2">
-          
-          {/* Left Layout Column Block */}
           <div className="col-lg-6 d-flex flex-column gap-3">
-            
-            {/* Policy Number Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Policy No</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.policy_no}</span>
               </div>
             </div>
-
-            {/* Policy Status Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Policy Status</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.policy_status.toUpperCase()}</span>
               </div>
             </div>
-            
-            {/* Coverage Status Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Coverage Status</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.coverage_status}</span>
               </div>
             </div>
-
-            {/* Compensation Amount Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Compensation Amount</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.compensation_amt}</span>
               </div>
             </div>
-
-            {/* Risk Level Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Risk Level</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.risk_lvl}</span>
               </div>
             </div>
-
-            {/* Colored Status Tag Row */}
             <div className="row align-items-baseline">
-            <div className="col-sm-5 text-secondary fw-semibold">Status</div>
-            <div className={`col-sm-7 fw-bold d-flex ${data.status === 'REJECTED' ? 'text-danger' : 'text-success'}`}>
+              <div className="col-sm-5 text-secondary fw-semibold">Status</div>
+              <div className={`col-sm-7 fw-bold d-flex ${data.status === 'REJECTED' ? 'text-danger' : 'text-success'}`}>
                 <span className="me-2">:</span>
                 <span>{data.status}</span>
+              </div>
             </div>
-            </div>
-
           </div>
 
-          {/* Right Layout Column Block */}
           <div className="col-lg-6 d-flex flex-column gap-3">
-
-            {/* Accident Type Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Accident Type</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.accident_type}</span>
               </div>
             </div>
-
-            {/* Accident Date Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Accident Date</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.accident_date ? new Date(data.accident_date).toLocaleDateString('en-CA') : 'N/A'}</span>
               </div>
             </div>
-
-            {/* Claim Date Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Submitted Date</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.submitted_date ? new Date(data.submitted_date).toLocaleDateString('en-CA') : 'N/A'}</span>
               </div>
             </div>
-
-            {/* Claimed Amount Row */}
             <div className="row align-items-baseline">
               <div className="col-sm-5 text-secondary fw-semibold">Claimed Amount</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
                 <span className="me-2">:</span><span>{data.claim_amt}</span>
               </div>
             </div>
-            
-            {/* Dynamic Claim Description Textblock */}
             <div className="row align-items-start">
               <div className="col-sm-5 text-secondary fw-semibold">Claim Description</div>
               <div className="col-sm-7 fw-semibold text-dark d-flex">
@@ -208,9 +234,7 @@ const ClaimApprovalDetails = () => {
                 <span>{data.des}</span>
               </div>
             </div>
-
           </div>
-
         </div>
 
         {/* Remark Text Input Area Wrapper */}
@@ -228,14 +252,13 @@ const ClaimApprovalDetails = () => {
           />
         </div>
 
-        {/* Action Bottom Buttons Segment (Centered) */}
+        {/* Action Bottom Buttons Segment */}
         <div className="d-flex justify-content-center gap-3 mt-5 px-2">
-          <button onClick={handleFinalSubmit} className="btn btn-warning
-          fw-bold text-dark shadow-sm" >
+          <button onClick={triggerSubmitConfirm} className="btn btn-warning fw-bold text-dark shadow-sm">
             Submit
           </button>
-          <button onClick={handleCancel} className="btn btn-danger
-          fw-bold text-white shadow-sm" >
+          {/* Changed onClick here to bypass the dialog box entirely */}
+          <button onClick={handleImmediateCancel} className="btn btn-danger fw-bold text-white shadow-sm">
             Cancel
           </button>
         </div>
