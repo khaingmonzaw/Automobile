@@ -79,6 +79,9 @@ const NewCoverage = () => {
 
   return (
     <div className="container-fluid py-3 text-start">
+
+
+      
       <div className="mb-2 text-start">
         <button 
           className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0" 
@@ -105,7 +108,7 @@ const NewCoverage = () => {
             <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-2">
                 <label htmlFor="coverage-type" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Coverage Type
+                  Coverage Type<span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -124,12 +127,12 @@ const NewCoverage = () => {
                 />
                 {validated && !coverageType && (
                   <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *Coverage Type is required.
+                    Coverage Type is required.
                   </div>
                 )}
                 {isDuplicate && (
                   <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *This Coverage Type already exists in the database.
+                    This Coverage Type already exists in the database.
                   </div>
                 )}
               </div>
@@ -139,7 +142,7 @@ const NewCoverage = () => {
             <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-2">
                 <label htmlFor="coverage-limit" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Coverage Limit
+                  Coverage Limit<span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -159,7 +162,7 @@ const NewCoverage = () => {
                     MMK
                   </span>
                   <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *Coverage Limit is required.
+                    Coverage Limit is required.
                   </div>
                 </div>
               </div>
@@ -169,7 +172,7 @@ const NewCoverage = () => {
             <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-2">
                 <label htmlFor="form-description" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Description
+                  Description<span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -184,7 +187,7 @@ const NewCoverage = () => {
                   required
                 />
                 <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                  *Description is required.
+                  Description is required.
                 </div>
               </div>
             </div>

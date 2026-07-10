@@ -13,10 +13,13 @@ function NewClaim() {
     const [errors, setErrors] = useState({});
     const [coverages, setCoverages] = useState([]);
     const [submit, setSubmit] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [message, setMessage] = useState("");
+    const [showConfirm, setShowConfirm] = useState(false);
     const [mapPosition, setMapPosition] = useState({
-    lat: 16.8409,
-    lng: 96.1735
-});
+        lat: 16.8409,
+        lng: 96.1735
+    });
 
     // ================= ADDED: formData now includes vehicle_id =================
     const [formData, setFormData] = useState({
@@ -99,7 +102,7 @@ function NewClaim() {
         const accidentDate = new Date(formData.accidentDate);
         accidentDate.setHours(0, 0, 0, 0);
         const fiveDaysAgo = new Date();
-        fiveDaysAgo.setDate(today.getDate() - 5);
+        fiveDaysAgo.setDate(today.getDate() - 6);
 
 
 
@@ -146,12 +149,15 @@ function NewClaim() {
             return;
         }
 
-         const confirmSubmit=window.confirm("Do You want to submit this claim?"
-            );
-            if (!confirmSubmit) return ;
-            setSubmit(true);
-        try {
+        setShowConfirm(true);
+        return;
 
+    };
+    const confirmSubmit = async () => {
+        setShowConfirm(false);
+        setSubmit(true);
+
+        try {
             const payload = {
                 user_id: userId,
                 policy_id: selectedPolicy?.policy_id,
@@ -166,7 +172,6 @@ function NewClaim() {
                 compensation_amount: 0
             };
 
-           
             const res = await fetch("http://localhost:3000/api/claims", {
                 method: "POST",
                 headers: {
@@ -176,19 +181,93 @@ function NewClaim() {
             });
 
             const data = await res.json();
-            alert(data.message);
+
+            setMessage(data.message || "Claim submitted successfully.");
+            setShowSuccess(true);
             handleReset();
+
+            setTimeout(() => {
+                setShowSuccess(false);
+            }, 3000); handleReset();
+
         } catch (err) {
-            alert("Faied to submit claim");
+            setMessage("Failed to submit claim.");
+            setShowSuccess(true);
+
+            setTimeout(() => {
+                setShowSuccess(false);
+            }, 3000);
         } finally {
             setSubmit(false);
         }
-
     };
-
 
     return (
         <div>
+
+            {showSuccess && (
+                <div
+                    className="alert alert-warning alert-dismissible fade show"
+                    role="alert"
+                >
+                    {message}
+
+                    <button
+                        type="button"
+                        className="btn-close"
+                        onClick={() => setShowSuccess(false)}
+                    ></button>
+                </div>
+            )}
+            {showConfirm && (
+                <div
+                    className="modal fade show d-block"
+                    style={{ backgroundColor: "rgba(0,0,0,.5)" }}
+                >
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+
+                            <div className="modal-header">
+                                <h5 className="modal-title fw-bold">
+                                    Confirm Submission
+                                </h5>
+
+                                <button
+                                    className="btn-close"
+                                    onClick={() => setShowConfirm(false)}
+                                ></button>
+                            </div>
+
+                            <div className="modal-body text-center">
+                                <p>
+                                    Are you sure you want to submit this claim?
+                                </p>
+                            </div>
+
+                            <div className="modal-footer justify-content-center">
+
+
+
+                                <button
+                                    className="btn btn-warning"
+                                    onClick={confirmSubmit}
+                                >
+                                    Submit
+                                </button>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => setShowConfirm(false)}
+                                >
+                                    Cancel
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <h3 className="fw-bold mb-4">New Claim Submission</h3>
 
             {/* Policy Selection */}
@@ -199,7 +278,7 @@ function NewClaim() {
 
                         <div className="col-md-3">
                             <label className="fw-bold mb-0">
-                                Select Policy
+                                Select Policy<span className="text-danger">*</span>
                             </label>
                         </div>
 
@@ -285,7 +364,7 @@ function NewClaim() {
                     <div className="col-md-6">
 
                         <div className="mb-4">
-                            <label>Accident Date</label>
+                            <label>Accident Date</label><span className="text-danger">*</span>
                             <input
                                 type="date"
                                 name="accidentDate"
@@ -302,7 +381,7 @@ function NewClaim() {
                         </div>
 
                         <div className="mb-4">
-                            <label>Accident Type</label>
+                            <label>Accident Type</label><span className="text-danger">*</span>
 
 
                             <select
@@ -329,7 +408,7 @@ function NewClaim() {
                         </div>
 
                         <div className="mb-4">
-                            <label>Claim Amount</label>
+                            <label>Claim Amount</label><span className="text-danger">*</span>
                             <input
                                 type="text"
                                 className={`form-control ${errors.claimAmount ? "is-invalid" : ""}`}
@@ -345,7 +424,7 @@ function NewClaim() {
                         </div>
 
                         <div className="mb-4">
-                            <label>Location</label>
+                            <label>Location</label><span className="text-danger">*</span>
 
                             <div className="row">
                                 <div className="">
@@ -363,35 +442,35 @@ function NewClaim() {
                                     )}
                                 </div>
 
-                               
+
                             </div>
                         </div>
 
 
-<div className="mb-4">
-    <label>Pick Accident Location on Map</label>
+                        <div className="mb-4">
+                            <label>Pick Accident Location on Map</label><span className="text-danger">*</span>
 
-    <LocationMap
-        position={mapPosition}
-        setPosition={setMapPosition}
-        setFormData={setFormData}
-    />
-</div>
+                            <LocationMap
+                                position={mapPosition}
+                                setPosition={setMapPosition}
+                                setFormData={setFormData}
+                            />
+                        </div>
                     </div>
 
                     <div className="col-md-6">
 
                         <div className="mb-4">
-                            <label>Description</label>
+                            <label>Description</label><span className="text-danger">*</span>
                             <textarea
                                 className={`form-control ${errors.description ? "is-invalid" : ""}`}
                                 rows="5"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleData}
-                            
+
                             />
-                           
+
                             {errors.description && (
                                 <small className="text-danger">
                                     {errors.description}
@@ -401,10 +480,10 @@ function NewClaim() {
 
                     </div>
                     <div className="d-flex justify-content-center gap-3">
-                        <button className="btn btn-warning" type="submit" disabled={submit}>
+                        <button className="btn btn-warning" type="submit" disabled={submit} style={{ width: "120px" }} >
                             {submit ? "Submitting" : "Submit"}
                         </button>
-                        <button className="btn btn-danger" type="button" onClick={handleReset}>
+                        <button className="btn btn-danger" type="button" onClick={handleReset} style={{ width: "120px" }}>
                             Reset
                         </button>
                     </div>
