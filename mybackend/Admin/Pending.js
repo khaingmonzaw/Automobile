@@ -17,7 +17,7 @@ const db = mysql.createConnection({
 router.put("/api/admin/claims/:id", (req, res) => {
   const coverage_status = "VALID";
   const claim_id = req.params.id;
-  const { status, remark } = req.body;
+  const { status, remark, staffId } = req.body;
 
   // ==========================================
   // 1. APPROVED PROCESS FLOW
@@ -35,7 +35,7 @@ router.put("/api/admin/claims/:id", (req, res) => {
         p.policy_number, 
         p.vehicle_id, 
         p.status AS policy_status, 
-        p.total_premium, 
+        p.total_coverage, 
         p.remaining_balance as assessed_amt,
         r.risk_level,
         u.id AS user_id,
@@ -60,7 +60,7 @@ router.put("/api/admin/claims/:id", (req, res) => {
       
       // Map database values safely to variables for Calc.exe arguments
       const claim_amt = row.claimed_amount || 0;
-      const total_premium = row.total_premium || 0;
+      const total_coverage = row.total_coverage || 0;
       const assessed_amt = row.assessed_amt || 0;
       const risk_lvl = row.risk_level || "LOW";
       const dob = row.dob ? new Date(row.dob).toISOString().split('T')[0] : "2000-01-01";  
@@ -68,7 +68,7 @@ router.put("/api/admin/claims/:id", (req, res) => {
       const model_year = row.model_year || 2020;
 
       const cobolPath = path.join(__dirname, '../calculate.exe');
-      const command = `"${cobolPath}" ${claim_amt} ${total_premium} ${assessed_amt} "${risk_lvl}" "${dob}" ${driver_year} ${model_year}`;
+      const command = `"${cobolPath}" ${claim_amt} ${total_coverage} ${assessed_amt} "${risk_lvl}" "${dob}" ${driver_year} ${model_year}`;
 
       exec(command, (error, stdout) => {
         if (error) {
@@ -109,9 +109,9 @@ router.put("/api/admin/claims/:id", (req, res) => {
   // 2. REJECTED PROCESS FLOW
   // ==========================================
   } else if (status === "REJECTED") {
-    const rejectSql = `UPDATE claims SET status = ?, remark = ? WHERE claim_id = ?`;
+    const rejectSql = `UPDATE claims SET approved_staff = ?, status = ?, remark = ?, compensation_amount = ?  WHERE claim_id = ?`;
 
-    db.query(rejectSql, ["REJECTED", remark, claim_id], (err, result) => {
+    db.query(rejectSql, [staffId, "REJECTED", remark, 0, claim_id], (err, result) => {
       if (err) {
         return res.status(500).json({ message: "Update failed" });
       }
@@ -128,6 +128,7 @@ router.put('/api/resultupdate/:id', (req, res) => {
     return res.status(400).json({ message: "Missing dataBundle object payload." });
   }
   const fulldata = dataBundle;
+  const status = fulldata.status;
 
   const claimsUpdateSql = `
     UPDATE claims 
@@ -135,36 +136,39 @@ router.put('/api/resultupdate/:id', (req, res) => {
     WHERE claim_id = ?
   `;
 
-  db.query(claimsUpdateSql, [staffId, fulldata.status, remark, fulldata.compensation_amt, claim_id], (err, result) => {
+  db.query(claimsUpdateSql, [staffId, status, remark, fulldata.compensation_amt, claim_id], (err, result) => {
     if (err) {
       return res.status(500).json({ message: "Final submission database update failed" });
     }
 
-    const policyUpdateSql = `
-    UPDATE policies 
-    SET remaining_balance = ?
-    WHERE user_id = ?
-  `;
-
-    db.query(policyUpdateSql, [fulldata.assessed_amount, fulldata.user_id], (err, result) => {
-      if (err) {
-        return res.status(500).json({ message: "Final submission database update failed" });
-      }
-      
-        const riskUpdateSql = `
-          UPDATE risk_assessment
-          SET risk_level = ?
+    if (status === "APPROVED"){
+          const policyUpdateSql = `
+          UPDATE policies 
+          SET remaining_balance = ?
           WHERE user_id = ?
         `;
-        db.query(riskUpdateSql, [fulldata.risk_lvl, fulldata.user_id], (err, result) => {
+
+        db.query(policyUpdateSql, [fulldata.assessed_amount, fulldata.user_id], (err, result) => {
           if (err) {
             return res.status(500).json({ message: "Final submission database update failed" });
           }
-          res.json({ message: "Claim completely processed and approved!" });
-        });
+      
+          const riskUpdateSql = `
+            UPDATE risk_assessment
+            SET risk_level = ?
+            WHERE user_id = ?
+          `;
+          db.query(riskUpdateSql, [fulldata.risk_lvl, fulldata.user_id], (err, result) => {
+            if (err) {
+              return res.status(500).json({ message: "Final submission database update failed" });
+            }
+            res.json({ message: "Claim completely processed and approved!" });
+          });
 
-    });
-    });
+        });
+    } 
+
+ });
 
 });
 

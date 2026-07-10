@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 
 const NewCoverage = () => {
   const navigate = useNavigate();
@@ -10,12 +13,32 @@ const NewCoverage = () => {
   const [validated, setValidated] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(false);
 
+  // --- NEW STATE VARIABLES FOR SYSTEM MODAL ---
+  const [showAlertModal, setShowAlertModal] = useState(false); // Controls the alert dialog visibility
+  const [modalMessage, setModalMessage] = useState('');         // Stores the alert text string
+  const [shouldRedirect, setShouldRedirect] = useState(false);   // Flag to navigate away after closing modal
+
   const handleReset = () => {
     setCoverageType('');
     setCoverageLimit('');
     setDescription('');
     setValidated(false);
     setIsDuplicate(false);
+  };
+
+  // Utility to fire custom dialog alerts instead of window.alert
+  const triggerModalAlert = (msg, autoNavigate = false) => {
+    setModalMessage(msg);
+    setShouldRedirect(autoNavigate);
+    setShowAlertModal(true);
+  };
+
+  // Handles closing the modal window
+  const closeAlertModal = () => {
+    setShowAlertModal(false);
+    if (shouldRedirect) {
+      navigate('/Admin/CoverageTypes');
+    }
   };
 
   const handleSave = async (e) => {
@@ -33,8 +56,8 @@ const NewCoverage = () => {
     let duplicateDetected = false;
     try {
       const checkResponse = await fetch(`http://localhost:3000/api/coverage/${encodeURIComponent(coverageType.trim())}`);
-      
-      if (checkResponse.status === 200) {
+      const data = await checkResponse.json();
+      if (data && data.coverage_type) {
         setIsDuplicate(true);
         duplicateDetected = true;
       }
@@ -65,32 +88,50 @@ const NewCoverage = () => {
       });
 
       if (response.ok) {
-        alert('Coverage saved successfully!');
-        navigate('/Admin/CoverageTypes'); 
+        // Replaced window.alert with modal trigger
+        triggerModalAlert('Coverage saved successfully!', true);
       } else {
         const errorData = await response.json();
-        alert(`Failed to save: ${errorData.error || 'Unknown error'}`);
+        // Replaced window.alert with modal trigger
+        triggerModalAlert(`Failed to save: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Network Error:', error);
-      alert('Could not connect to the backend server.');
+      // Replaced window.alert with modal trigger
+      triggerModalAlert('Could not connect to the backend server.');
     }
   };
 
   return (
     <div className="container-fluid py-3 text-start">
+      {/* Informative Dialog Alert Popup Component */}
+      {showAlertModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,.5)", zIndex: 1055 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">System Notification</h5>
+                <button type="button" className="btn-close" onClick={closeAlertModal}></button>
+              </div>
+              <div className="modal-body text-center py-4">
+                <p className="mb-0 fw-medium text-dark">{modalMessage}</p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button className="btn btn-warning fw-bold text-dark px-4" onClick={closeAlertModal}>
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-2 text-start">
-        <button 
-          className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0" 
-          style={{ width: "40px", height: "36px", borderRadius: "8px" }}
-          onClick={() => navigate('/Admin/CoverageTypes')} 
-          aria-label="Back to coverage list"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
+        <Link to="/Admin/CoverageTypes" className="text-decoration-none text-dark" >
+          <button className='btn btn-warning'>
+            <FontAwesomeIcon icon={faCircleLeft} />
+          </button>
+        </Link>
       </div>
 
       <div className="row my-3">
@@ -105,7 +146,7 @@ const NewCoverage = () => {
             <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-2">
                 <label htmlFor="coverage-type" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Coverage Type
+                  Coverage Type <span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -124,12 +165,12 @@ const NewCoverage = () => {
                 />
                 {validated && !coverageType && (
                   <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *Coverage Type is required.
+                    Coverage Type is required.
                   </div>
                 )}
                 {isDuplicate && (
                   <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *This Coverage Type already exists in the database.
+                    This Coverage Type already exists in the database.
                   </div>
                 )}
               </div>
@@ -139,7 +180,7 @@ const NewCoverage = () => {
             <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-2">
                 <label htmlFor="coverage-limit" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Coverage Limit
+                  Coverage Limit <span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -159,7 +200,7 @@ const NewCoverage = () => {
                     MMK
                   </span>
                   <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                    *Coverage Limit is required.
+                    Coverage Limit is required.
                   </div>
                 </div>
               </div>
@@ -169,7 +210,7 @@ const NewCoverage = () => {
             <div className="row align-items-start my-3">
               <div className="col-sm-4 pt-2">
                 <label htmlFor="form-description" className="form-label text-secondary fw-semibold mb-sm-0">
-                  Description
+                  Description <span className="text-danger">*</span>
                 </label>
               </div>
               <div className="col-sm-8">
@@ -184,7 +225,7 @@ const NewCoverage = () => {
                   required
                 />
                 <div className="invalid-feedback text-danger mt-1 fw-medium" style={{ fontSize: "13px" }}>
-                  *Description is required.
+                  Description is required.
                 </div>
               </div>
             </div>
