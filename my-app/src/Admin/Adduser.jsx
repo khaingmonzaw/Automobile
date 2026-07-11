@@ -21,8 +21,9 @@ function AddUser() {
     const licenseRegex = /^[A-D]\/[A-Z]{2,4}-\d{5,6}$/;
     const vehicleNoRegex = /^[0-9]{1,2}[A-Z]-[0-9]{4}$/;
     const policyRegex = /^POL-\d+$/;
+    console.log("formData =", formData);
     // Full Name 
-    if (!formData.fullName.trim()) {
+    if (!formData.fullName|| formData.fullName.trim() === "") {
       newErrors.fullName = "*Full Name is required";
     } else if (!nameRegex.test(formData.fullName)) {
       newErrors.fullName = "*Full Name must not contain digits or special characters";
@@ -95,7 +96,7 @@ function AddUser() {
       newErrors.vehicleNumber = "*Invalid format. Example: 1Y-1234";
     }
     //Policy
-    if (!formData.policyNumber.trim()) {
+    /*if (!formData.policyNumber.trim()) {
       newErrors.policyNumber = "*Policy Number is required";
     } else if (!policyRegex.test(formData.policyNumber)) {
       newErrors.policyNumber = "*Invalid format! Example: POL-0001";
@@ -103,7 +104,7 @@ function AddUser() {
 
     else if (formData.policyNumber.length < 8) {
       newErrors.policyNumber = "*Policy Number must be at least 8 characters";
-    }
+    }*/
 
     // Start Date
     if (!formData.startDate) {
@@ -131,31 +132,52 @@ function AddUser() {
     nrcTownship: "", nrcType: "N", nrcNumber: "", address: "",
     driverLicense: "", drivingYear: "", vehicleModel: "",
     vehicleNumber: "", modelYear: "", policyNumber: "",
-    coverage: [], startDate: "", endDate: "", coverageLimit: ""
+    coverage: [], startDate: "", endDate: "", coverageLimit: "" ,
+    monthlyPremium: "",  totalPremium: ""  , policyDuration: ""
+     
   });
 
   // Fetch coverage options
   useEffect(() => {
     fetch("http://localhost:3000/api/coverage_types")
       .then(res => res.json())
-      .then(data => setCoverageOptions(data))
+      .then(data => {
+        setFormData(prev => ({ ...prev, policyNumber: data.policyNumber }));
+  //const activeOnly = data.filter(item => item.status === 'active');
+  console.log("Database မှရလာသော အချက်အလက်များ:", data);
+  setCoverageOptions(data);
+})
       .catch(err => console.error("Error fetching coverage:", err));
   }, []);
+  
   useEffect(() => {
     if (isEditMode) {
       fetch(`http://localhost:3000/api/users/${id}`)
         .then((res) => res.json())
         .then((data) => {
+          const formatDate = (dateStr) => {
+          if (!dateStr) return "";
+          // 'T' ဆိုတဲ့ အမှတ်အသားနေရာမှာ ဖြတ်ထုတ်လိုက်ရင် YYYY-MM-DD သီးသန့်ကျန်ခဲ့ပါမယ်
+          return dateStr.split("T")[0]; 
+        };
+          setFormData(prev => ({ ...prev, policyNumber: data.newPolicyNumber }));
+    
           // NRC Parsing
           let nrcS = "", nrcT = "", nrcTy = "N", nrcN = "";
           if (data.nrc) {
             const match = data.nrc.match(/([^\/]*)\/([a-zA-Z-]+)\(([a-zA-Z])\)(\d+)/);
             if (match) { [nrcS, nrcT, nrcTy, nrcN] = [match[1], match[2], match[3], match[4]]; }
           }
-          const coverageIds = data.coverageTypeIds
-            ? data.coverageTypeIds.split(',').map(id => Number(id.trim()))
-            : [];
-          // Map the database response to your formData state
+        const coverageIds = data.coverageTypeIds 
+      ? data.coverageTypeIds.split(',').map(id => Number(id.trim())) 
+      : [];
+    const limitStrings = data.coverageLimit ? data.coverageLimit.toString().split(',') : [];
+    const totalLimit = limitStrings.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    
+    const duration = parseInt(data.policyDuration) || 12;
+    const premiums = calculatePremiums(totalLimit, duration);
+          
+    // Map the database response to your formData state
           setFormData({
             
             fullName: data.name || "",
@@ -174,9 +196,12 @@ function AddUser() {
             modelYear: data.model_year || "",
             policyNumber: data.policyNumber || "",
             coverage: coverageIds,
-            startDate: data.startDate ? data.startDate.split('T')[0] : "",
-            endDate: data.endDate ? data.endDate.split('T')[0] : "",
-            coverageLimit: data.coverageLimit || ""
+            startDate:data.startDate,
+            endDate: data.endDate,
+            coverageLimit: data.coverageLimit || "" ,
+            policyDuration: duration.toString() ,           
+            monthlyPremium:premiums.monthlyPremium, // Database column name ကို သေချာစစ်ပါ
+            totalPremium: premiums.totalPremium,     // Database column name ကို သေချာစစ်ပါ
           });
         })
         .catch((err) => console.error("Error fetching user for edit:", err));
@@ -192,10 +217,90 @@ function AddUser() {
   const townships = selectedState
     ? mmNrc.getNrcTownshipsByStateId(selectedState.id)
     : [];
+  
+  const calculateTotalLimit = (limitString) => {
+
+  if (!limitString) return 0;
+
+  return limitString
+    .toString()
+    .split(',')
+    .reduce(
+      (sum, val) => sum + (parseFloat(val.replace(/,/g, "")) || 0),
+      0
+    );
+
+};
+
+  const calculatePremiums = (limit, months) => {
+
+  // prevent NaN
+  const limitNum = parseFloat(limit) || 0;
+  const monthsNum = parseInt(months) || 12;
+
+  const rate = 0.05;
+  const serviceFee = 1000;
+
+  const yearlyTotal = limitNum * rate;
+
+  let total = 0;
+  let monthly = 0;
+
+  if (monthsNum === 6) {
+
+    total = (yearlyTotal / 2) + serviceFee;
+    monthly = total / 6;
+
+  } else {
+
+    const years = monthsNum / 12;
+    total = yearlyTotal * years;
+    monthly = total / monthsNum;
+
+  }
+
+  return {
+    totalPremium: total.toFixed(2),
+    monthlyPremium: monthly.toFixed(2)
+  };
+};
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+    // ၁။ လက်ရှိ input value ကို အရင် update လုပ်ပါ
+    const updated = { ...prev, [name]: value };
+
+    // ၂။ startDate နှင့် policyDuration ရှိနေမှသာ endDate ကို တွက်ချက်ပါ
+    if (updated.startDate && updated.policyDuration) {
+      //const start = new Date(updated.startDate);
+      //const end = new Date(start);
+     // ၁။ Start Date String ကို (YYYY-MM-DD) အဖြစ် ခွဲယူပါ
+      const [y, m, d] = updated.startDate.split('-').map(Number);
+      
+      // ၂။ လပေါင်းကို ပေါင်းပြီး Date Object တည်ဆောက်ပါ
+      const dateObj = new Date(y, m - 1, d); 
+      dateObj.setMonth(dateObj.getMonth() + parseInt(updated.policyDuration));
+      
+      // ၃။ Timezone အလွှဲအပြောင်းမဖြစ်စေရန် ဤနည်းဖြင့်သာ ပြန်ယူပါ
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      
+      updated.endDate = `${year}-${month}-${day}`;
+    }
+    // ၃။ Premium တွက်ချက်မှု Logic ကို ဆက်လက်လုပ်ဆောင်ပါ
+       
+    
+    const totalLimit = calculateTotalLimit(updated.coverageLimit);
+    
+    const months = parseInt(updated.policyDuration) || 12;
+    const premiums = calculatePremiums(totalLimit, months);
+    updated.totalPremium = premiums.totalPremium;
+    updated.monthlyPremium = premiums.monthlyPremium;
+    
+    return updated;
+  });
   };
   const handleCheckboxChange = (id) => {
     setFormData(prev => {
@@ -208,14 +313,22 @@ function AddUser() {
       newCoverage.forEach(cId => {
         const option = coverageOptions.find(o => Number(o.coverage_type_id) === Number(cId));
         if (option && option.coverage_limit) {
-          newTotalLimit += Number(option.coverage_limit);
+        const val = parseFloat(option.coverage_limit.toString().replace(/,/g, '')) || 0;
+        newTotalLimit += val;
         }
       });
+       const duration = prev.policyDuration || 12;
+       const premiums = calculatePremiums(
+      newTotalLimit,
+      duration
+    );
 
       return {
         ...prev,
         coverage: newCoverage,
-        coverageLimit: newTotalLimit // တွက်ပြီးသား Limit ကို Auto ထည့်ပေးခြင်း
+        coverageLimit: newTotalLimit.toString(),// တွက်ပြီးသား Limit ကို Auto ထည့်ပေးခြင်း
+        totalPremium: premiums.totalPremium,
+        monthlyPremium: premiums.monthlyPremium
       };
     });
   };
@@ -272,13 +385,7 @@ function AddUser() {
     } catch (error) {
       console.error("Policy check error:", error);
     }
-
-
-
-
-
   };
-
 
   const checkVehicleExists = async (vehicleNumber) => {
     if (!vehicleNumber) return;
@@ -302,19 +409,17 @@ function AddUser() {
     } catch (error) {
       console.error("Policy check error:", error);
     }
-
-
-
-
-
   };
   const handleSave = async () => {
+    const cleanCoverageLimit = formData.coverageLimit.toString().replace(/,/g, '');
     if (validate()) {
       if (formData.coverage.length === 0) {
         alert("Please select at least one coverage type.");
         return;
       }
-
+     const limit = calculateTotalLimit(formData.coverageLimit);
+      const duration = parseInt(formData.policyDuration) || 12;
+     const premiums = calculatePremiums(limit, duration);
       const fullNrc = `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`;
       console.log("Current Form NRC :", fullNrc);
       // ဥပမာ - Email တစ်ခုတည်းကိုပဲ စစ်မယ်ဆိုရင်
@@ -352,8 +457,13 @@ function AddUser() {
       // ... စသဖြင့် ဆက်စစ်သွားလို့ရပါတယ်
       const dataToSend = {
         ...formData,
-        nrc: fullNrc
+        nrc: fullNrc,
+        coverageLimit: cleanCoverageLimit,
+        totalPremium: premiums.totalPremium,     // တွက်ပြီးသားတန်ဖိုး
+        monthlyPremium: premiums.monthlyPremium, // တွက်ပြီးသားတန်ဖိုး
+        policyDuration: duration
       };
+        console.log("Sending Data:", dataToSend);
       const url = isEditMode ? `http://localhost:3000/api/update-user/${id}` : "http://localhost:3000/api/add-user";
       const method = isEditMode ? "PUT" : "POST";
       try {
@@ -428,48 +538,48 @@ if (response.ok) {
         <div className="row ">
           <div className="col-md-6 ">
             <SectionHeader icon="👤" title="User Information" />
-            {renderRow("Full Name", <input name="fullName" value={formData.fullName} onChange={handleInputChange} className={`form-control form-control-sm ${errors.fullName ? "is-invalid" : ""
+            {renderRow("Full Name", <input name="fullName" value={formData.fullName ?? ""} onChange={handleInputChange} className={`form-control form-control-sm ${errors.fullName ? "is-invalid" : ""
               }`} style={inputStyle} />,
               errors.fullName)}
-            {renderRow("Email", <input name="email" value={formData.email} onChange={handleInputChange} className={`form-control form-control-sm ${errors.email ? "is-invalid" : ""
+            {renderRow("Email", <input name="email" value={formData.email ?? ""} onChange={handleInputChange} className={`form-control form-control-sm ${errors.email ? "is-invalid" : ""
               }`} style={inputStyle} />,
               errors.email)}
-            {renderRow("Phone", <input name="phone" value={formData.phone} onChange={handleInputChange} className={`form-control form-control-sm ${errors.phone ? "is-invalid" : ""
+            {renderRow("Phone", <input name="phone" value={formData.phone ?? "" } onChange={handleInputChange} className={`form-control form-control-sm ${errors.phone ? "is-invalid" : ""
               }`} style={inputStyle} />, errors.phone)}
-            {renderRow("DOB", <input name="dob" type="date" value={formData.dob} onChange={handleInputChange} className={`form-control form-control-sm ${errors.dob ? "is-invalid" : ""
+            {renderRow("DOB", <input name="dob" type="date" value={formData.dob ?? ""} onChange={handleInputChange} className={`form-control form-control-sm ${errors.dob ? "is-invalid" : ""
               }`} style={inputStyle} />, errors.dob)}
-            {renderRow("Driver License", <input name="driverLicense" value={formData.driverLicense} onChange={handleInputChange} className={`form-control form-control-sm ${errors.driverLicense ? "is-invalid" : ""
+            {renderRow("Driver License", <input name="driverLicense" value={formData.driverLicense?? ""} onChange={handleInputChange} className={`form-control form-control-sm ${errors.driverLicense ? "is-invalid" : ""
               }`} style={inputStyle} placeholder="A/YGN-123456" />, errors.driverLicense)}
-            {renderRow("Driving Year", <input name="drivingYear" type="number" value={formData.drivingYear} onChange={handleInputChange} className={`form-control form-control-sm ${errors.driver_year ? "is-invalid" : ""
+            {renderRow("Driving Year", <input name="drivingYear" type="number" value={formData.drivingYear ?? "" } onChange={handleInputChange} className={`form-control form-control-sm ${errors.driver_year ? "is-invalid" : ""
               }`} style={inputStyle} />, errors.drivingYear)}
             {renderRow("NRC", (
               <div className="d-flex gap-1">
-                <select name="nrcState" className="form-select form-select-sm" value={formData.nrcState} onChange={handleInputChange} style={inputStyle}>
+                <select name="nrcState" className="form-select form-select-sm" value={formData.nrcState ?? ""} onChange={handleInputChange} style={inputStyle}>
                   <option value="">Select</option>
                   {states.map((s) => <option key={s.id} value={s.number.en}>{s.number.en}</option>)}
                 </select>
-                <select name="nrcTownship" className="form-select form-select-sm" value={formData.nrcTownship} onChange={handleInputChange} style={inputStyle}>
+                <select name="nrcTownship" className="form-select form-select-sm" value={formData.nrcTownship ?? "" } onChange={handleInputChange} style={inputStyle}>
                   <option value="">Select</option>
                   {townships.map((t) => <option key={t.id} value={t.code}>{t.short.en}</option>)}
                 </select>
-                <select name="nrcType" className="form-select form-select-sm" value={formData.nrcType} onChange={handleInputChange} style={inputStyle}>
+                <select name="nrcType" className="form-select form-select-sm" value={formData.nrcType ?? "" } onChange={handleInputChange} style={inputStyle}>
                   {types.map((t) => <option key={t.id} value={t.name.en}>{t.name.en}</option>)}
                 </select>
-                <input name="nrcNumber" type="text" className="form-control form-control-sm" value={formData.nrcNumber} onChange={handleInputChange} maxLength={6} style={inputStyle} />
+                <input name="nrcNumber" type="text" className="form-control form-control-sm" value={formData.nrcNumber ?? "" } onChange={handleInputChange} maxLength={6} style={inputStyle} />
               </div>
             ), errors.nrcNumber)}
 
-            {renderRow("Address", <input name="address" value={formData.address} onChange={handleInputChange} className={`form-control form-control-sm ${errors.address ? "is-invalid" : ""
+            {renderRow("Address", <input name="address" value={formData.address ?? ""} onChange={handleInputChange} className={`form-control form-control-sm ${errors.address ? "is-invalid" : ""
               }`} style={inputStyle} />, errors.address)}
 
             <SectionHeader icon="🚗" title="Vehicle Information" />
-            {renderRow("Vehicle Model", <input name="vehicleModel" value={formData.vehicleModel} onChange={handleInputChange} className={`form-control form-control-sm ${errors.vehicleModel ? "is-invalid" : ""
+            {renderRow("Vehicle Model", <input name="vehicleModel" value={formData.vehicleModel ?? ""} onChange={handleInputChange} className={`form-control form-control-sm ${errors.vehicleModel ? "is-invalid" : ""
               }`} style={inputStyle} />, errors.vehicleModel)}
-            {renderRow("Vehicle Number", <input name="vehicleNumber" value={formData.vehicleNumber} onChange={handleInputChange} onBlur={(e) => checkVehicleExists(e.target.value)} className={`form-control form-control-sm ${errors.vehicleNumber ? "is-invalid" : ""
+            {renderRow("Vehicle Number", <input name="vehicleNumber" value={formData.vehicleNumber?? ""} onChange={handleInputChange} onBlur={(e) => checkVehicleExists(e.target.value)} className={`form-control form-control-sm ${errors.vehicleNumber ? "is-invalid" : ""
               }`} style={inputStyle} />, errors.vehicleNumber)}
             {renderRow("Model Year", (
-              <select name="modelYear" className="form-select form-select-sm" value={formData.modelYear} onChange={handleInputChange} style={inputStyle}>
-                <option value="">▼ Select Year</option>
+              <select name="modelYear" className="form-select form-select-sm" value={formData.modelYear?? ""} onChange={handleInputChange} style={inputStyle}>
+                <option value="">Select Year</option>
                 {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i).map((y) => <option key={y} value={y}>{y}</option>)}
               </select>
             ))}
@@ -477,8 +587,8 @@ if (response.ok) {
 
           <div className="col-md-6">
             <SectionHeader icon="🛡" title="Policy Information" />
-            {renderRow("Policy Number", <input name="policyNumber" value={formData.policyNumber} onChange={handleInputChange} onBlur={(e) => checkPolicyExists(e.target.value)} className={`form-control form-control-sm ${errors.policyNumber ? "is-invalid" : ""
-              }`} style={inputStyle} />, errors.policyNumber)}
+            { isEditMode && (renderRow("Policy Number", <input name="policyNumber" value={formData.policyNumber || ""} readOnly  className={`form-control form-control-sm ${errors.policyNumber ? "is-invalid" : ""
+              }`} style={inputStyle} />, errors.policyNumber))}
 
             <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
               <label className="col-sm-4 col-form-label fw-bold">Coverage Type</label>
@@ -496,6 +606,20 @@ if (response.ok) {
                 ))}
               </div>
             </div>
+            {renderRow("Policy Duration", (
+          <select 
+           name="policyDuration" 
+           value={formData.policyDuration || ""} 
+           onChange={handleInputChange} 
+           className="form-control form-control-sm" 
+          style={inputStyle}
+          >
+             <option value="">Select Duration</option>
+             <option value="6">6 Months</option>
+             <option value="12">12 Months</option>
+             <option value="24">24 Months</option>
+          </select>
+           ))}
 
             {renderRow(
               "Start Date",
@@ -504,6 +628,7 @@ if (response.ok) {
                 type="date"
                 value={formData.startDate}
                 onChange={handleInputChange}
+                min={new Date().toISOString().split("T")[0]}
                 className={`form-control form-control-sm ${errors.startDate ? "is-invalid" : ""
                   }`}
                 style={inputStyle}
@@ -515,18 +640,18 @@ if (response.ok) {
                 name="endDate"
                 type="date"
                 value={formData.endDate}
-                onChange={handleInputChange}
-                min={formData.startDate}
-                disabled={!formData.startDate}
+                readOnly
                 className={`form-control form-control-sm ${errors.endDate ? "is-invalid" : ""
                   }`}
                 style={inputStyle}
               />,
               errors.endDate
-            )}       {renderRow("Coverage Limit", <input name="coverageLimit" value={formData.coverageLimit} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
+            )}       {renderRow("Coverage Limit", <input name="coverageLimit" value={formData.coverageLimit?? ""} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
+                     {renderRow("Monthly Premium", <input name="monthlyPremium"  value={formData.monthlyPremium?? ""} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
+                     {renderRow("Total Premium", <input name="totalPremium"  value={formData.totalPremium?? ""} onChange={handleInputChange} className="form-control form-control-sm" style={inputStyle} />)}
           </div>
         </div>
-
+         
         <div className="d-flex justify-content-center gap-3 mt-4">
           <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none' }} onClick={handleSave}>Save</button>
           <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none' }} onClick={() => navigate(-1)}>Cancel</button>

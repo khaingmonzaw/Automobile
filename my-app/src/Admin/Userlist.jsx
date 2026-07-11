@@ -14,7 +14,7 @@ function Userlist() {
     fetch("http://localhost:3000/api/users")
       .then((res) => res.json())
       .then((data) => {
-        setUsers(data);
+        setUsers(data.reverse());
         setLoading(false);
       })
       .catch((err) => {

@@ -1,5 +1,40 @@
 const bcrypt = require("bcrypt");
+async function generatePolicyNumber(db) {
+  return new Promise((resolve, reject) => {
+    // Database ထဲမှ နောက်ဆုံးထည့်ထားသော Policy Number ကို ရှာပါ
+    db.query(
+      "SELECT policy_number FROM policies ORDER BY policy_id DESC LIMIT 1",
+      (err, result) => {
+        if (err) return reject(err);
 
+        let newNumber = "POL-0001"; // စတင်မည့်နံပါတ်
+        if (result.length > 0 && result[0].policy_number) {
+          const lastPolicy = result[0].policy_number; // ဥပမာ - POL-0005
+          const numPart = parseInt(lastPolicy.split("-")[1]); // 0005 ကို ယူပါ
+          newNumber = `POL-${String(numPart + 1).padStart(4, "0")}`; // 0006 ဟု ပြောင်းပါ
+        }
+        resolve(newNumber);
+      }
+    );
+  });
+}
+exports.getNextPolicyNumber = (db) => {
+  return async (req, res) => {
+    try {
+      const policyNumber = await generatePolicyNumber(db);
+
+      res.json({
+        policyNumber: policyNumber
+      });
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Failed to generate policy number"
+      });
+    }
+  };
+};
 exports.addUser = (db) => {
   return async (req, res) => {
     const {
@@ -14,11 +49,13 @@ exports.addUser = (db) => {
       vehicleModel,
       vehicleNumber,
       modelYear,
-      policyNumber,
       coverage,
       startDate,
       endDate,
+      totalPremium,
+      monthlyPremium,
       coverageLimit,
+      policyDuration,
     } = req.body;
 
     let userId;
@@ -196,8 +233,10 @@ WHERE vehicle_number=?
     }
 
     // 3. Insert Policy
-    function savePolicy(vehicleId,userId) {
-      db.query(
+    async function savePolicy(vehicleId,userId) {
+          console.log("savePolicy called");
+    const generatedPolicyNumber = await generatePolicyNumber(db);
+      /*db.query(
         `
 SELECT policy_id
 FROM policies
@@ -212,7 +251,7 @@ WHERE policy_number=?
             return res.status(400).json({
               message: "Policy number already exists.",
             });
-          }
+          }*/
 
           const policySql = `
         INSERT INTO policies
@@ -223,35 +262,40 @@ WHERE policy_number=?
           start_date,
           end_date,
           total_premium,
-          remaining_balance
+          remaining_balance,
+          total_coverage,
+          monthly_premium,
+          policy_duration
         )
-        VALUES(?,?,?,?,?,?,?)
+        VALUES(?,?,?,?,?,?,?,?,?,?)
       `;
 
           db.query(
             policySql,
             [
-              policyNumber,
+              generatedPolicyNumber,
               userId,
               vehicleId,
               startDate,
               endDate,
+              totalPremium,         
               coverageLimit,
               coverageLimit,
+              monthlyPremium,
+              policyDuration,
             ],
             (err, pResult) => {
               if (err) {
+                console.error("Policy Insert Error:",err);
                 return res.status(500).json(err);
-                 console.log(err);
+                 
               }
 
               const policyId = pResult.insertId;
 
               saveCoverage(policyId);
-            },
-          );
-        },
-      );
+            } 
+          );  
     }
 
     // 5. Insert Coverage

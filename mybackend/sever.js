@@ -15,6 +15,7 @@ const db = mysql.createConnection({
   user: "root",
   password: "",
   database: "auto_assurance_db",
+  timezone:  "local",
 });
 
 const seedAdmin=require("./seedAdmin");
@@ -61,7 +62,9 @@ app.put("/api/change-password",passwordController.changePassword(db));
 
 //Adduser 
 app.post("/api/add-user", addUser.addUser(db));
- 
+
+// Preview Next Policy Number
+app.get("/api/policy-number", addUser.getNextPolicyNumber(db));
 
 //update
 app.put('/api/update-user/:id', updateUser.updateUser(db));

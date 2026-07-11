@@ -24,7 +24,11 @@ console.log("BODY:", req.body);
       startDate,
       endDate,
 
-      coverage
+      coverage,
+      policyDuration,
+      totalPremium,
+      monthlyPremium,
+      coverageLimit
     } = req.body;
 
 
@@ -131,7 +135,11 @@ console.log("BODY:", req.body);
                   UPDATE policies SET
                   policy_number=?,
                   start_date=?,
-                  end_date=?
+                  end_date=? ,
+                  total_premium=?,
+                  total_coverage=? ,
+                  monthly_premium=?, 
+                  policy_duration=? 
                   WHERE policy_id=?
                 `;
 
@@ -142,6 +150,10 @@ console.log("BODY:", req.body);
                     policyNumber,
                     startDate,
                     endDate,
+                    totalPremium,
+                    coverageLimit,
+                    monthlyPremium,
+                    policyDuration,
                     policyId
                   ],
                   (err)=>{
