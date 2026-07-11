@@ -3,7 +3,7 @@
 exports.updateUser = (db) => {
   return async (req, res) => {
 
-    const policyId = req.params.id;   
+const policyId = req.params.id;   
 console.log("POLICY ID:", policyId);
 console.log("BODY:", req.body);
     const {

@@ -5,7 +5,7 @@
               WORKING-STORAGE SECTION.
               *> Storage containers to hold the 7 input arguments from Node.js
               01  claim_amt            PIC 9(10).
-              01  total_premium        PIC 9(10).
+              01  total_coverage       PIC 9(10).
               01  assessed_amt         PIC 9(10).
               01  risk_lvl             PIC X(10).
               01  dob                  PIC X(10).
@@ -42,7 +42,7 @@
               PROCEDURE DIVISION.
                   *> 1. Accept the 7 parameters in sequential order from Node.js execution
                   ACCEPT claim_amt FROM ARGUMENT-VALUE.
-                  ACCEPT total_premium FROM ARGUMENT-VALUE.
+                  ACCEPT total_coverage FROM ARGUMENT-VALUE.
                   ACCEPT assessed_amt FROM ARGUMENT-VALUE.
                   ACCEPT risk_lvl FROM ARGUMENT-VALUE.
                   ACCEPT dob FROM ARGUMENT-VALUE.
@@ -142,7 +142,7 @@
               RISK-ASSESSMENT.
               COMPUTE assessed_amt = assessed_amt - compensation_amt.
               COMPUTE percentage ROUNDED = 
-              (assessed_amt / total_premium) * 100.
+              (assessed_amt / total_coverage) * 100.
                   
               EVALUATE percentage
                WHEN 70 THRU 100

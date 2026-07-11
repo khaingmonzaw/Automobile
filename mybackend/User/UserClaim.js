@@ -8,9 +8,17 @@ exports.userClaim = (db) => {
 
     const sql = `
     SELECT
-    *
+    c.claim_id,
+    c.accident_date,
+    c.status,
+    c.claimed_amount,
+    c.description,
+p.policy_number,
+v.vehicle_number
     FROM claims c
-    WHERE c.user_id = ?
+    JOIN policies p ON p.policy_id = c.policy_id
+    Join vehicles v On v.vehicle_id = p.vehicle_id
+   WHERE c.user_id = ?
     ORDER BY c.claim_id DESC
   `;
 

@@ -53,8 +53,49 @@ app.use(coverageUpdateRouter);
 app.use(PendingRouter);
 
 
+
+
+
+
+
+
+
 seedAdmin(db);
 // Login API
+
+// ✅ Check Pending Claim (Duplicate Check)
+// =============================================
+app.get("/api/claims/check-pending", (req, res) => {
+  const { policy_id, accident_type, user_id } = req.query;
+
+  // Parameter အကုန်ပါမပါ စစ်ဆေးခြင်း
+  if (!policy_id  || !accident_type || !user_id) {
+    return res.status(400).json({ error: "Missing required parameters" });
+  }
+
+  const sql = `
+    SELECT COUNT(*) AS count
+    FROM claims
+    WHERE user_id = ?
+      AND policy_id = ?
+      AND accident_type = ?
+      AND status = 'PENDING'
+  `;
+
+  db.query(sql, [user_id, policy_id, accident_type], (err, results) => {
+    if (err) {
+      console.error("Check pending error:", err);
+      return res.status(500).json({ message: "Database Error" });
+    }
+
+    const hasPending = results[0].count > 0;
+    res.json({ hasPending });
+  });
+
+});
+
+//myo code end
+
 app.post("/api/login",authController.login(db));
 
 // Change Password API
@@ -120,7 +161,10 @@ app.get("/api/claims/:id", userClaimDetail.userClaimDetail(db));
 //Active Coverage types
 app.get("/api/coverage_types",getActiveCoverageType.getActiveCoverageType(db));
 
-//Pending router
+//myo code start
+ 
+  // =============================================
+
 
 
 

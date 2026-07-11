@@ -9,17 +9,17 @@ function Dashboard() {
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?.id
 
-const recentClaim = Array.isArray(claims) ? claims.slice(0, 5) : [];
+    const recentClaim = Array.isArray(claims) ? claims.slice(0, 5) : [];
     useEffect(() => {
-  fetch(`http://localhost:3000/api/claims/user/${userId}`)
-    .then(res => res.json())
-    .then(data => {
-      console.log(data);
-      console.log(Array.isArray(data));
-      setClaims(Array.isArray(data) ? data : []);
-    })
-    .catch(err => console.log(err));
-}, [userId]);
+        fetch(`http://localhost:3000/api/claims/user/${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                console.log(Array.isArray(data));
+                setClaims(Array.isArray(data) ? data : []);
+            })
+            .catch(err => console.log(err));
+    }, [userId]);
 
     const total = claims.length;
     const pending = claims.filter(c => c.status === "PENDING").length;
@@ -80,10 +80,10 @@ const recentClaim = Array.isArray(claims) ? claims.slice(0, 5) : [];
                 <div className="row my-4 bg-white px-3 rounded">
 
                     {/* Header */}
-                    <div className="col-11">
-                        <div className="d-flex justify-content-between align-items-center my-3 px-3 ">
-                            <h4 className="mb-0">Recent Claims</h4>
-                            <button className="btn btn-warning "><Link to="../MyClaims" className="text-decoration-none text-dark">All</Link></button>
+                    <div className="col-12">
+                        <div className="d-flex justify-content-between align-items-center my-3  ">
+                            <h4>Recent Claims</h4>
+                            <button className="btn btn-warning "><Link to="../MyClaims" className="text-decoration-none text-dark">All Claims</Link></button>
                         </div>
                     </div>
 
@@ -93,6 +93,9 @@ const recentClaim = Array.isArray(claims) ? claims.slice(0, 5) : [];
                         <thead >
                             <tr>
                                 <th style={{ backgroundColor: "#ffed92" }}>Claim ID</th>
+                                <th style={{ backgroundColor: "#ffed92" }}>Policy Number</th>
+                                <th style={{ backgroundColor: "#ffed92" }}>Vehicle Number</th>
+
                                 <th style={{ backgroundColor: "#ffed92" }}>Accident Date</th>
                                 <th style={{ backgroundColor: "#ffed92" }}>Status</th>
                                 <th style={{ backgroundColor: "#ffed92" }}>Claim Amount</th>
@@ -100,24 +103,34 @@ const recentClaim = Array.isArray(claims) ? claims.slice(0, 5) : [];
                             </tr>
                         </thead>
 
-                       <tbody>
-  {recentClaim.length === 0 ? (
-    <tr>
-      <td colSpan="4" className="text-center">
-        No claims found.
-      </td>
-    </tr>
-  ) : (
-    recentClaim.map((c) => (
-      <tr key={c.claim_id}>
-        <td>CLM-{c.claim_id}</td>
-        <td>{c.accident_date.split("T")[0]}</td>
-        <td>{c.status}</td>
-        <td>{c.claimed_amount}</td>
-      </tr>
-    ))
-  )}
-</tbody>
+                        <tbody>
+                            {recentClaim.length === 0 ? (
+                                <tr>
+                                    <td colSpan="4" className="text-center">
+                                        No claims found.
+                                    </td>
+                                </tr>
+                            ) : (
+                                recentClaim.map((c) => (
+                                    <tr key={c.claim_id}>
+                                        <td className="text-primary">CLM-{c.claim_id}</td>
+                                        <td>{c.policy_number}</td>
+                                        <td>{c.vehicle_number}</td>
+                                        <td>{c.accident_date.split("T")[0]}</td>
+                                        <td
+                                            className={
+                                                c.status === "PENDING" ? "text-warning"
+                                                    : c.status === "APPROVED" ? "text-success"
+                                                        : c.status === "REJECTED" ? "text-danger"
+                                                            : ""
+                                            }
+
+                                        >{c.status}</td>
+                                        <td>{c.claimed_amount}</td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
                     </table>
                     <a href=""></a>
                 </div>

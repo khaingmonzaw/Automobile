@@ -12,10 +12,10 @@ exports.adminClaims = (db) => {
 
     FROM claims c
 
-    JOIN users u 
+    LEFT JOIN users u 
       ON u.id = c.user_id
 
-    JOIN risk_assessment rk 
+    LEFT JOIN risk_assessment rk 
       ON rk.user_id = u.id
 
     ORDER BY c.claim_id DESC

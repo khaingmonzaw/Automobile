@@ -6,11 +6,26 @@ function AddUser() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
+  const [showAlert, setShowAlert] = useState(false);
+const [alertMessage, setAlertMessage] = useState("");
+const [alertType, setAlertType] = useState("warning");
   const [errors, setErrors] = useState({});
   const [coverageOptions, setCoverageOptions] = useState([]); // Database မှလာမည့် Coverage များ
   // Consistent yellow border style
   const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
 
+
+
+
+
+  //alert box
+
+
+  const showCustomAlert = (message, type = "warning") => {
+  setAlertMessage(message);
+  setAlertType(type);
+  setShowAlert(true);
+};
   //validation
   const validate = () => {
     let newErrors = {};
@@ -121,6 +136,15 @@ function AddUser() {
       if (endDate <= startDate) {
         newErrors.endDate = "*End Date must be greater than Start Date";
       }
+
+       // Calculate minimum end date (6 months after start date)
+  const minEndDate = new Date(startDate);
+  minEndDate.setMonth(minEndDate.getMonth() + 6);
+
+
+  if (endDate < minEndDate) {
+    newErrors.endDate = "*End Date must be at least 6 months after Start Date";
+  }
     }
 
 
@@ -414,8 +438,10 @@ function AddUser() {
     const cleanCoverageLimit = formData.coverageLimit.toString().replace(/,/g, '');
     if (validate()) {
       if (formData.coverage.length === 0) {
-        alert("Please select at least one coverage type.");
-        return;
+showCustomAlert(
+  "Please select at least one coverage type.",
+  "warning"
+);        return;
       }
      const limit = calculateTotalLimit(formData.coverageLimit);
       const duration = parseInt(formData.policyDuration) || 12;
@@ -478,18 +504,30 @@ function AddUser() {
         const result = await response.json();
 
 if (response.ok) {
+const successMsg = isEditMode ? "Update user successfully!" : "Save successfully!";
+showCustomAlert(
+  result.message || "Success",
+  "success"
+);
 
-  alert(result.message || "Success");
+setTimeout(() => {
   navigate('/Admin/Users');
+}, 1500);  //navigate('/Admin/Users');
 
 } else {
 
-  alert("Error: " + result.message);
+  showCustomAlert(
+  "Error: " + result.message,
+  "danger"
+);
 
 }
       } catch (error) {
         console.error("Error:", error);
-        alert("Connection Error to Sever");
+        showCustomAlert(
+  "Connection Error to Server",
+  "danger"
+);
       }
     }
     
@@ -513,7 +551,68 @@ if (response.ok) {
   return (
     <>
 
+{showAlert && (
+  <div
+    className="modal fade show d-block"
+    tabIndex="-1"
+    style={{
+      backgroundColor: "rgba(0,0,0,0.5)"
+    }}
+  >
 
+    <div className="modal-dialog modal-dialog-centered">
+
+      <div className="modal-content shadow">
+
+        <div className={`modal-header bg-${alertType} text-white`}>
+
+          <h5 className="modal-title fw-bold">
+            {
+              alertType === "success"
+              ? "Success"
+              : alertType === "danger"
+              ? "Error"
+              : "Warning"
+            }
+          </h5>
+
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowAlert(false)}
+          >
+          </button>
+
+        </div>
+
+
+        <div className="modal-body text-center">
+
+          <p className="fw-semibold mb-0">
+            {alertMessage}
+          </p>
+
+        </div>
+
+
+        <div className="modal-footer justify-content-center">
+
+          <button
+            className={`btn btn-${alertType} fw-bold px-4`}
+            onClick={() => setShowAlert(false)}
+          >
+            OK
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+)}
       <div className="mb-2 text-start">
         <button
           className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0"
@@ -653,8 +752,8 @@ if (response.ok) {
         </div>
          
         <div className="d-flex justify-content-center gap-3 mt-4">
-          <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none' }} onClick={handleSave}>Save</button>
-          <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none' }} onClick={() => navigate(-1)}>Cancel</button>
+          <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Save</button>
+          <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none' , width: '100px'}} onClick={() => navigate(-1)}>Cancel</button>
         </div>
       </div>
     </>
