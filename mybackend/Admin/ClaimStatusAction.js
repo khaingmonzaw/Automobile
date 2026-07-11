@@ -1,6 +1,4 @@
-
 const bcrypt = require("bcrypt");
-
 exports.claimStatusAction = (db) => {
   return async (req, res) => {
     const claim_id = req.params.id; //
@@ -24,7 +22,6 @@ exports.claimStatusAction = (db) => {
     JOIN vehicles v ON v.vehicle_id=p.vehicle_id
     WHERE claim_id = ?
   `;
-    //[06/07/2026 13:42] Myoyadanar:
     db.query(sql, [claim_id], (err, results) => {
       if (err) {
         console.error("Database error:", err);
@@ -39,5 +36,3 @@ exports.claimStatusAction = (db) => {
     });
   };
 };
-
-//Myo Yadanar
