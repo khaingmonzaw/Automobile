@@ -75,7 +75,7 @@ function MyClaims() {
               <ul className="dropdown-menu">
 
                 <li><button className="dropdown-item" onClick={() => handleSelect("All")}>All</button></li>
-                <li><button className="dropdown-item" onClick={() => handleSelect("PENDING")}>PENDINF</button></li>
+                <li><button className="dropdown-item" onClick={() => handleSelect("PENDING")}>PENDING</button></li>
                 <li><button className="dropdown-item" onClick={() => handleSelect("APPROVED")}>APPROVED</button></li>
                 <li><button className="dropdown-item" onClick={() => handleSelect("REJECTED")}>REJECTED</button></li>
 

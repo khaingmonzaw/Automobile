@@ -87,7 +87,7 @@ const ClaimApprovalDetails = () => {
     <div className="container-fluid py-3">
       {/* Dynamic Top Banner Message Display */}
       {showSuccess && (
-        <div className="alert alert-warning alert-dismissible fade show text-start" role="alert">
+        <div className="alert alert-success alert-dismissible fade show text-start" role="alert">
           {message}
           <button type="button" className="btn-close" onClick={() => setShowSuccess(false)}></button>
         </div>

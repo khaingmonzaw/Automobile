@@ -564,7 +564,7 @@ setTimeout(() => {
 
       <div className="modal-content shadow">
 
-        <div className={`modal-header bg-${alertType} text-white`}>
+        <div className={`modal-header bg-light text-dark`}>
 
           <h5 className="modal-title fw-bold">
             {

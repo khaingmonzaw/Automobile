@@ -168,7 +168,17 @@ useEffect(() => {
           <table className="table table-hover align-middle mb-0" style={{ minWidth: "1000px" }}>
             
             {/* Table Head - ခေါင်းစဉ်များ */}
-            
+            <thead>
+              <tr>
+                <td style={{ backgroundColor: "#ffed92" }}>Number</td>
+                <td style={{ backgroundColor: "#ffed92" }}>Policy Number</td>
+                <td style={{ backgroundColor: "#ffed92" }}>Vehicle</td>
+                <td style={{ backgroundColor: "#ffed92" }}>Vehicle Number</td>
+                <td style={{ backgroundColor: "#ffed92" }}>Start Date</td>
+              <td style={{ backgroundColor: "#ffed92" }}>End Date</td>
+                    <td className="text-center " style={{ backgroundColor: "#ffed92" }}>Status</td>
+              </tr>
+            </thead>
             
             {/* Table Body - အချက်အလက်များ */}
             <tbody>

@@ -262,6 +262,26 @@ function Layout() {
                   )}
                 </NavLink>
               </li>
+
+
+               <li className="mb-2">
+                <NavLink
+                  to="/Admin/PasswordChangeAdmin"
+                  className={({ isActive }) =>
+                    `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
+                    }`
+                  }
+                >
+                  {collapsed ? (
+                    <FontAwesomeIcon icon={faKey} />
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faKey} className="me-3" />
+                      Change Password
+                    </>
+                  )}
+                </NavLink>
+              </li>
             </>
           )}
 

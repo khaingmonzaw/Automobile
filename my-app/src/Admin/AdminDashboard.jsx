@@ -139,8 +139,8 @@ const AdminDashboard = () => {
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3 className="fs-5 fw-bold text-dark mb-0">Recent Claims</h3>
                 <Link to="/Admin/AllClaims">
-                  <button className="btn btn-warning btn-sm border-0 fw-semibold px-3 text-dark rounded me-3 shadow-sm">
-                     All
+                  <button className="btn btn-warning  border-0 fw-semibold px-3 text-dark rounded me-3 shadow-sm">
+                     All Claims
                   </button>
                 </Link>
               </div>
@@ -163,7 +163,7 @@ const AdminDashboard = () => {
       </td>
     </tr>
   ) : (
-    claimsData.slice(0, 7).map((claim, index) => (
+    claimsData.slice(0, 5).map((claim, index) => (
       <tr key={claim.claim_id || index}>
         <td className="py-3 px-3 fw-semibold text-primary">
           {`CLM${String(claim.claim_id).padStart(4, "0")}`}
