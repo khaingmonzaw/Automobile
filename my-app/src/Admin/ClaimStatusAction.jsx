@@ -61,14 +61,24 @@ function ClaimStatusAction() {
     const user = JSON.parse(localStorage.getItem("user"));
     const staffId = user?.id;
     setSubmitting(true);
+// default messages that carries to database(myo code start)
+let finalRemark = remarkInput?.trim();
 
+if (!finalRemark) {
+  if (decision === 'APPROVED') {
+    finalRemark = "Information is Valid.";
+  } else if (decision === 'REJECTED') {
+    finalRemark = "Information is Invalid.";
+  }
+}
+//myo code end 
     try {
       const response = await fetch(`http://localhost:3000/api/admin/claims/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           status: decision, 
-          remark: remarkInput, 
+         remark: finalRemark,//send to backend default msg
           staffId: staffId 
         })
       });
@@ -280,8 +290,9 @@ function ClaimStatusAction() {
               <div className="remarks-box approved-remarks">
                 <span className="remarks-label">Status</span>
                 <p className="remarks-text" style={{ color: '#52DD75', fontWeight: 'bold' }}>
-                  ✅ Approved: {claim.remark && claim.remark.trim() !== "" ? claim.remark : "No remarks provided."}
-                </p>
+                  ✅ Approved: {claim.remark }
+                  {/* update change for more flexible default message to .cbl */}
+                   </p>
               </div>
             )}
 
@@ -289,10 +300,13 @@ function ClaimStatusAction() {
               <div className="remarks-box rejected-remarks">
                 <span className="remarks-label">Status</span>
                 <p className="remarks-text" style={{ color: '#DC3545', fontWeight: 'bold' }}>
-                  ❌ Rejected: {claim.remark && claim.remark.trim() !== "" ? claim.remark : "No remarks provided."}
+                  ❌ Rejected: {claim.remark }
+                      {/*update change for more flexible default message to .cbl */}
                 </p>
               </div>
             )}
+
+            
 
             {/* Pending Options */}
             {claim.status === 'PENDING' && (
