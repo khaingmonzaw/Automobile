@@ -27,6 +27,7 @@ exports.submitClaim = (db) => {
 
     const searchSql = `
     SELECT ct.coverage_type
+    
     FROM coverage_policies cp
     JOIN coverage_types ct
       ON cp.coverage_type_id = ct.coverage_type_id

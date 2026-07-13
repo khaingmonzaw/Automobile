@@ -14,6 +14,7 @@ exports.profile = (db) => {
         IFNULL(u.nrc, '-') AS nrc, 
         u.dob,
         p.policy_number, 
+        p.remaining_balance,
         p.start_date, 
         p.end_date, 
         p.status,

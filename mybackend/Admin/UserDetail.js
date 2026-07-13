@@ -23,6 +23,7 @@ exports.userDetails = (db) => {
         p.policy_number AS policyNumber, 
         p.status AS policyStatus, 
         p.policy_id,
+        p.remaining_balance,
         DATE_FORMAT(p.start_date, '%Y-%m-%d') AS startDate,
         DATE_FORMAT(p.end_date, '%Y-%m-%d') AS endDate,
         p.policy_duration AS policyDuration,

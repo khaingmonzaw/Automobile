@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import * as mmNrc from "mm-nrc";
 // 🛠 Clean NRC ပြောင်းပေးမည့် Helper Function
 const getCleanNrc = (rawNrc) => {
@@ -52,24 +55,16 @@ function UserDetail() {
   return (
 
     <>
-      <div className="mb-2 text-start">
-        <button
-          className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0"
-          style={{ width: "40px", height: "36px", borderRadius: "8px" }}
-          onClick={() => navigate('/Admin/Users')}
-          aria-label="Back to coverage list"
-        >
-          {/* Centered, Bold/Thick Vector Arrow Icon */}
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
+     <div className="mb-2 text-start">
+        <Link to="/Admin/Users" className="text-decoration-none text-dark" >
+                    <button className='btn btn-warning'>
+                        <FontAwesomeIcon icon={faCircleLeft} />
+                    </button></Link>
       </div>
     <div className="container mt-4 bg-white p-4 shadow-sm rounded" style={{ fontSize: '0.85rem' }}>
       {/* Header with Back and Edit buttons */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="fs-3 fw-bold m-0">User Information</h4>
+        <h4 className="fs-2 fw-bold m-0">User Information</h4>
         <div className="d-flex gap-2">
         
 
@@ -88,9 +83,9 @@ function UserDetail() {
       <hr style={{ borderColor: '#34495e' }} />
 
       {/* Info Table */}
-      <table className="table table-borderless text-start" style={{ fontSize: '0.85rem' }}>
+      <table className="table table-borderless text-start" style={{ fontSize: "1rem" }}>
         <tbody>
-          <tr><td style={{ width: "30%", fontWeight: "bold" }}>User ID</td><td style={{ width: "5%" }}>:</td><td>{user.id}</td></tr>
+          <tr><td className="" style={{ width: "30%", fontWeight: "bold" }}>User ID</td><td style={{ width: "5%" }}>:</td><td>{user.id}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>User Name</td><td>:</td><td>{user.name}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Email</td><td>:</td><td>{user.email}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Phone</td><td>:</td><td>{user.phone}</td></tr>
@@ -103,6 +98,8 @@ function UserDetail() {
           <tr><td style={{ fontWeight: "bold" }}>Coverage Type</td><td>:</td><td>{user.coverageType || "-"}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Vehicle Model</td><td>:</td><td>{user.vehicleModel || "-"}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>Vehicle Number</td><td>:</td><td>{user.vehicleNumber || "-"}</td></tr>
+                    <tr><td style={{ fontWeight: "bold" }}>Remaining Balance</td><td>:</td><td>{user.remaining_balance || "-"}</td></tr>
+
           <tr><td style={{ fontWeight: "bold" }}>Start Date</td><td>:</td><td>{user.startDate || "-"}</td></tr>
           <tr><td style={{ fontWeight: "bold" }}>End Date</td><td>:</td><td>{user.endDate || "-"}</td></tr>
         </tbody>

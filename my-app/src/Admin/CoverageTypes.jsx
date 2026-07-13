@@ -65,7 +65,7 @@ const CoverageTypes = () => {
      
 
       {/* Table Main Wrapper Card Container */}
-      <div className="card bg-white border border-secondary-subtle rounded-4 shadow-sm w-100  p-4">
+      <div className="card bg-white border border-secondary-subtle rounded shadow-sm w-100  p-4">
 
 
          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 w-100">

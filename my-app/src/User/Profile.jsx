@@ -176,6 +176,8 @@ useEffect(() => {
                 <td style={{ backgroundColor: "#ffed92" }}>Vehicle Number</td>
                 <td style={{ backgroundColor: "#ffed92" }}>Start Date</td>
               <td style={{ backgroundColor: "#ffed92" }}>End Date</td>
+                            <td style={{ backgroundColor: "#ffed92" }}>Avaliable Balance</td>
+
                     <td className="text-center " style={{ backgroundColor: "#ffed92" }}>Status</td>
               </tr>
             </thead>
@@ -214,7 +216,10 @@ useEffect(() => {
                       
                       {/* ၆။ ကုန်ဆုံးမည့် ရက်စွဲ */}
                       <td className="text-secondary fw-medium">{formatDate(item?.end_date)}</td>
-                      
+
+  <td>
+                        <span className="fw-bold text-primary">{item?.remaining_balance || 0}</span>
+                      </td>
                       {/* ၇။ Status Badge */}
                       <td className="text-center">
                         <span className="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fw-bold text-uppercase small" style={{ fontSize: "0.75rem", letterSpacing: "0.5px" }}>
