@@ -34,7 +34,7 @@ function Userlist() {
   const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="container mt-4 bg-white px-4 py-5 shadow-sm rounded" >
+    <div className="container mt-4 bg-white px-4 py-5 shadow-md" >
       {/* Add user button */}
       <div className="d-flex justify-content-between align-items-center px-2 mb-4">
         <h3 className="fs-2 fw-bold m-0">User's Policy List</h3>

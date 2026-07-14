@@ -25,7 +25,8 @@ exports.getPolicy = (db) => {
         p.policy_id,
         p.policy_number,
         v.vehicle_number,
-        v.vehicle_model
+        v.vehicle_model,
+        p.remaining_balance
       FROM policies p
       JOIN vehicles v
         ON p.vehicle_id = v.vehicle_id

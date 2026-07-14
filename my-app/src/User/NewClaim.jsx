@@ -312,6 +312,10 @@ if (checkData.hasPending) {
                 <p className="text-muted">Vehicle Model</p>
                 <h5 className="fw-bold">{selectedPolicy.vehicle_model}</h5>
               </div>
+              <div className="col-md-4 mb-3">
+                <p className="text-muted">Avaliable Amountl</p>
+                <h5 className="fw-bold">{selectedPolicy.remaining_balance}</h5>
+              </div>
             </div>
           </div>
         </div>

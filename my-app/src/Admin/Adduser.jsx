@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import * as mmNrc from "mm-nrc";
 
 function AddUser() {
@@ -612,25 +615,16 @@ setTimeout(() => {
     </div>
 
   </div>
-)}
-      <div className="mb-2 text-start">
-        <button
-          className="btn btn-warning d-flex align-items-center justify-content-center text-dark p-0"
-          style={{ width: "40px", height: "36px", borderRadius: "8px" }}
-          onClick={() => navigate('/Admin/Users')}
-          aria-label="Back to coverage list"
-        >
-          {/* Centered, Bold/Thick Vector Arrow Icon */}
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
+)}   <div className="mb-2 text-start">
+        <Link to="/Admin/Users" className="text-decoration-none text-dark" >
+                    <button className='btn btn-warning'>
+                        <FontAwesomeIcon icon={faCircleLeft} />
+                    </button></Link>
       </div>
 
       <div className="container mt-4 bg-white p-4 shadow-sm rounded text-start">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h4 className="fw-bold">{isEditMode ? "🚗 Edit User" : "🚗 Add New User"}</h4>
+          <h3 className="fw-bold">{isEditMode ? "🚗 Edit User" : "🚗 Add New User"}</h3>
 
         </div>
 
