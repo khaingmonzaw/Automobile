@@ -337,7 +337,7 @@ function Layout() {
         </nav>
 
         {/* Page Content */}
-        <div className="container-fluid p-4 " style={{ minHeight: "100vh", backgroundColor: "F2F9FF" }}>
+        <div className="container-fluid p-4" style={{ minHeight: "100vh", backgroundColor: "F2F9FF" }}>
           {showLogout && (
             <div
               className="modal fade show d-block"

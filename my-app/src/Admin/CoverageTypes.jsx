@@ -33,25 +33,20 @@ const CoverageTypes = () => {
 
   return (
     <div className="container-fluid px-2 px-md-4 py-3 text-start">
-      {/* Dynamic Style overrides to force parent container responsiveness on mobile layout screens */}
       <style>{`
         .custom-pag-btn {
           background: transparent;
           transition: all 0.15s ease-in-out;
         }
-        .custom-pag-btn:hover {
-          background-color: #40a9ff !important;
-          color: #ffffff !important;
+        .custom-pag-btn:hover:not(:disabled) {
+          background-color: #ffed92 !important;
+          color: #000000 !important;
         }
 
-        /* Standard Bootstrap MD Breakpoint (768px and below) */
         @media (max-width: 768px) {
-          /* Finds the outer fixed sidebar layout container and hides it on mobile viewports */
           div[style*="width: 230px"] {
             display: none !important;
           }
-          
-          /* Finds the outer main screen layout block and removes the forced 230px desktop left-margin */
           div[style*="margin-left: 230px"] {
             margin-left: 0 !important;
             width: 100% !important;
@@ -61,54 +56,55 @@ const CoverageTypes = () => {
         }
       `}</style>
 
-      {/* Top Header Row - Fully responsive stacking using standard Bootstrap utilities */}
-     
-
       {/* Table Main Wrapper Card Container */}
+<<<<<<< HEAD
+      <div className="card bg-white border border-light-subtle rounded-4 shadow-sm w-100 p-4">
+=======
       <div className="card bg-white border border-secondary-subtle rounded shadow-sm w-100  p-4">
+>>>>>>> main
 
+        {/* Header Block */}
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 w-100">
+          <h2 className="mb-0 fw-bold fs-3 text-dark">Coverage Types</h2>
+          <button 
+            className="btn btn-warning d-flex align-items-center justify-content-center fw-bold fs-4 text-dark shadow-sm align-self-start align-self-sm-auto" 
+            style={{ width: "42px", height: "42px", borderRadius: "8px" }}
+            onClick={() => navigate('/Admin/CoverageTypes/NewCoverage')}
+            aria-label="Add New Coverage"
+          >
+            +
+          </button>
+        </div>
 
-         <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 w-100">
-        <h2 className="mb-0 fw-bold fs-3 text-dark">Coverage Types</h2>
-        <button 
-          className="btn btn-warning d-flex align-items-center justify-content-center fw-bold fs-4 text-dark shadow-sm align-self-start align-self-sm-auto" 
-          style={{ width: "42px", height: "42px", borderRadius: "8px" }}
-          onClick={() => navigate('/Admin/CoverageTypes/NewCoverage')}
-          aria-label="Add New Coverage"
-        >
-          +
-        </button>
-      </div>
-        {/* Bootstrap table-responsive class guarantees scrollability without compressing grid layout items */}
-        <div className="">
-          <table className="table table-hover align-middle mb-0 text-start w-100"
-          style={{ tableLayout: "fixed" }} >
+        {/* TABLE WRAPPER - class added for horizontal scrolling on small viewports */}
+        <div className="table-responsive w-100">
+          <table className="table table-hover align-middle mb-0 text-start w-100">
             <thead>
               <tr>
-                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92" }}>Coverage ID</th>
-                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Coverage Type</th>
-                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Description</th>
-                <th className="border-bottom-0 text-dark fw-bold  py-3" style={{  backgroundColor: "#ffed92", }}>Coverage Limit (MMK)</th>
-                <th className="border-bottom-0 text-dark fw-bold  py-3 text-center" style={{  backgroundColor: "#ffed92" }}>Status</th>
-                <th className="border-bottom-0 text-dark fw-bold  py-3 text-center" style={{  backgroundColor: "#ffed92" }}>Action</th>
+                <th className="border-bottom-0 text-dark fw-bold py-3" style={{ backgroundColor: "#ffed92", whiteSpace: "nowrap" }}>Coverage ID</th>
+                <th className="border-bottom-0 text-dark fw-bold py-3" style={{ backgroundColor: "#ffed92", whiteSpace: "nowrap" }}>Coverage Type</th>
+                <th className="border-bottom-0 text-dark fw-bold py-3" style={{ backgroundColor: "#ffed92", whiteSpace: "nowrap" }}>Description</th>
+                <th className="border-bottom-0 text-dark fw-bold py-3" style={{ backgroundColor: "#ffed92", whiteSpace: "nowrap" }}>Coverage Limit (MMK)</th>
+                <th className="border-bottom-0 text-dark fw-bold py-3 text-center" style={{ backgroundColor: "#ffed92", whiteSpace: "nowrap" }}>Status</th>
+                <th className="border-bottom-0 text-dark fw-bold py-3 text-center" style={{ backgroundColor: "#ffed92", whiteSpace: "nowrap" }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {currentRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-5 text-muted fw-semibold fs-5">
-                    No data available
+                  <td colSpan={6} className="text-center py-5 text-secondary border-0" style={{ fontSize: "14px", opacity: 0.7 }}>
+                    No data found.
                   </td>
                 </tr>
               ) : (
                 currentRecords.map((coverage) => (
                   <tr key={coverage.coverage_type_id} className="border-bottom border-light-subtle">
-                    <td className="py-3 text-dark fw-semibold" >{coverage.coverage_type_id}</td>
-                    <td className="py-3 text-dark fw-semibold" >{coverage.coverage_type}</td>
-                    <td className="py-3 text-dark fw-semibold" style={{ fontSize: "14px", lineHeight: "1.4", wordBreak: "break-word" }}>
+                    <td className="py-3 text-dark fw-semibold" style={{ whiteSpace: "nowrap" }}>{coverage.coverage_type_id}</td>
+                    <td className="py-3 text-dark fw-semibold" style={{ whiteSpace: "nowrap" }}>{coverage.coverage_type}</td>
+                    <td className="py-3 text-dark fw-semibold" style={{ fontSize: "14px", lineHeight: "1.4", minWidth: "200px" }}>
                       {coverage.description}
                     </td>                    
-                    <td className="py-3 text-dark fw-semibold" >
+                    <td className="py-3 text-dark fw-semibold" style={{ whiteSpace: "nowrap" }}>
                       {Number(coverage.coverage_limit).toLocaleString()}
                     </td>
                     <td className="py-3 text-center">
@@ -142,31 +138,31 @@ const CoverageTypes = () => {
           </table>
         </div>
 
-        {/* Pagination */}
-        {coverageData.length > 0 && (
-          <div className="d-flex justify-content-center my-5">
+        {/* Persistent Pagination Component matches styling in Image 2 */}
+        <div className="d-flex justify-content-center align-items-center my-4 pt-3 gap-2 border-top border-light-subtle">
+          <button 
+            className="btn btn-outline-warning fw-semibold custom-pag-btn px-3"
+            style={{ borderRadius: "6px" }}
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(prev => prev - 1)}
+          >
+            Prev
+          </button>
 
-            <button 
-              className="btn btn-outline-warning me-2"
-              disabled={currentPage === 1} // <-- ADD THIS LINE
-              onClick={() => setCurrentPage(prev => prev - 1)}
-            >
-              Prev
-            </button>
+          <span className="text-secondary fw-medium px-2" style={{ fontSize: "14px" }}>
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <button 
+            className="btn btn-outline-warning fw-semibold custom-pag-btn px-3"
+            style={{ borderRadius: "6px" }}
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
 
-            <span className='px-3 py-1'>
-              Page {currentPage} of {totalPages}
-            </span>
-            
-            <button 
-              className="btn btn-outline-warning"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(prev => prev + 1)}
-            >
-              Next
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
