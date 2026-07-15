@@ -137,14 +137,14 @@ function NewClaim() {
       return;
     }
 
-    // 🟢 Check for existing PENDING claim for the same user, policy, and accident type 
+    // Check for existing PENDING claim for the same user, policy, and accident type 
     //myo code start
     setIsValidating(true);
     try {
       const checkUrl = `http://localhost:3000/api/claims/check-pending?policy_id=${selectedPolicy.policy_id}&accident_type=${formData.accidentType}&user_id=${userId}`;
       const res = await fetch(checkUrl);
      
-// ✅ Response က OK မဟုတ်ရင် Error ထုတ်ပြီး ရပ်လိုက်
+
 if (!res.ok) {
   const errorData = await res.json();
   throw new Error(errorData.error || "Failed to check pending claim");

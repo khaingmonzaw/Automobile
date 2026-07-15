@@ -7,7 +7,7 @@ function ClaimStatusList() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ Fetch claims from backend
+  //  Fetch claims from backend
   useEffect(() => {
     fetch("http://localhost:3000/api/claims") // your backend URL
       .then((response) => {

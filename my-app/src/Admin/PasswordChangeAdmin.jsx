@@ -12,7 +12,6 @@ const PasswordChange = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
 
-  // Font Awesome Icon တွေကို အဖွင့်/အပိတ် လုပ်ပေးမယ့် State များ
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,7 +20,6 @@ const PasswordChange = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Handlers
   const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
@@ -82,8 +80,8 @@ const PasswordChange = () => {
 
       if (response.ok) {
         setMessage(data.message);
-        setShowRedirectModal(true); // ✅ Show navigation confirmation modal
-        setShowSuccess(true);       // ✅ Show banner alert
+        setShowRedirectModal(true); // Show navigation confirmation modal
+        setShowSuccess(true);       // Show banner alert
         
         // Reset form inputs
         setCurrentPassword('');
@@ -110,7 +108,7 @@ const PasswordChange = () => {
     setShowConfirmPassword(false);  
   };
 
-  // ✅ Route handling for navigation path /LoginPage
+  //  Route handling for navigation path /LoginPage
   const handleGoToLogin = () => {
     setShowRedirectModal(false); 
     navigate('/LoginPage'); 
@@ -130,7 +128,7 @@ const PasswordChange = () => {
         </div>
       )}
 
-      {/* ✅ Updated "Go Back to Login" Dialogue Box */}
+      {/* Updated "Go Back to Login" Dialogue Box */}
       {showRedirectModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,.5)" }}>
           <div className="modal-dialog modal-dialog-centered">

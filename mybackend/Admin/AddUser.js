@@ -1,17 +1,16 @@
 const bcrypt = require("bcrypt");
 async function generatePolicyNumber(db) {
   return new Promise((resolve, reject) => {
-    // Database ထဲမှ နောက်ဆုံးထည့်ထားသော Policy Number ကို ရှာပါ
     db.query(
       "SELECT policy_number FROM policies ORDER BY policy_id DESC LIMIT 1",
       (err, result) => {
         if (err) return reject(err);
 
-        let newNumber = "POL-0001"; // စတင်မည့်နံပါတ်
+        let newNumber = "POL-0001"; 
         if (result.length > 0 && result[0].policy_number) {
-          const lastPolicy = result[0].policy_number; // ဥပမာ - POL-0005
-          const numPart = parseInt(lastPolicy.split("-")[1]); // 0005 ကို ယူပါ
-          newNumber = `POL-${String(numPart + 1).padStart(4, "0")}`; // 0006 ဟု ပြောင်းပါ
+          const lastPolicy = result[0].policy_number; 
+          const numPart = parseInt(lastPolicy.split("-")[1]); 
+          newNumber = `POL-${String(numPart + 1).padStart(4, "0")}`;
         }
         resolve(newNumber);
       }

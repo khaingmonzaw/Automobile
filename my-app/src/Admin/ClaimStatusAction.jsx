@@ -92,7 +92,7 @@ if (!finalRemark) {
       }
 
       if (response.ok) {
-        // 🟢 Success path
+        //  Success path
         setMessageType('success'); 
         if (decision === 'APPROVED') {
           setMessage("Claim approved successfully!");
@@ -112,7 +112,7 @@ if (!finalRemark) {
           }, 5000);
         }
       } else {
-        // ❌ Server error path
+        //  Server error path
         setMessageType('error');
         setMessage(`${resData.message || ''} Server Error: ${response.status}`);
         setShowSuccess(true);
@@ -122,7 +122,7 @@ if (!finalRemark) {
       }
     } catch (err) {
       console.error("Submission Error:", err);
-      // ❌ Network error path
+      // Network error path
       setMessageType('error');
       setMessage("Network Error: Cannot connect to the server.");
       setShowSuccess(true);
@@ -148,7 +148,7 @@ if (!finalRemark) {
 
   return (
     <>
-      {/* 🔔 Success/Error Banner */}
+      {/*  Success/Error Banner */}
       {showSuccess && (
         <div 
           className={`alert alert-dismissible fade show text-start ${
@@ -171,7 +171,7 @@ if (!finalRemark) {
       </div>
 
       <div>
-        {/* 🟢 Admin Decision Confirmation Modal */}
+        {/*  Admin Decision Confirmation Modal */}
         {showConfirm && (
           <div
             className="modal fade show d-block"
@@ -273,7 +273,7 @@ if (!finalRemark) {
               </table>
             </div>
 
-            {/* 📝 Remarks display section */}
+            {/*  Remarks display section */}
             {claim.status === 'PENDING' && (
               <div className="remarks-box pending-remarks">
                 <span className="remarks-label">Remarks</span>

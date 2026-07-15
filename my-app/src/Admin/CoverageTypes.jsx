@@ -57,12 +57,9 @@ const CoverageTypes = () => {
       `}</style>
 
       {/* Table Main Wrapper Card Container */}
-<<<<<<< HEAD
-      <div className="card bg-white border border-light-subtle rounded-4 shadow-sm w-100 p-4">
-=======
-      <div className="card bg-white border border-secondary-subtle rounded shadow-sm w-100  p-4">
->>>>>>> main
 
+      <div className="card bg-white border border-secondary-subtle rounded shadow-sm w-100  p-4">
+ 
         {/* Header Block */}
         <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 w-100">
           <h2 className="mb-0 fw-bold fs-3 text-dark">Coverage Types</h2>

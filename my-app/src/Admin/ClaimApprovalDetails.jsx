@@ -11,7 +11,7 @@ const ClaimApprovalDetails = () => {
   const [remark, setRemark] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // --- STATE VARIABLES FOR SYSTEM MODAL & ALERTS ---
+  
   const [showConfirm, setShowConfirm] = useState(false); // Controls the confirm modal
   const [showSuccess, setShowSuccess] = useState(false); // Controls the success banner
   const [message, setMessage] = useState("");             // Stores the success/error text
@@ -27,14 +27,14 @@ const ClaimApprovalDetails = () => {
 
   if (!data) return null;
 
-  // --- TRIGGER DISPLAY FOR SUBMIT MODAL BOX ---
+
   const triggerSubmitConfirm = () => {
     setShowConfirm(true);
   };
 
-  // --- CONFIRMED DELEGATION SUBMISSIONS ---
+
   const handleFinalSubmit = async () => {
-    setShowConfirm(false); // Close Modal
+    setShowConfirm(false); 
     setSubmitting(true);
 
     const user = JSON.parse(localStorage.getItem("user"));

@@ -2,22 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
  
 const AdminDashboard = () => {
-  // State Variables သတ်မှတ်ခြင်း
   const [claimsData, setClaimsData] = useState([]);
   
-  // ✨ Backend API မှလာမည့် Risk Level ဒေတာအတွက် State 
   const [riskStats, setRiskStats] = useState({ low: 0, medium: 0, high: 0 });
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
  
-  // Backend API များမှ ဒေတာဆွဲထုတ်ခြင်း
   useEffect(() => {
-    let isMounted = true; // Memory Leak ကာကွယ်ရန်
+    let isMounted = true; 
  
     const fetchDashboardData = async () => {
       try {
-        // API နှစ်ခုလုံးကို ပြိုင်တူ လှမ်းခေါ်ခြင်း
         const [claimsRes, riskRes] = await Promise.all([
           fetch('http://localhost:3000/api/admin/claims'),
           fetch('http://localhost:3000/api/admin/risk-stats') 
@@ -33,7 +29,6 @@ const AdminDashboard = () => {
         if (isMounted) {
           setClaimsData(Array.isArray(claims) ? claims : []);
           
-          // Backend ကလာတဲ့ Risk Object ကို ထည့်သွင်းခြင်း (မတော်တဆ null ဖြစ်ခဲ့ရင် error မတက်အောင်ပါ ကာကွယ်ထားသည်)
           setRiskStats(risk ? {
             low: risk.low ?? 0,
             medium: risk.medium ?? 0,
@@ -57,13 +52,11 @@ const AdminDashboard = () => {
     };
   }, []);
  
-  // ကောင်တာများကို Dynamic တွက်ချက်ခြင်း
   const totalClaims = claimsData.length;
   const pendingClaims = claimsData.filter(c => c?.status?.toUpperCase() === 'PENDING').length;
   const approvedClaims = claimsData.filter(c => c?.status?.toUpperCase() === 'APPROVED').length;
   const rejectedClaims = claimsData.filter(c => c?.status?.toUpperCase() === 'REJECTED').length;
  
-  // Status အလိုက် Badge အရောင်ပြောင်းရန် Function
   const getBadgeClass = (status) => {
     switch (status?.toUpperCase()) {
       case 'APPROVED': 
@@ -101,7 +94,7 @@ const AdminDashboard = () => {
     <div className="container-fluid min-vh-100 p-0 bg-light d-flex">
       <div className="flex-grow-1 p-4">
         
-        {/* Metrics/Counter Grid Section */}
+      
         <div className="row g-3 mb-4">
           <div className="col-md-3">
             <div className="card border-0 rounded-4 p-3 text-center bg-white shadow-sm">

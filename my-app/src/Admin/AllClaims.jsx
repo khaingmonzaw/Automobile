@@ -4,21 +4,20 @@ import { faFilter, faEye } from "@fortawesome/free-solid-svg-icons";
 import { Link } from 'react-router-dom';
 
 const AllClaims = () => {
-  // State Variables သတ်မှတ်ခြင်း
+ 
   const [claimsData, setClaimsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // တစ်မျက်နှာလျှင် ပြသမည့် အရေအတွက် (၅ ခု ပြောင်းထားပါသည်)
-
-  // Backend API မှ ဒေတာဆွဲထုတ်ခြင်း
+  const itemsPerPage = 5;
+ 
   useEffect(() => {
     const fetchClaims = async () => {
       try {
         const response = await fetch('http://localhost:3000/api/admin/claims');
         if (!response.ok) {
-          throw new Error('ဒေတာဆွဲထုတ်ရာတွင် အမှားအယွင်းရှိနေပါသည်။');
+          throw new Error('Error : Data is Not Found');
         }
         const data = await response.json();
         setClaimsData(data);
@@ -32,7 +31,6 @@ const AllClaims = () => {
     fetchClaims();
   }, []);
 
-  // Status အလိုက် Badge အရောင်ပြောင်းရန် Function
   const getBadgeConfig = (status) => {
     switch (status?.toUpperCase()) {
       case 'APPROVED':
@@ -46,24 +44,21 @@ const AllClaims = () => {
     }
   };
 
-  // Status Filter စစ်ထုတ်ခြင်း logic
   const filteredClaims = claimsData.filter(claim => {
     return statusFilter === "All" || claim.status?.toUpperCase() === statusFilter.toUpperCase();
   });
 
-  // Filter ပြောင်းလျှင် ပထမစာမျက်နှာသို့ ပြန်ပို့ရန်
   const handleFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setCurrentPage(1);
   };
 
-  // Pagination တွက်ချက်မှုများ
+  
   const totalPages = Math.ceil(filteredClaims.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredClaims.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Loading ပြသမည့် UI
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -74,7 +69,7 @@ const AllClaims = () => {
     );
   }
 
-  // Error ပြသမည့် UI
+  
   if (error) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
