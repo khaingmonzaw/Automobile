@@ -68,9 +68,11 @@ const CoverageUpdate = () => {
         } else {
           const errText = await response.text();
           console.error(`Backend returned error: ${errText}`);
+          triggerModalAlert(`Backend returned error: ${errText}`, true);
         }
       } catch (error) {
         console.error('Network connection to backend failed:', error);
+        triggerModalAlert(`Network connection to backend failed: ${error.message}`, true);
       }
     };
 
@@ -99,7 +101,18 @@ const CoverageUpdate = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     setIsDuplicate(false);
+    if (originalData) {
+      const isUnchanged = 
+        coverageType.trim() === (originalData.coverage_type || '').trim() &&
+        Number(coverageLimit) === Number(originalData.coverage_limit) &&
+        description.trim() === (originalData.description || '').trim() &&
+        status === originalData.status;
 
+      if (isUnchanged) {
+        triggerModalAlert('No data changed.');
+        return; // Stop form validation and API requests
+      }
+    }
     // Check empty inputs to toggle validation errors visually
     const newErrors = {
       coverageType: !coverageType.toString().trim(),
@@ -127,6 +140,7 @@ const CoverageUpdate = () => {
         }
       } catch (error) {
         console.error('Error verifying coverage type availability:', error);
+         triggerModalAlert('Error verifying coverage type availability');
       }
     }
 
@@ -316,8 +330,8 @@ const CoverageUpdate = () => {
                   onChange={(e) => setStatus(e.target.value)}
                   style={{ borderRadius: "8px", fontSize: "14px", cursor: "pointer" }}
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
             </div>
