@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 exports.userLists = (db) => {
   return async (req, res) => {
-     const updatePolicyStatus = `
+    /* const updatePolicyStatus = `
       UPDATE policies
       SET status = 'inactive'
       WHERE CURDATE() > DATE_ADD(end_date, INTERVAL 3 DAY)
@@ -19,7 +19,7 @@ exports.userLists = (db) => {
         return res.status(500).json(updateErr);
       }
       console.log("Updated Rows:", result.affectedRows);
-
+*/
     const sql = `
     SELECT 
         u.id AS User_ID, 
@@ -45,8 +45,8 @@ exports.userLists = (db) => {
       res.json(results);
      });
 
-    });
-
-  };
+    
 };
+};
+
 //khaing mon mon zaw
