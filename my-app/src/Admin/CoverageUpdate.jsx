@@ -12,7 +12,7 @@ const CoverageUpdate = () => {
   const [coverageType, setCoverageType] = useState('');
   const [coverageLimit, setCoverageLimit] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('Active');
+  const [status, setStatus] = useState('active');
 
   // Cache state to store database values for the Cancel button reset
   const [originalData, setOriginalData] = useState(null);
@@ -61,7 +61,7 @@ const CoverageUpdate = () => {
           setCoverageType(data.coverage_type || '');
           setCoverageLimit(data.coverage_limit || '');
           setDescription(data.description || '');
-          setStatus(data.status || 'Active');
+          setStatus(data.status || 'active');
 
           // Cache initial record data for recovery resets later
           setOriginalData(data);
@@ -87,7 +87,7 @@ const CoverageUpdate = () => {
       setCoverageType(originalData.coverage_type || '');
       setCoverageLimit(originalData.coverage_limit || '');
       setDescription(originalData.description || '');
-      setStatus(originalData.status || 'Active');
+      setStatus(originalData.status || 'active');
     }
     // Clear any active red validation labels and duplicate flags
     setErrors({
