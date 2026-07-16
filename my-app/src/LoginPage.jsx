@@ -82,7 +82,7 @@ function LoginPage() {
         <h1 className="text-start">
           Automobile
           <div >
-            Claim  & <span className="text-warning">Risk</span>
+           Insurance Claim  & <span className="text-warning">Risk</span>
           </div>
 
           <div className="text-warning">
