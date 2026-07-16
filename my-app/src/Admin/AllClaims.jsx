@@ -84,7 +84,7 @@ const AllClaims = () => {
   }
 
   return (
-    <div className="container-fluid p-4 bg-light">
+    <div className="container-fluid p-4 bg-light ">
 
 
 
