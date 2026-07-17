@@ -122,7 +122,7 @@ function Userlist() {
               <th className="py-3" style={{ backgroundColor: "#ffed92" }}>User Name</th>
               <th className="py-3" style={{ backgroundColor: "#ffed92" }}>Policy Number</th>
               <th className="py-3" style={{ backgroundColor: "#ffed92" }}>Claimed Freq.</th>
-              <th className="py-3" style={{ backgroundColor: "#ffed92" }}>Status</th>
+              <th className="py-3" style={{ backgroundColor: "#ffed92" }}>Policy Status</th>
               <th className="py-3" style={{ backgroundColor: "#ffed92" }}>Action</th>
             </tr>
           </thead>
