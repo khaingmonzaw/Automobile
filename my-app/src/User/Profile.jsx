@@ -5,12 +5,11 @@ import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link } from 'react-router-dom';
 const Profile = () => {
 const [profile, setProfile] = useState(null);
-const [policies, setPolicies] = useState([]);       // 💡 အမှားမတက်စေရန် policies state ကို ပြန်လည်ထည့်သွင်းထားပါသည်
+const [policies, setPolicies] = useState([]);      
 const [activePolicies, setActivePolicies] = useState([]); 
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
 
-// localStorage ထဲက လက်ရှိဝင်ထားတဲ့ User ID ကို ယူသုံးခြင်း
 const user = JSON.parse(localStorage.getItem("user"));
 const userId = user?.id;
 
@@ -29,7 +28,7 @@ useEffect(() => {
         if (response.status === 404) {
           setProfile({ fullName: user?.name || 'User', email: user?.email || '-' });
           setActivePolicies([]);
-          setPolicies([]); // လုံခြုံစိတ်ချရအောင် အလွတ်ပတ်ပေးထားမည်
+          setPolicies([]); 
           setLoading(false);
           return;
         }
@@ -37,12 +36,12 @@ useEffect(() => {
       }
       
       const data = await response.json();
-      console.log("Backend က ကျလာတဲ့ ဒေတာပုံစံ - ", data);
+      console.log("Backend Data Form- ", data);
 
       if (Array.isArray(data) && data.length > 0) {
         setProfile(data[0]);         
         setActivePolicies(data);     
-        setPolicies(data);           // 💡 နာမည်ဟောင်း သုံးထားသော နေရာများအတွက်ပါ ဒေတာ တစ်ခါတည်း ထည့်ပေးခြင်း
+        setPolicies(data);           
       } else {
         setProfile(null);
         setActivePolicies([]);
@@ -151,23 +150,19 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* 💡 ပြင်ဆင်ချက် - Vehicle နှင့် Policy ဒေတာများကို ဇယားတစ်ခုတည်းတွင် ပေါင်းစည်း၍ Layout အပြည့်ဖြင့် ပြသခြင်း */}
 <div className="row g-4">
   <div className="col-12">
     <div className="card bg-white border-0 rounded-4 shadow-sm p-4">
       
-      {/* ကတ်ပြား၏ ခေါင်းစဉ်ပိုင်း */}
       <div className="d-flex align-items-center gap-2 border-bottom pb-3 mb-3">
         <FontAwesomeIcon icon={faFileContract} className="text-warning fs-5" />
         <h5 className="fw-bold text-dark mb-0">Policies Information </h5>
       </div>
       
       <div className="d-flex flex-column gap-3 py-1">
-        {/* Table Container - Responsive ဖြစ်ပြီး အောက်သို့ Scroll ဆွဲကြည့်နိုင်သည် */}
         <div className="table-responsive rounded-3 border border-light-subtle shadow-sm" style={{ maxHeight: "450px", overflowY: "auto" }}>
           <table className="table table-hover align-middle mb-0" style={{ minWidth: "1000px" }}>
             
-            {/* Table Head - ခေါင်းစဉ်များ */}
             <thead>
               <tr>
                 <td style={{ backgroundColor: "#ffed92" }}>Number</td>
@@ -176,51 +171,43 @@ useEffect(() => {
                 <td style={{ backgroundColor: "#ffed92" }}>Vehicle Number</td>
                 <td style={{ backgroundColor: "#ffed92" }}>Start Date</td>
               <td style={{ backgroundColor: "#ffed92" }}>End Date</td>
-                            <td style={{ backgroundColor: "#ffed92" }}>Avaliable Balance</td>
+              <td style={{ backgroundColor: "#ffed92" }}>Avaliable Balance</td>
 
                     <td className="text-center " style={{ backgroundColor: "#ffed92" }}>Status</td>
               </tr>
             </thead>
             
-            {/* Table Body - အချက်အလက်များ */}
             <tbody>
               {policies && policies.filter(item => item?.status?.toLowerCase() === 'active').length > 0 ? (
                 policies
-                  .filter(item => item?.status?.toLowerCase() === 'active') // Active ဖြစ်နေသော ပေါ်လစီများကိုသာ စစ်ထုတ်သည်
+                  .filter(item => item?.status?.toLowerCase() === 'active') 
                   .map((item, index) => (
                     <tr key={index} className="border-bottom border-light-subtle">
                       
-                      {/* ၁။ စဉ်နံပါတ် */}
                       <td className="ps-3 fw-medium text-secondary">{index + 1}</td>
                       
-                      {/* ၂။ ပေါ်လစီနံပါတ် */}
                       <td>
                         <span className="fw-bold text-primary">{item?.policy_number || '-'}</span>
                       </td>
                       
-                      {/* ၃။ ကားမော်ဒယ်နှင့် မော်ဒယ်နှစ် (ပေါင်းပြထားပါသည်) */}
                       <td>
                         <div className="fw-semibold text-dark">{item?.vehicle_model || '-'}</div>
                         <div className="text-muted small">Year: {item?.model_year || '-'}</div>
                       </td>
                       
-                      {/* ၄။ ကားနံပါတ် */}
                       <td>
                         <span className="badge bg-light text-dark border border-secondary-subtle px-2 py-1.5 font-monospace fw-semibold">
                           {item?.vehicle_number || '-'}
                         </span>
                       </td>
                       
-                      {/* ၅။ စတင်သည့် ရက်စွဲ */}
                       <td className="text-secondary fw-medium">{formatDate(item?.start_date)}</td>
                       
-                      {/* ၆။ ကုန်ဆုံးမည့် ရက်စွဲ */}
                       <td className="text-secondary fw-medium">{formatDate(item?.end_date)}</td>
 
   <td>
                         <span className="fw-bold text-primary">{item?.remaining_balance || 0}</span>
                       </td>
-                      {/* ၇။ Status Badge */}
                       <td className="text-center">
                         <span className="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fw-bold text-uppercase small" style={{ fontSize: "0.75rem", letterSpacing: "0.5px" }}>
                           {item?.status}
@@ -229,7 +216,6 @@ useEffect(() => {
                     </tr>
                   ))
               ) : (
-                /* ပေါ်လစီ လုံးဝမရှိပါက ပြသမည့် Row */
                 <tr>
                   <td colSpan="7" className="text-center text-muted py-5 fw-medium">
                     <div className="fs-6 mb-1">🚗 No Active Insurance Policies Found</div>

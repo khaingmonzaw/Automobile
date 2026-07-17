@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import * as mmNrc from "mm-nrc";
-// 🛠 Clean NRC ပြောင်းပေးမည့် Helper Function
+
 const getCleanNrc = (rawNrc) => {
   if (!rawNrc) return "-";
   
@@ -32,7 +32,7 @@ const getCleanNrc = (rawNrc) => {
   const townships = mmNrc.getNrcTownships(); 
   const matchedTownship = townships.find(t => t.code === townshipCode);
   if (matchedTownship) {
-    townshipDisplay = matchedTownship.short.en; // ကိုက်ညီတာတွေ့ရင် "HAPANA" ကို ယူပါမယ်
+    townshipDisplay = matchedTownship.short.en; 
   }
 
   return `${stateNumber ? stateNumber : ''}/${townshipDisplay}(${type})${number}`;

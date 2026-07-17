@@ -49,7 +49,7 @@ function MyClaims() {
 
 
   return (
-    <div className="container-fluid ">
+    <div className="container-uid ">
 
 
 

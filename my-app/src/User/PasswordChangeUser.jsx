@@ -81,8 +81,8 @@ const PasswordChange = () => {
 
       if (response.ok) {
         setMessage(data.message);
-        setShowRedirectModal(true); // ✅ Show navigation confirmation modal
-        setShowSuccess(true);       // ✅ Show banner alert
+        setShowRedirectModal(true); // Show navigation confirmation modal
+        setShowSuccess(true);       // Show banner alert
         
         // Reset form inputs
         setCurrentPassword('');
@@ -109,7 +109,7 @@ const PasswordChange = () => {
     setShowConfirmPassword(false);  
   };
 
-  // ✅ Route handling for navigation path /LoginPage
+  
   const handleGoToLogin = () => {
     setShowRedirectModal(false); 
     navigate('/LoginPage'); 
@@ -129,7 +129,6 @@ const PasswordChange = () => {
         </div>
       )}
 
-      {/* ✅ Updated "Go Back to Login" Dialogue Box to match the standard Confirm/Cancel layout style */}
       {showRedirectModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,.5)" }}>
           <div className="modal-dialog modal-dialog-centered">

@@ -70,7 +70,7 @@ const NewCoverage = () => {
       return;
     }
 
-    // 3. Match keys with backend requirements and sanitize values
+    // 3. Match keys with backend requirements
     const formData = {
       coverageType: coverageType.trim(),      
       coverageLimit: Number(coverageLimit), 
@@ -88,16 +88,13 @@ const NewCoverage = () => {
       });
 
       if (response.ok) {
-        // Replaced window.alert with modal trigger
         triggerModalAlert('Coverage saved successfully!', true);
       } else {
         const errorData = await response.json();
-        // Replaced window.alert with modal trigger
         triggerModalAlert(`Failed to save: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Network Error:', error);
-      // Replaced window.alert with modal trigger
       triggerModalAlert('Could not connect to the backend server.');
     }
   };

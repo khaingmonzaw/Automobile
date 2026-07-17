@@ -13,8 +13,8 @@ function AddUser() {
 const [alertMessage, setAlertMessage] = useState("");
 const [alertType, setAlertType] = useState("warning");
   const [errors, setErrors] = useState({});
-  const [coverageOptions, setCoverageOptions] = useState([]); // Database မှလာမည့် Coverage များ
-  // Consistent yellow border style
+  const [coverageOptions, setCoverageOptions] = useState([]); 
+  
   const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
 
 
@@ -87,16 +87,14 @@ const [alertType, setAlertType] = useState("warning");
       newErrors.driverLicense = "*Driver License must be at least 10 characters";
     }
 
-    // ၂။ Driving Duration check
+    //  Driving Duration check
     if (!formData.drivingYear) {
       newErrors.drivingYear = "*Driving duration is required";
     } else {
       const duration = parseInt(formData.drivingYear);
-      // logic: အသက် (Age) - duration = စမောင်းတဲ့အချိန်အသက် (Age at start)
       if (isNaN(duration) || duration < 0 || duration > 80) {
         newErrors.drivingYear = "*Please enter a valid duration (0 - 80 years)";
       } else if ((age - duration) < 18) {
-        // ဥပမာ - အသက် ၁၈ နှစ်၊ duration ၄ နှစ်ဆိုရင် ၁၄ နှစ်ကတည်းက စမောင်းတာဖြစ်လို့ Invalid ဖြစ်မယ်
         newErrors.drivingYear = "Invalid experience: You cannot start driving before 18 years old";
       }
     }
@@ -184,7 +182,7 @@ const [alertType, setAlertType] = useState("warning");
         .then((data) => {
           const formatDate = (dateStr) => {
           if (!dateStr) return "";
-          // 'T' ဆိုတဲ့ အမှတ်အသားနေရာမှာ ဖြတ်ထုတ်လိုက်ရင် YYYY-MM-DD သီးသန့်ကျန်ခဲ့ပါမယ်
+        
           return dateStr.split("T")[0]; 
         };
           setFormData(prev => ({ ...prev, policyNumber: data.newPolicyNumber }));
@@ -227,8 +225,8 @@ const [alertType, setAlertType] = useState("warning");
             endDate: data.endDate,
             coverageLimit: data.coverageLimit || "" ,
             policyDuration: duration.toString() ,           
-            monthlyPremium:premiums.monthlyPremium, // Database column name ကို သေချာစစ်ပါ
-            totalPremium: premiums.totalPremium,     // Database column name ကို သေချာစစ်ပါ
+            monthlyPremium:premiums.monthlyPremium, 
+            totalPremium: premiums.totalPremium,     
           });
         })
         .catch((err) => console.error("Error fetching user for edit:", err));
@@ -295,28 +293,22 @@ const [alertType, setAlertType] = useState("warning");
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
-    // ၁။ လက်ရှိ input value ကို အရင် update လုပ်ပါ
     const updated = { ...prev, [name]: value };
 
-    // ၂။ startDate နှင့် policyDuration ရှိနေမှသာ endDate ကို တွက်ချက်ပါ
     if (updated.startDate && updated.policyDuration) {
       //const start = new Date(updated.startDate);
       //const end = new Date(start);
-     // ၁။ Start Date String ကို (YYYY-MM-DD) အဖြစ် ခွဲယူပါ
       const [y, m, d] = updated.startDate.split('-').map(Number);
       
-      // ၂။ လပေါင်းကို ပေါင်းပြီး Date Object တည်ဆောက်ပါ
       const dateObj = new Date(y, m - 1, d); 
       dateObj.setMonth(dateObj.getMonth() + parseInt(updated.policyDuration));
       
-      // ၃။ Timezone အလွှဲအပြောင်းမဖြစ်စေရန် ဤနည်းဖြင့်သာ ပြန်ယူပါ
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
       const day = String(dateObj.getDate()).padStart(2, '0');
       
       updated.endDate = `${year}-${month}-${day}`;
     }
-    // ၃။ Premium တွက်ချက်မှု Logic ကို ဆက်လက်လုပ်ဆောင်ပါ
        
     
     const totalLimit = calculateTotalLimit(updated.coverageLimit);
@@ -335,7 +327,6 @@ const [alertType, setAlertType] = useState("warning");
         ? prev.coverage.filter(c => c !== id)
         : [...prev.coverage, id];
 
-      // ၂။ ရွေးထားတဲ့ Coverage အားလုံးအတွက် Limit စုစုပေါင်းကို တွက်ချက်ခြင်း
       let newTotalLimit = 0;
       newCoverage.forEach(cId => {
         const option = coverageOptions.find(o => Number(o.coverage_type_id) === Number(cId));
@@ -353,7 +344,7 @@ const [alertType, setAlertType] = useState("warning");
       return {
         ...prev,
         coverage: newCoverage,
-        coverageLimit: newTotalLimit.toString(),// တွက်ပြီးသား Limit ကို Auto ထည့်ပေးခြင်း
+        coverageLimit: newTotalLimit.toString(),
         totalPremium: premiums.totalPremium,
         monthlyPremium: premiums.monthlyPremium
       };
@@ -393,7 +384,6 @@ const [alertType, setAlertType] = useState("warning");
   const checkPolicyExists = async (policyNum) => {
     if (!policyNum) return;
 
-    // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် စစ်ဆေးရန်
     if (isEditMode) return;
 
     try {
@@ -417,7 +407,6 @@ const [alertType, setAlertType] = useState("warning");
   const checkVehicleExists = async (vehicleNumber) => {
     if (!vehicleNumber) return;
 
-    // Edit Mode ဆိုရင် Validation ကို ခဏရပ်ထားရန် (သို့မဟုတ်) Edit Mode အတွက် စစ်ဆေးရန်
     if (isEditMode) return;
 
     try {
@@ -451,7 +440,7 @@ showCustomAlert(
      const premiums = calculatePremiums(limit, duration);
       const fullNrc = `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`;
       console.log("Current Form NRC :", fullNrc);
-      // ဥပမာ - Email တစ်ခုတည်းကိုပဲ စစ်မယ်ဆိုရင်
+      
       // const checkDuplicate = async (field, value) => {
 
       //   if (!value) return false;
@@ -475,7 +464,7 @@ showCustomAlert(
       //   return false;
       // };
 
-      // သုံးတဲ့အခါ
+      
       // if (await checkDuplicate('email', formData.email)) return;
       // if (await checkDuplicate('phone', formData.phone)) return;
       // if (await checkDuplicate("driver_license", formData.driverLicense)) return;
@@ -483,13 +472,13 @@ showCustomAlert(
       // if (await checkDuplicate("vehicle_number", formData.vehicleNumber)) return;
 
       // if (await checkDuplicate("policy_number", formData.policyNumber)) return;
-      // ... စသဖြင့် ဆက်စစ်သွားလို့ရပါတယ်
+     
       const dataToSend = {
         ...formData,
         nrc: fullNrc,
         coverageLimit: cleanCoverageLimit,
-        totalPremium: premiums.totalPremium,     // တွက်ပြီးသားတန်ဖိုး
-        monthlyPremium: premiums.monthlyPremium, // တွက်ပြီးသားတန်ဖိုး
+        totalPremium: premiums.totalPremium,     
+        monthlyPremium: premiums.monthlyPremium, 
         policyDuration: duration
       };
         console.log("Sending Data:", dataToSend);

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { faEye,faSearch } from "@fortawesome/free-solid-svg-icons";
 
 function Userlist() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 5;
   const navigate = useNavigate();
 
@@ -14,6 +15,9 @@ function Userlist() {
     fetch("http://localhost:3000/api/users")
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
+        console.log("Status values:");
+      data.forEach(item => console.log(JSON.stringify(item.Policy_Status)));
         setUsers(data.reverse());
         setLoading(false);
       })
@@ -24,14 +28,34 @@ function Userlist() {
   }, []);
 
   if (loading) return <div className="text-center mt-5">Loading...</div>;
+  const filteredUsers = users.filter((item) => {
+  const keyword = searchTerm.trim().toLowerCase();
 
+  const userName = String(item.User_Name || "").trim().toLowerCase();
+  const policyNo = String(item.Policy_Number || "").trim().toLowerCase();
+  const status = String(item.Policy_Status || "").trim().toLowerCase();
 
-  const totalPages = Math.ceil(users.length / itemsPerPage) || 1;
+  // Search box ဗလာဆိုရင် အားလုံးပြ
+  if (keyword === "") return true;
+
+  // Status ကို exact match လုပ်
+  if (keyword === "active" || keyword === "inactive") {
+    return status === keyword;
+  }
+
+  // User Name နဲ့ Policy Number ကို partial search
+  return (
+    userName.includes(keyword) ||
+    policyNo.includes(keyword)
+  );
+});
+
+ const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+ const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="container mt-4 bg-white px-4 py-5 shadow-md" >
@@ -54,6 +78,42 @@ function Userlist() {
           +
         </button>
       </div>
+      
+  <div className="d-flex justify-content-end mb-3">
+  <div
+    className="input-group"
+    style={{ width: "250px" }}
+  >
+    <span
+      className="input-group-text"
+      style={{
+        backgroundColor: "#ffed92",
+        border: "1px solid #FFC107",
+        padding: "6px 10px"
+      }}
+    >
+       <FontAwesomeIcon icon={faSearch} />
+    </span>
+
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Search..."
+      value={searchTerm}
+      onChange={(e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+      }}
+      style={{
+        height: "38px",
+        fontSize: "0.85rem",
+        border: "1px solid #FFC107",
+        boxShadow: "none"
+      }}
+    />
+  </div>
+</div>
+
       <div className="table-responsive">
         <table className="table table-hover shadow-sm" style={{ textAlign: 'left' }}>
           <thead className="custom-header ">
@@ -67,7 +127,7 @@ function Userlist() {
             </tr>
           </thead>
           <tbody>
-            {users.length > 0 ? (
+            {currentItems.length > 0 ? (
               currentItems.map((item, index) => (
 
                 <tr key={index}>
@@ -77,13 +137,26 @@ function Userlist() {
                   <td>{item.Claimed_Freq || 0}</td>
                   <td>
                     <span
-                      className={`badge rounded-pill px-3 py-2 fw-semibold ${item.status === "active"
-                          ? "bg-success-subtle text-success-emphasis"
-                          : "bg-primary-subtle text-primary-emphasis"
-                        }`}
-                    >
-                      {item.status === "active" ? "Active" : "Inactive"}
-                    </span>
+  style={{
+    backgroundColor:
+      String(item.Policy_Status).trim().toLowerCase() === "active"
+        ? "#d1fae5"
+        : "#fee2e2",
+    color:
+      String(item.Policy_Status).trim().toLowerCase() === "active"
+        ? "#065f46"
+        : "#991b1b",
+    padding: "4px 10px",
+    borderRadius: "20px",
+    fontSize: "0.75rem",
+    fontWeight: "600",
+    display: "inline-block",
+    minWidth: "75px",
+    textAlign: "center"
+  }}
+>
+  {String(item.Policy_Status).trim()}
+</span>
                   </td>
 
                   <td style={{ textAlign: 'left' }}>
