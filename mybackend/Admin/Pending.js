@@ -9,7 +9,7 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "auto_assurance_db",
+  database: "auto_assurance_db",// will cause server500 error wrong_database_name_testing auto_assurance_db
 });
 
 

@@ -8,6 +8,7 @@ function ClaimStatusAction() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [messageType, setMessageType] = useState(''); 
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
 
   // --- State for claim data ---
   const [claim, setClaim] = useState(null);
@@ -52,10 +53,20 @@ function ClaimStatusAction() {
 
   const handleSubmitDecision = (e) => {
     e.preventDefault();
-    if (!decision) return alert("Please select an action (Approve or Reject)");
+    
+    if (!decision) {
+      // pleas select radio button tag
+      setShowValidationDialog(true);
+      
+     
+      setTimeout(() => {
+        setShowValidationDialog(false);
+      }, 3000);
+      return;
+    }
+    
     setShowConfirm(true);
   };
-
   const confirmDecisionSubmit = async () => {
     setShowConfirm(false);
     const user = JSON.parse(localStorage.getItem("user"));
@@ -122,7 +133,7 @@ if (!finalRemark) {
       }
     } catch (err) {
       console.error("Submission Error:", err);
-      // ❌ Network error path
+     
       setMessageType('error');
       setMessage("Network Error: Cannot connect to the server.");
       setShowSuccess(true);
@@ -148,7 +159,7 @@ if (!finalRemark) {
 
   return (
     <>
-      {/* 🔔 Success/Error Banner */}
+      {/* 🔔 Success Banner */}
       {showSuccess && (
         <div 
           className={`alert alert-dismissible fade show text-start ${
@@ -171,6 +182,28 @@ if (!finalRemark) {
       </div>
 
       <div>
+      {/* ⚠️ Warning Dialog Box (No Buttons, Auto-dismisses) */}
+        {showValidationDialog && (
+          <div
+            className="modal fade show d-block"
+            style={{ backgroundColor: "rgba(0,0,0,.4)", zIndex: 1060 }}
+          >
+            <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: "400px" }}>
+              <div className="modal-content border-0 rounded-4 shadow p-4 text-center">
+                <div className="modal-body">
+                  {/* အဝိုင်းပုံ Warning သင်္ကေတ */}
+                  <div className="text-warning mb-3" style={{ fontSize: "3rem" }}>
+                    ⚠️
+                  </div>
+                  <h4 className="fw-bold text-dark mb-2">Selection Required</h4>
+                  <p className="text-secondary mb-0">
+                    Please select an action (Approve or Reject) to proceed.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* 🟢 Admin Decision Confirmation Modal */}
         {showConfirm && (
           <div
