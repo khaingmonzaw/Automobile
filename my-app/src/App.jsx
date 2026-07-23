@@ -69,7 +69,7 @@ function App() {
         }
       >
         <Route index element={<Navigate to="ClaimDetailApproved" replace />} />
-        <Route path="AdminDashboard" element={<AdminDashboard />} />
+        <Route path="Dashboard" element={<AdminDashboard />} />
         <Route path="AllClaims" element={<AllClaims />} />
         {/* <Route path="ClaimDetailApproved" element={<ClaimDetailApproved />} /> */}
         <Route path="CoverageTypes" element={<CoverageTypes />} />

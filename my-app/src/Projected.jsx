@@ -4,22 +4,37 @@ import { useNavigate } from "react-router-dom";
 function Projected({ role, children }) {
   const navigate = useNavigate();
 
+  const [message, setMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     if (!user) {
+      setMessage("Please login first.");
+      setShowAlert(true);
+    } else if (role && user.role !== role) {
+      setMessage("You cannot access this page.");
       setShowAlert(true);
     }
-  }, [user]);
+  }, [user, role]);
 
-  const handleLogin = () => {
+  const handleOK = () => {
     setShowAlert(false);
-    navigate("/", { replace: true });
+
+    if (!user) {
+      navigate("/", { replace: true }); // Login page
+    } else {
+      // Redirect based on role
+      if (user.role === "admin") {
+        navigate("/Admin/Dashboard", { replace: true });
+      } else {
+        navigate("/User/Dashboard", { replace: true });
+      }
+    }
   };
 
-  if (!user) {
+  if (!user || (role && user.role !== role)) {
     return (
       <>
         {showAlert && (
@@ -29,38 +44,30 @@ function Projected({ role, children }) {
           >
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
-
                 <div className="modal-header">
                   <h5 className="modal-title fw-bold">
-                    Login Required
+                    Access Denied
                   </h5>
                 </div>
 
                 <div className="modal-body text-center">
-                  <p className="mb-0">
-                    Please login first.
-                  </p>
+                  <p>{message}</p>
                 </div>
 
                 <div className="modal-footer justify-content-center">
                   <button
                     className="btn btn-warning"
-                    onClick={handleLogin}
+                    onClick={handleOK}
                   >
                     OK
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
         )}
       </>
     );
-  }
-
-  if (role && user.role !== role) {
-    return <Navigate to="/" replace />;
   }
 
   return children;
