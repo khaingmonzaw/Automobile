@@ -53,10 +53,18 @@ function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
+
+        console.log(data.user);
+
+          // Check account status
+  if (data.user.status.toLowerCase() !== "active") {
+    setServerError("Your account is inactive. Please contact admin.");
+    return;
+  }
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        if (data.user.role == "admin") {
-          navigate("../Admin/AdminDashboard")
+        if (data.user.role == "admin" || data.user.role =="staff") {
+          navigate("../Admin/Dashboard")
         } else {
           navigate("../User/Dashboard");
         }

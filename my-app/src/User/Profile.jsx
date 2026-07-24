@@ -173,7 +173,7 @@ useEffect(() => {
               <td style={{ backgroundColor: "#ffed92" }}>End Date</td>
               <td style={{ backgroundColor: "#ffed92" }}>Avaliable Balance</td>
 
-                    <td className="text-center " style={{ backgroundColor: "#ffed92" }}>Status</td>
+                    <td className="text-center " style={{ backgroundColor: "#ffed92" }}>Policy Status</td>
               </tr>
             </thead>
             

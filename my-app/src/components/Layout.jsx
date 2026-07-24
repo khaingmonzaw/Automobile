@@ -182,11 +182,11 @@ function Layout() {
 
         <ul className="list-unstyled p-3">
 
-          {user?.role === "admin" && (
+          {(user?.role === "admin" || user?.role==="staff")&& (
             <>
               <li className="mb-2">
                 <NavLink
-                  to="/Admin/AdminDashboard"
+                  to="/Admin/Dashboard"
                   className={({ isActive }) =>
                     `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
                     }`
@@ -244,6 +244,29 @@ function Layout() {
               </li>
 
 
+
+{/* Only Admin can see Staffs */}
+{user?.role === "admin" && (
+  <li className="mb-2">
+    <NavLink
+      to="/Admin/Staff"
+      className={({ isActive }) =>
+        `d-block p-3 rounded text-decoration-none ${
+          isActive ? "bg-warning text-white" : "text-dark"
+        }`
+      }
+    >
+      {collapsed ? (
+        <FontAwesomeIcon icon={faUsers} />
+      ) : (
+        <>
+          <FontAwesomeIcon icon={faUsers} className="me-3" />
+          Staffs
+        </>
+      )}
+    </NavLink>
+  </li>
+)}
               <li className="mb-2">
                 <NavLink
                   to="/Admin/CoverageTypes"
