@@ -32,6 +32,7 @@ import Userlist from "./Admin/Userlist"
 import StaffLists from './Admin/StaffLists.jsx';
 import AddStaff from './Admin/AddStaff.jsx';
 import Adminprofile from './Admin/Adminprofile.jsx';
+import Adminprofileupdate from './Admin/Adminprofileupdate.jsx';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
@@ -90,6 +91,8 @@ function App() {
          <Route path="AllClaims/ClaimStatusAction/:id" element={< ClaimStatusAction />} />
          <Route path="Staff" element={<Userlist/>} /> 
          <Route path="Adminprofile" element={<Adminprofile/>} /> 
+         <Route path="Adminprofileupdate" element={<Adminprofileupdate/>} /> 
+
 
   
       </Route>

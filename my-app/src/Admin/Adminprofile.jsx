@@ -108,7 +108,7 @@ const Adminprofile = () => {
               {/* Action Buttons Group (Update Profile & Change Password) */}
              <div className="d-flex align-items-center gap-2">
                 <Link 
-                  to="/Admin/UpdateProfile" 
+                  to="/Admin/Adminprofileupdate" 
                   className="text-decoration-none btn btn-warning btn-sm fw-semibold d-flex align-items-center justify-content-center"
                   style={{ width: "32px", height: "32px" }}
                   title="Update Profile"
