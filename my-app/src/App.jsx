@@ -82,6 +82,7 @@ function App() {
         <Route path="Users/UserDetail/:id" element={<UserDetail />} />
          <Route path="Users" element={<Userlist/>} /> 
          <Route path="AllClaims/ClaimStatusAction/:id" element={< ClaimStatusAction />} />
+         <Route path="Staff" element={<Userlist/>} /> 
 
       </Route>
 
