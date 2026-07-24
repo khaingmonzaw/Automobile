@@ -12,6 +12,8 @@ import ClaimDetails from './User/ClaimDetails';
 import AdminDashboard from './Admin/AdminDashboard.jsx';
 import AllClaims from './Admin/AllClaims.jsx';
 import Profile from './User/Profile.jsx';
+import AdminProfile from './Admin/Adminprofile.jsx';
+
 
 import ClaimApprovalDetails from './Admin/ClaimApprovalDetails';
 import CoverageTypes from './Admin/CoverageTypes.jsx';
@@ -29,6 +31,7 @@ import UserDetail from "./Admin/UserDetail";
 import Userlist from "./Admin/Userlist"
 import StaffLists from './Admin/StaffLists.jsx';
 import AddStaff from './Admin/AddStaff.jsx';
+import Adminprofile from './Admin/Adminprofile.jsx';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
@@ -86,7 +89,9 @@ function App() {
          <Route path="Users" element={<Userlist/>} /> 
          <Route path="AllClaims/ClaimStatusAction/:id" element={< ClaimStatusAction />} />
          <Route path="Staff" element={<Userlist/>} /> 
+         <Route path="Adminprofile" element={<Adminprofile/>} /> 
 
+  
       </Route>
 
 

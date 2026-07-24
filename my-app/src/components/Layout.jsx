@@ -287,9 +287,29 @@ function Layout() {
               </li>
 
 
+              <li className="mb-2">
+  <NavLink
+    to="/Admin/Adminprofile"
+    className={({ isActive }) =>
+      `d-block p-3 rounded text-decoration-none ${
+        isActive ? "bg-warning text-white" : "text-dark"
+      }`
+    }
+  >
+    {collapsed ? (
+      <FontAwesomeIcon icon={faUser} />
+    ) : (
+      <>
+        <FontAwesomeIcon icon={faUser} className="me-3" />
+        Profile
+      </>
+    )}
+  </NavLink>
+ </li> 
+ {/*
                <li className="mb-2">
                 <NavLink
-                  to="/Admin/PasswordChangeAdmin"
+                  to="/Admin/Adminprofile"
                   className={({ isActive }) =>
                     `d-block p-3 rounded text-decoration-none ${isActive ? "bg-warning text-white" : "text-dark"
                     }`
@@ -300,11 +320,12 @@ function Layout() {
                   ) : (
                     <>
                       <FontAwesomeIcon icon={faKey} className="me-3" />
-                      Change Password
+                      Profile
                     </>
                   )}
                 </NavLink>
-              </li>
+              </li> */}
+              
             </>
           )}
 

@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const mysql = require("mysql2");
 const cors = require("cors");
 const { exec } = require("child_process"); // Call COBOL
@@ -48,11 +49,14 @@ const submitClaim=require("./User/SubmitClaim");
 const userClaim=require("./User/UserClaim");
 const userClaimDetail=require("./User/UserClaimDetail");
 const getActiveCoverageType=require("./User/GetActiveCoverageType");
+const adminProfileRoute = require('./Admin/Adminprofile');
+
 const { get } = require("http");
 app.use(newCoverageRouter);
 app.use(coverageTypesRouter);
 app.use(coverageUpdateRouter);
 app.use(PendingRouter);
+app.use('/api/admin', adminProfileRoute(db));
 
 
 

@@ -88,7 +88,7 @@ const PasswordChange = () => {
         handleCancel();
         setErrors({});
       setTimeout(() => {
-    navigate("/LoginPage");
+    navigate("/Adminprofile");
   }, 3000);
         setErrors({
           currentPassword: data.message,
@@ -106,8 +106,9 @@ const PasswordChange = () => {
     setConfirmPassword('');
     setShowCurrent(false);
     setShowNew(false);
-setShowConfirmPassword(false);  };
-
+setShowConfirmPassword(false);  
+    navigate("/Admin/Adminprofile");
+  };
   return (
 <>
        {showSuccess && (
