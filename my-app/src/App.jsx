@@ -29,6 +29,8 @@ import UserDetail from "./Admin/UserDetail";
 import Userlist from "./Admin/Userlist"
 import StaffLists from './Admin/StaffLists.jsx';
 import AddStaff from './Admin/AddStaff.jsx';
+import StaffDetails from './Admin/StaffDetails.jsx';
+import UpdateStaff from './Admin/UpdateStaff.jsx';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
@@ -75,6 +77,9 @@ function App() {
         <Route path="AllClaims" element={<AllClaims />} />
         <Route path="Staff" element={<StaffLists/>}></Route>
         <Route path="Staff/AddStaff" element={<AddStaff/>}></Route>
+        <Route path="Staff/View/:id" element={<StaffDetails/>}></Route>
+       <Route path="Staff/Update/:id" element={<UpdateStaff/>}></Route>
+
         <Route path="CoverageTypes" element={<CoverageTypes />} />
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />

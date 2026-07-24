@@ -39,7 +39,8 @@ const PendingRouter=require("./Admin/Pending");
 const getStaffLists=require("./Admin/getStaffLists");
 const addStaff=require("./Admin/AddStaff");
 const deleteStaff=require("./Admin/DeleteStaff");
-
+const staffDetails=require("./Admin/StaffDetals");
+const updateStaff=require("./Admin/UpdateStaff");
 
 const profileUser=require("./User/Profile");
 const getPolicy=require("./User/GetPolicy");
@@ -173,5 +174,7 @@ app.post("/api/add_staff",addStaff.addStaff(db));
 
 app.put("/api/staff_status/:id",deleteStaff.updateStaffStatus(db));
 
+app.get("/api/staff_details/:id",staffDetails.staffDetails(db));
 
+app.put("/api/update_staff/:id",updateStaff.updateStaff(db));
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));

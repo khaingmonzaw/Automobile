@@ -352,6 +352,7 @@ const handleStatusChange = async () => {
     <button
       className="btn btn-sm btn-warning"
       title="View Staff"
+      onClick={()=>navigate(`/Admin/Staff/View/${item.id}`)}
     >
       <FontAwesomeIcon icon={faEye} />
     </button>
@@ -359,6 +360,7 @@ const handleStatusChange = async () => {
     <button
       className="btn btn-sm btn-primary"
       title="Edit Staff"
+       onClick={()=>navigate(`/Admin/Staff/Update/${item.id}`)}
     >
       <FontAwesomeIcon icon={faPenToSquare} />
     </button>
