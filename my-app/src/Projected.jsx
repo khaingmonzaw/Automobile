@@ -9,32 +9,45 @@ function Projected({ role, children }) {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // Check whether the user's role is allowed
+  const hasAccess = user &&
+    
+  (
+    Array.isArray(role)
+      ? role.includes(user.role)
+      : user.role === role
+  );
+
   useEffect(() => {
     if (!user) {
       setMessage("Please login first.");
       setShowAlert(true);
-    } else if (role && user.role !== role) {
+    } else if (!hasAccess) {
       setMessage("You cannot access this page.");
       setShowAlert(true);
     }
-  }, [user, role]);
+  }, [user, hasAccess]);
 
   const handleOK = () => {
     setShowAlert(false);
 
     if (!user) {
-      navigate("/", { replace: true }); // Login page
+      navigate("/", { replace: true });
+    } 
+    
+     else if (user.status !== "active") {
+    // inactive admin/staff/user
+    navigate("/", { replace: true });
+  } 
+    
+    else if (user.role === "admin" || user.role === "staff") {
+      navigate("/Admin/Dashboard", { replace: true });
     } else {
-      // Redirect based on role
-      if (user.role === "admin") {
-        navigate("/Admin/Dashboard", { replace: true });
-      } else {
-        navigate("/User/Dashboard", { replace: true });
-      }
+      navigate("/User/Dashboard", { replace: true });
     }
   };
 
-  if (!user || (role && user.role !== role)) {
+  if (!hasAccess) {
     return (
       <>
         {showAlert && (

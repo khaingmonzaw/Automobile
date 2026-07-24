@@ -36,7 +36,9 @@ const claimStatusAction=require("./Admin/ClaimStatusAction");
 const userLists=require("./Admin/UserList");
 const userDetails=require("./Admin/UserDetail");
 const PendingRouter=require("./Admin/Pending");
-
+const getStaffLists=require("./Admin/getStaffLists");
+const addStaff=require("./Admin/AddStaff");
+const deleteStaff=require("./Admin/DeleteStaff");
 
 
 const profileUser=require("./User/Profile");
@@ -161,11 +163,15 @@ app.get("/api/claims/:id", userClaimDetail.userClaimDetail(db));
 //Active Coverage types
 app.get("/api/coverage_types",getActiveCoverageType.getActiveCoverageType(db));
 
+
+//Get Staff Lists
+app.get("/api/staff_lists",getStaffLists.getStaffLists(db));
 //myo code start
  
+app.post("/api/add_staff",addStaff.addStaff(db));
   // =============================================
 
-
+app.put("/api/staff_status/:id",deleteStaff.updateStaffStatus(db));
 
 
 app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
