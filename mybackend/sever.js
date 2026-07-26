@@ -49,11 +49,17 @@ const submitClaim=require("./User/SubmitClaim");
 const userClaim=require("./User/UserClaim");
 const userClaimDetail=require("./User/UserClaimDetail");
 const getActiveCoverageType=require("./User/GetActiveCoverageType");
+const adminProfileRoute = require('./Admin/Adminprofile');
+const adminProfileupdateRoute = require('./Admin/Adminprofileupdate');
+const adminUserRouter = require('./Admin/Adminprofileupdate');
+
 const { get } = require("http");
 app.use(newCoverageRouter);
 app.use(coverageTypesRouter);
 app.use(coverageUpdateRouter);
 app.use(PendingRouter);
+app.use(adminUserRouter)
+app.use('/api/admin', adminProfileRoute(db));
 
 
 

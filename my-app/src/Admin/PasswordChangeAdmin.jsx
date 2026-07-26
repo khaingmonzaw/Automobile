@@ -16,13 +16,13 @@ const PasswordChange = () => {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [message, setMessage] = useState("");
- const navigate = useNavigate();//go back login page after 3 seconds
+  const navigate = useNavigate();
+
   // Handlers
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     let newErrors = {};
-
 
     if (!currentPassword) {
       newErrors.currentPassword = "Current password is required";
@@ -30,22 +30,15 @@ const PasswordChange = () => {
 
     if (!newPassword) {
       newErrors.newPassword = "New password is required";
-    }
-
-    if (newPassword) {
-      if (newPassword.length < 8) {
-        newErrors.newPassword = "Password must be at least 8 characters";
-      }
-      else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
-        newErrors.newPassword = "Password must contain at least one letter and one digit";
-      }
+    } else if (newPassword.length < 8) {
+      newErrors.newPassword = "Password must be at least 8 characters";
+    } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+      newErrors.newPassword = "Password must contain at least one letter and one digit";
     }
 
     if (!confirmPassword) {
       newErrors.confirmPassword = "Confirm password is required";
-    }
-
-    if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+    } else if (newPassword !== confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
@@ -84,12 +77,24 @@ const PasswordChange = () => {
       if (response.ok) {
         setMessage(data.message);
         setShowSuccess(true);
-
-        handleCancel();
         setErrors({});
-      setTimeout(() => {
-    navigate("/LoginPage");
-  }, 3000);
+
+        // Clear input fields without triggering route navigation
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setShowCurrent(false);
+        setShowNew(false);
+        setShowConfirmPassword(false);
+
+        // Remove the session so user is fully logged out
+        localStorage.removeItem("user");
+
+        // Wait 3 seconds, then navigate strictly to Login page
+        setTimeout(() => {
+          navigate("/LoginPage");
+        }, 3000);
+      } else {
         setErrors({
           currentPassword: data.message,
         });
@@ -106,11 +111,13 @@ const PasswordChange = () => {
     setConfirmPassword('');
     setShowCurrent(false);
     setShowNew(false);
-setShowConfirmPassword(false);  };
+    setShowConfirmPassword(false);  
+    navigate("/Admin/Adminprofile");
+  };
 
   return (
-<>
-       {showSuccess && (
+    <>
+      {showSuccess && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           {message}
           <button
@@ -120,149 +127,129 @@ setShowConfirmPassword(false);  };
           ></button>
         </div>
       )}
-    <div className="d-flex justify-content-center align-items-center py-5">
 
-
-   
-
-      {showConfirmModal && (
-        <div
-          className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,.5)" }}
-        >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title fw-bold">Confirm Change Password</h5>
-                <button
-                  className="btn-close"
-                   onClick={() => setShowConfirmModal(false)}
-                ></button>
+      <div className="d-flex justify-content-center align-items-center py-5">
+        {showConfirmModal && (
+          <div
+            className="modal fade show d-block"
+            style={{ backgroundColor: "rgba(0,0,0,.5)" }}
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title fw-bold">Confirm Change Password</h5>
+                  <button
+                    className="btn-close"
+                    onClick={() => setShowConfirmModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body text-center">
+                  <p>Are you sure you want to change this password?</p>
+                </div>
+                <div className="modal-footer justify-content-center">
+                  <button className="btn btn-warning" onClick={confirmSubmit}>
+                    Submit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => setShowConfirmModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-              <div className="modal-body text-center">
-                <p>Are you sure you want to Change this password?</p>
-              </div>
-              <div className="modal-footer justify-content-center">
-                <button className="btn btn-warning" onClick={confirmSubmit}>
-                  Submit
-                </button>
-                <button
-                  className="btn btn-danger"
-  onClick={() => setShowConfirmModal(false)}
+            </div>
+          </div>
+        )}
+
+        <div className="card shadow border-0 p-4 p-md-5" style={{ width: '100%', maxWidth: '600px', borderRadius: '20px' }}>
+          <h2 className="text-center mb-4 fw-bold text-dark">Change Password</h2>
+
+          <form onSubmit={handleSubmit}>
+            {/* Current Password */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Current Password</label>
+              <div className="input-group">
+                <input
+                  type={showCurrent ? "text" : "password"}
+                  className={`form-control form-control-lg bg-light ${errors.currentPassword ? "is-invalid" : ""}`}
+                  placeholder="**********"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+                <span
+                  className="input-group-text bg-light border-start-0 text-secondary"
+                  style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
+                  onClick={() => setShowCurrent(!showCurrent)}
                 >
-                  Cancel
-                </button>
+                  <i className={showCurrent ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
+                </span>
               </div>
+              {errors.currentPassword && (
+                <small className="text-danger">{errors.currentPassword}</small>
+              )}
             </div>
-          </div>
+
+            {/* New Password */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold">New Password</label>
+              <div className="input-group">
+                <input
+                  type={showNew ? "text" : "password"}
+                  className={`form-control form-control-lg bg-light ${errors.newPassword ? "is-invalid" : ""}`}
+                  placeholder="**********"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <span
+                  className="input-group-text bg-light border-start-0 text-secondary"
+                  style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
+                  onClick={() => setShowNew(!showNew)}
+                >
+                  <i className={showNew ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
+                </span>
+              </div>
+              {errors.newPassword && (
+                <small className="text-danger">{errors.newPassword}</small>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="mb-4">
+              <label className="form-label fw-semibold">Confirm Password</label>
+              <div className="input-group">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  className={`form-control form-control-lg bg-light ${errors.confirmPassword ? "is-invalid" : ""}`}
+                  placeholder="**********"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                <span
+                  className="input-group-text bg-light border-start-0 text-secondary"
+                  style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <i className={showConfirmPassword ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
+                </span>
+              </div>
+              {errors.confirmPassword && (
+                <small className="text-danger">{errors.confirmPassword}</small>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="d-flex gap-3 justify-content-center mt-4">
+              <button type="submit" className="btn btn-warning px-4">
+                Change 
+              </button>
+              <button type="button" className="btn btn-danger px-4" onClick={handleCancel}>
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
-      )}
-      <div className="card shadow border-0 p-4 p-md-5" style={{ width: '100%', maxWidth: '600px', borderRadius: '20px' }}>
-        <h2 className="text-center mb-4 fw-bold text-dark">Change Password</h2>
-
-        <form onSubmit={handleSubmit}>
-
-          {/* Current Password */}
-          <div className="mb-3">
-            <label className="form-label fw-semibold">Current Password</label>
-            <div className="input-group">
-              <input
-                type={showCurrent ? "text" : "password"}
-                className={`form-control form-control-lg bg-light ${errors.currentPassword ? "is-invalid" : ""
-                  }`}
-                placeholder="**********"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-              />
-              <span
-                className="input-group-text bg-light border-start-0 text-secondary"
-                style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
-                onClick={() => setShowCurrent(!showCurrent)}
-              >
-                <i className={showCurrent ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
-
-              </span>
-
-            </div>
-            {errors.currentPassword && (
-              <small className="text-danger">{errors.currentPassword}</small>
-            )}
-          </div>
-
-          {/* New Password */}
-          <div className="mb-3">
-            <label className="form-label fw-semibold">New Password</label>
-            <div className="input-group">
-              <input
-                type={showNew ? "text" : "password"}
-                className={`form-control form-control-lg bg-light ${errors.newPassword ? "is-invalid" : ""
-                  }`}
-                placeholder="**********"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              <span
-                className="input-group-text bg-light border-start-0 text-secondary"
-                style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
-                onClick={() => setShowNew(!showNew)}
-              >
-                <i className={showNew ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
-              </span>
-
-            </div>
-
-            {errors.newPassword && (
-              <small className="text-danger">{errors.newPassword}</small>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div className="mb-4">
-            <label className="form-label fw-semibold">Confirm Password</label>
-            <div className="input-group">
-              <input
-               type={showConfirmPassword ? "text" : "password"}
-                className={`form-control form-control-lg bg-light ${errors.confirmPassword ? "is-invalid" : ""
-                  }`}
-                placeholder="**********"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <span
-                className="input-group-text bg-light border-start-0 text-secondary"
-                style={{ cursor: 'pointer', width: '45px', justifyContent: 'center' }}
-onClick={() => setShowConfirmPassword(!showConfirmPassword)}
->
-  <i className={showConfirmPassword ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"}></i>
-  </span>
-            </div>
-            {errors.confirmPassword && (
-              <small className="text-danger">{errors.confirmPassword}</small>
-            )}
-          </div>
-
-          {/* Buttons */}
-     <div className="d-flex gap-3 justify-content-center mt-4">
-
-  <button
-    type="submit"
-    className="btn btn-warning px-4"
-  >
-    Change 
-  </button>
-
-  <button
-    type="button"
-    className="btn btn-danger px-4"
-    onClick={handleCancel}
-  >
-    Cancel
-  </button>
-
-</div>
-        </form>
       </div>
-    </div>
     </>
   );
 };
