@@ -155,7 +155,7 @@ INSERT INTO risk_assessment
 (user_id,risk_level)
 VALUES(?,?)
 `,
-        [userId, "low"],
+        [userId, "LOW"],
 
         (err) => {
           if (err) {
