@@ -115,12 +115,12 @@ const PasswordChange = () => {
     setShowCurrent(false);
     setShowNew(false);
     setShowConfirmPassword(false);  
-    navigate("/Admin/Adminprofile");
+    setErrors({});
   };
 
   return (
     <>
-    <Link to="/Admin/Profile/Update" className="text-decoration-none text-dark">
+    <Link to="/Admin/Profile" className="text-decoration-none text-dark">
             <button className="btn btn-warning mb-3" type="button">
               <FontAwesomeIcon icon={faCircleLeft} />
             </button>

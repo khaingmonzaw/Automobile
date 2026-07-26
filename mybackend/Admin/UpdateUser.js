@@ -232,7 +232,7 @@ console.log("BODY:", req.body);
 
                                 res.json({
                                   message:
-                                  "User, Vehicle, Policy and Coverage updated successfully"
+                                  "User information is updated successfully"
                                 });
 
                               }

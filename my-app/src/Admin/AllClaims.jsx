@@ -121,7 +121,7 @@ const AllClaims = () => {
                 <th className="py-3" style={{ backgroundColor: "inherit" }}>Claimed Amount</th>
                 <th className="py-3" style={{ backgroundColor: "inherit" }}>Accident Date</th>
                 <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Status</th>
-                                                <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Approved By</th>
+                <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Approved By</th>
 
                 <th className="py-3 text-center" style={{ backgroundColor: "inherit" }}>Risk Level</th>
 
@@ -147,11 +147,11 @@ const AllClaims = () => {
                         </span>
                       </td>
 
-                                            <td className="py-3 px-3 ">{claim.name}</td>
+                     <td className="py-3 text-center small text-secondary fw-bold">{claim.name || '-'}</td>
 
                       <td className="py-3 text-center">
                         <span
-                          className={`fw-bold small ${claim.risk_level === "low"
+                          className={`fw-bold small ${claim.risk_level === "LOW" || "low"
                               ? "text-success"
                               : claim.risk_level === "MEDIUM"
                                 ? "text-warning"
@@ -160,7 +160,7 @@ const AllClaims = () => {
                                   : ""
                             }`}
                         >
-                          {claim.risk_level}
+                          {claim.risk_level?.toUpperCase()}
                         </span>
                       </td>
                       <td className="py-3 text-center">

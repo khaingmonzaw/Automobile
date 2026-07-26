@@ -14,7 +14,7 @@ const [alertMessage, setAlertMessage] = useState("");
 const [alertType, setAlertType] = useState("warning");
   const [errors, setErrors] = useState({});
   const [coverageOptions, setCoverageOptions] = useState([]); 
-  
+  const [originalData, setOriginalData] = useState(null);
   const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
 
 
@@ -180,6 +180,7 @@ const [alertType, setAlertType] = useState("warning");
       fetch(`http://localhost:3000/api/users/${id}`)
         .then((res) => res.json())
         .then((data) => {
+          setOriginalData(data); //Cancel
           const formatDate = (dateStr) => {
           if (!dateStr) return "";
         
@@ -426,15 +427,114 @@ const [alertType, setAlertType] = useState("warning");
       console.error("Policy check error:", error);
     }
   };
+  //Cancel
+const handleCancelReset = () => {
+  if (isEditMode && originalData) {
+    // 1. Reset to Original Data (Edit Mode)
+    let nrcS = "", nrcT = "", nrcTy = "N", nrcN = "";
+    if (originalData.nrc) {
+      const match = originalData.nrc.match(/([^\/]*)\/([a-zA-Z-]+)\(([a-zA-Z])\)(\d+)/);
+      if (match) { [nrcS, nrcT, nrcTy, nrcN] = [match[1], match[2], match[3], match[4]]; }
+    }
+
+    const coverageIds = originalData.coverageTypeIds 
+      ? originalData.coverageTypeIds.split(',').map(id => Number(id.trim())) 
+      : [];
+    const limitStrings = originalData.coverageLimit ? originalData.coverageLimit.toString().split(',') : [];
+    const totalLimit = limitStrings.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    const duration = parseInt(originalData.policyDuration) || 12;
+    const premiums = calculatePremiums(totalLimit, duration);
+
+    setFormData({
+      fullName: originalData.name || "",
+      email: originalData.email || "",
+      phone: originalData.phone || "",
+      dob: originalData.dob ? originalData.dob.split('T')[0] : "",
+      nrcState: nrcS,
+      nrcTownship: nrcT,
+      nrcType: nrcTy,
+      nrcNumber: nrcN,
+      address: originalData.address || "",
+      driverLicense: originalData.driver_license || "",
+      drivingYear: originalData.driver_year || "",
+      vehicleModel: originalData.vehicleModel || "",
+      vehicleNumber: originalData.vehicleNumber || "",
+      modelYear: originalData.model_year || "",
+      policyNumber: originalData.policyNumber || "",
+      coverage: coverageIds,
+      startDate: originalData.startDate || "",
+      endDate: originalData.endDate || "",
+      coverageLimit: originalData.coverageLimit || "",
+      policyDuration: duration.toString(),           
+      monthlyPremium: premiums.monthlyPremium, 
+      totalPremium: premiums.totalPremium,     
+    });
+  } else {
+    // 2. Reset to Blank (Add Mode)
+    setFormData({
+      fullName: "", email: "", phone: "", dob: "", nrcState: "",
+      nrcTownship: "", nrcType: "N", nrcNumber: "", address: "",
+      driverLicense: "", drivingYear: "", vehicleModel: "",
+      vehicleNumber: "", modelYear: "", policyNumber: "",
+      coverage: [], startDate: "", endDate: "", coverageLimit: "",
+      monthlyPremium: "", totalPremium: "", policyDuration: ""
+    });
+  }
+
+  // Clear validation error messages
+  setErrors({});
+};
   const handleSave = async () => {
     const cleanCoverageLimit = formData.coverageLimit.toString().replace(/,/g, '');
     if (validate()) {
       if (formData.coverage.length === 0) {
-showCustomAlert(
-  "Please select at least one coverage type.",
-  "warning"
-);        return;
+        showCustomAlert(
+          "Please select at least one coverage type.",
+          "warning"
+        );        return;
       }
+
+      // Check if form data is unchanged in Edit Mode
+      if (isEditMode && originalData) {
+        // Re-construct NRC string
+        const currentNrc = formData.nrcState && formData.nrcTownship && formData.nrcNumber
+          ? `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`
+          : "";
+
+        // Format dates
+        const origDob = originalData.dob ? originalData.dob.split('T')[0] : "";
+        const origStart = originalData.startDate ? originalData.startDate.split('T')[0] : "";
+        const origEnd = originalData.endDate ? originalData.endDate.split('T')[0] : "";
+
+        // Format Coverage IDs for comparison
+        const origCoverage = originalData.coverageTypeIds 
+          ? originalData.coverageTypeIds.split(',').map(id => Number(id.trim())).sort().join(',')
+          : "";
+        const currentCoverage = [...formData.coverage].sort().join(',');
+
+        const isUnchanged =
+          formData.fullName === (originalData.name || "") &&
+          formData.email === (originalData.email || "") &&
+          formData.phone === (originalData.phone || "") &&
+          formData.dob === origDob &&
+          currentNrc === (originalData.nrc || "") &&
+          formData.address === (originalData.address || "") &&
+          formData.driverLicense === (originalData.driver_license || "") &&
+          String(formData.drivingYear) === String(originalData.driver_year || "") &&
+          formData.vehicleModel === (originalData.vehicleModel || "") &&
+          formData.vehicleNumber === (originalData.vehicleNumber || "") &&
+          String(formData.modelYear) === String(originalData.model_year || "") &&
+          currentCoverage === origCoverage &&
+          String(formData.policyDuration) === String(originalData.policyDuration || "12") &&
+          formData.startDate === origStart &&
+          formData.endDate === origEnd;
+
+        if (isUnchanged) {
+          showCustomAlert("No data changed.", "warning");
+          return; // Stop form submission
+        }
+      }
+
      const limit = calculateTotalLimit(formData.coverageLimit);
       const duration = parseInt(formData.policyDuration) || 12;
      const premiums = calculatePremiums(limit, duration);
@@ -736,7 +836,7 @@ setTimeout(() => {
          
         <div className="d-flex justify-content-center gap-3 mt-4">
           <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Save</button>
-          <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none' , width: '100px'}} onClick={() => navigate(-1)}>Cancel</button>
+         <button className="btn fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none' , width: '100px'}} onClick={handleCancelReset}>Cancel</button>
         </div>
       </div>
     </>

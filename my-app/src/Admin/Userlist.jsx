@@ -155,8 +155,17 @@ function Userlist() {
     textAlign: "center"
   }}
 >
-  {String(item.Policy_Status).trim()}
+  {String(item.Policy_Status).trim() === 'active' ? (
+                        <span>
+                          Active
+                        </span>
+                      ) : (
+                        <span>
+                          Inactive
+                        </span>
+                      )}
 </span>
+
                   </td>
 
                   <td style={{ textAlign: 'left' }}>

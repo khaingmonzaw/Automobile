@@ -13,6 +13,8 @@ const { id } = useParams();
     const [alertType, setAlertType] = useState("warning");
     const [errors, setErrors] = useState({});
     const [coverageOptions, setCoverageOptions] = useState([]);
+      // Cache state to store database values for the Cancel button reset
+    const [originalData, setOriginalData] = useState(null);
 
     const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
 
@@ -31,7 +33,7 @@ const { id } = useParams();
             const data = await response.json();
 
             console.log(data); // check data
-
+            setOriginalData(data);
             if(response.ok){
 
                 let nrcState = "";
@@ -78,6 +80,7 @@ const { id } = useParams();
                     address: data.address || ""
 
                 });
+                
 
             }
 
@@ -223,7 +226,30 @@ const { id } = useParams();
 
  const handleSave = async () => {
     if (!validate()) return;
+    // Check if form data is unchanged compared to originalData
+    if (originalData) {
+      // Re-construct the NRC string to compare with originalData.nrc
+      const currentNrc = formData.nrcState && formData.nrcTownship && formData.nrcNumber
+        ? `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`
+        : "";
 
+      // Format original DOB to YYYY-MM-DD
+      const originalDobFormatted = originalData.dob ? originalData.dob.split("T")[0] : "";
+
+      // Compare all fields individually
+      const isUnchanged =
+        formData.fullName === (originalData.name || "") &&
+        formData.email === (originalData.email || "") &&
+        formData.phone === (originalData.phone || "") &&
+        formData.dob === originalDobFormatted &&
+        currentNrc === (originalData.nrc || "") &&
+        formData.address === (originalData.address || "");
+
+      if (isUnchanged) {
+        showCustomAlert("No data changed.", "warning");
+        return; // Stop execution before sending the API call
+      }
+    }
     try {
 
         const response = await fetch(
@@ -254,10 +280,15 @@ const { id } = useParams();
 
         }else{
 
-            showCustomAlert(
-                data.message,
-                "danger"
-            );
+            if(data.message === "Email already exists"){
+
+        setErrors((prev)=>({
+            ...prev,
+            email: "Email is already exists"
+        }));
+
+    }
+
 
         }
 
@@ -272,6 +303,62 @@ const { id } = useParams();
         );
     }
 };
+//Cancel
+const handleCancelReset = () => {
+    if (originalData) {
+      let nrcState = "";
+      let nrcTownship = "";
+      let nrcType = "N";
+      let nrcNumber = "";
+
+
+                // Split NRC
+                if(originalData.nrc){
+
+                    const match = originalData.nrc.match(
+                        /^(\d+)\/([A-Z]+)\((.*?)\)(\d+)$/
+                    );
+
+
+                    if(match){
+
+                        nrcState = match[1];
+                        nrcTownship = match[2];
+                        nrcType = match[3];
+                        nrcNumber = match[4];
+
+                    }
+                }
+
+
+                setFormData({
+
+                    fullName: originalData.name || "",
+                    email: originalData.email || "",
+                    phone: originalData.phone || "",
+                    dob: originalData.dob 
+                        ? originalData.dob.split("T")[0] 
+                        : "",
+
+
+                    nrcState: nrcState,
+                    nrcTownship: nrcTownship,
+                    nrcType: nrcType,
+                    nrcNumber: nrcNumber,
+
+
+                    address: originalData.address || ""
+
+                });
+    }
+    // Clear any active red validation labels and duplicate flags
+    setErrors({});
+  };
+
+
+
+
+
     const renderRow = (label, input, error) => (
         <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
             <label className="col-sm-4 col-form-label fw-bold text-dark" style={{ textAlign: 'left' }}>{label}</label>
@@ -375,14 +462,8 @@ const { id } = useParams();
                             errors.fullName)}
                         {renderRow( <>
     Email 
-  </>, <input
-  name="email"
-  type="email"
-  value={formData.email ?? ""}
- 
-  className="form-control bg-light"
- 
-/>,
+  </>, <input name="email" value={formData.email ?? ""} onChange={handleInputChange} className={`form-control ${errors.email ? "is-invalid" : ""
+                            }`} style={inputStyle} />,
                             errors.email)}
                         {renderRow( <>
     Phone <span className="text-danger">*</span>
@@ -430,7 +511,7 @@ const { id } = useParams();
 
                 <div className="d-flex justify-content-center gap-3 mt-4">
                     <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Update</button>
-                    <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button>
+                    {<button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={handleCancelReset}>Cancel</button>}
                 </div>
             </div>
         </>

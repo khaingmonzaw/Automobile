@@ -155,7 +155,7 @@ INSERT INTO risk_assessment
 (user_id,risk_level)
 VALUES(?,?)
 `,
-        [userId, "low"],
+        [userId, "LOW"],
 
         (err) => {
           if (err) {
@@ -338,7 +338,7 @@ WHERE policy_number=?
 
             if (count === coverage.length) {
               res.json({
-                message: "User and all data saved successfully",
+                message: "User is added successfully",
               });
             }
           },

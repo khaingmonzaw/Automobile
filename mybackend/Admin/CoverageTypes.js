@@ -16,7 +16,7 @@ const db = mysql.createConnection({
 // --- ADD THIS GET ROUTE HANDLER ---
 router.get("/api/coverages", (req, res) => {
   const query =
-    "SELECT coverage_type_id, coverage_type, description, coverage_limit, status FROM coverage_types";
+    "SELECT coverage_type_id, coverage_type, description, coverage_limit, status FROM coverage_types ORDER BY coverage_type_id DESC";
 
   db.query(query, (err, results) => {
     if (err) {
