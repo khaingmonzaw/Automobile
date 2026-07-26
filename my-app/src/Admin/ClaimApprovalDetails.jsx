@@ -54,7 +54,7 @@ const ClaimApprovalDetails = () => {
       });
 
       if (response.ok) {
-        setMessage("Claims table successfully updated!");
+        setMessage("This claim is successfully updated!");
         setShowSuccess(true);
         
         setTimeout(() => {

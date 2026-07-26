@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 const PasswordChange = () => {
   // Form input states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -105,18 +107,23 @@ const PasswordChange = () => {
     }
   };
 
-  const handleCancel = () => {
+const handleCancel = () => {
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
     setShowCurrent(false);
     setShowNew(false);
     setShowConfirmPassword(false);  
-    navigate("/Admin/Adminprofile");
+    setErrors({});
   };
 
   return (
     <>
+        <Link to="/User/Profile" className="text-decoration-none text-dark">
+            <button className="btn btn-warning mb-3" type="button">
+              <FontAwesomeIcon icon={faCircleLeft} />
+            </button>
+          </Link>  
       {showSuccess && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           {message}

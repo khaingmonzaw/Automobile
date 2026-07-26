@@ -160,7 +160,7 @@ function Userlist() {
                           Active
                         </span>
                       ) : (
-                        <span className="badge rounded-pill fw-bold text-warning-emphasis bg-warning-subtle px-3 py-2" style={{ fontSize: "13px" }}>
+                        <span>
                           Inactive
                         </span>
                       )}

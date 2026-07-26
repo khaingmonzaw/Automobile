@@ -15,7 +15,8 @@ const id = user?.id;
     const [alertType, setAlertType] = useState("warning");
     const [errors, setErrors] = useState({});
     const [coverageOptions, setCoverageOptions] = useState([]);
-
+      // Cache state to store database values for the Cancel button reset
+    const [originalData, setOriginalData] = useState(null);
     const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
 
 
@@ -33,7 +34,7 @@ const id = user?.id;
             const data = await response.json();
 
             console.log(data); // check data
-
+            setOriginalData(data);
             if(response.ok){
 
                 let nrcState = "";
@@ -217,7 +218,57 @@ const id = user?.id;
         ? mmNrc.getNrcTownshipsByStateId(selectedState.id)
         : [];
 
+//Cancel
+const handleCancelReset = () => {
+    if (originalData) {
+      let nrcState = "";
+      let nrcTownship = "";
+      let nrcType = "N";
+      let nrcNumber = "";
 
+
+                // Split NRC
+                if(originalData.nrc){
+
+                    const match = originalData.nrc.match(
+                        /^(\d+)\/([A-Z]+)\((.*?)\)(\d+)$/
+                    );
+
+
+                    if(match){
+
+                        nrcState = match[1];
+                        nrcTownship = match[2];
+                        nrcType = match[3];
+                        nrcNumber = match[4];
+
+                    }
+                }
+
+
+                setFormData({
+
+                    fullName: originalData.name || "",
+                    email: originalData.email || "",
+                    phone: originalData.phone || "",
+                    dob: originalData.dob 
+                        ? originalData.dob.split("T")[0] 
+                        : "",
+
+
+                    nrcState: nrcState,
+                    nrcTownship: nrcTownship,
+                    nrcType: nrcType,
+                    nrcNumber: nrcNumber,
+
+
+                    address: originalData.address || ""
+
+                });
+    }
+    // Clear any active red validation labels and duplicate flags
+    setErrors({});
+  };
 
 
 
@@ -225,7 +276,29 @@ const id = user?.id;
 
  const handleSave = async () => {
     if (!validate()) return;
+     if (originalData) {
+      // Re-construct the NRC string from formData to compare with originalData.nrc
+      const currentNrc = formData.nrcState && formData.nrcTownship && formData.nrcNumber
+        ? `${formData.nrcState}/${formData.nrcTownship}(${formData.nrcType})${formData.nrcNumber}`
+        : "";
 
+      // Format original DOB to YYYY-MM-DD format
+      const originalDobFormatted = originalData.dob ? originalData.dob.split("T")[0] : "";
+
+      // Compare each property individually
+      const isUnchanged =
+        formData.fullName === (originalData.name || "") &&
+        formData.email === (originalData.email || "") &&
+        formData.phone === (originalData.phone || "") &&
+        formData.dob === originalDobFormatted &&
+        currentNrc === (originalData.nrc || "") &&
+        formData.address === (originalData.address || "");
+
+      if (isUnchanged) {
+        showCustomAlert("No data changed.", "warning");
+        return; // Stop form validation and API requests
+      }
+    }
     try {
 
         const response = await fetch(
@@ -246,12 +319,12 @@ const id = user?.id;
         if(response.ok){
 
             showCustomAlert(
-                "Staff updated successfully.",
+                "Profile updated successfully.",
                 "success"
             );
 
             setTimeout(()=>{
-                navigate("/Admin/Staff");
+                navigate("/Admin/Profile");
             },1000);
 
         }else{
@@ -436,7 +509,7 @@ const id = user?.id;
 
                 <div className="d-flex justify-content-center gap-3 mt-4">
                     <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Update</button>
-                    {/* <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button> */}
+                    { <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={handleCancelReset}>Cancel</button>}
                 </div>
             </div>
         </>

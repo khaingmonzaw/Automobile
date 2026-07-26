@@ -338,7 +338,7 @@ WHERE policy_number=?
 
             if (count === coverage.length) {
               res.json({
-                message: "User and all data saved successfully",
+                message: "User is added successfully",
               });
             }
           },

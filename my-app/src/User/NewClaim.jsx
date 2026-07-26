@@ -439,7 +439,7 @@ if (checkData.hasPending) {
                             {submit ? "Submitting" : "Submit"}
                         </button>
                         <button className="btn btn-danger" type="button" onClick={handleReset}>
-                            Reset
+                            Cancel
                         </button>
                     </div>
 
