@@ -240,22 +240,26 @@ const { id } = useParams();
 
         const data = await response.json();
 
-if (response.ok) {
-    showCustomAlert("Staff updated successfully.", "success");
 
-    setTimeout(() => {
-        navigate("/Admin/Staff");
-    }, 1000);
-} else {
-    if (data.message === "Email already exists") {
-        setErrors((prev) => ({
-            ...prev,
-            email: "Email already exists",
-        }));
-    }
+        if(response.ok){
 
-    showCustomAlert(data.message, "danger");
-}
+            showCustomAlert(
+                "Staff updated successfully.",
+                "success"
+            );
+
+            setTimeout(()=>{
+                navigate("/Admin/Staff");
+            },1000);
+
+        }else{
+
+            showCustomAlert(
+                data.message,
+                "danger"
+            );
+
+        }
 
 
     }catch(error){
@@ -371,8 +375,14 @@ if (response.ok) {
                             errors.fullName)}
                         {renderRow( <>
     Email 
-  </>, <input name="email" value={formData.email ?? ""} onChange={handleInputChange} className={`form-control ${errors.email ? "is-invalid" : ""
-                            }`} style={inputStyle} />,
+  </>, <input
+  name="email"
+  type="email"
+  value={formData.email ?? ""}
+ 
+  className="form-control bg-light"
+ 
+/>,
                             errors.email)}
                         {renderRow( <>
     Phone <span className="text-danger">*</span>
@@ -420,7 +430,7 @@ if (response.ok) {
 
                 <div className="d-flex justify-content-center gap-3 mt-4">
                     <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Update</button>
-                    {/* <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button> */}
+                    <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button>
                 </div>
             </div>
         </>
