@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
+// import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
 const PasswordChange = () => {
   // Form input states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -117,6 +120,11 @@ const PasswordChange = () => {
 
   return (
     <>
+    <Link to="/Admin/Profile/Update" className="text-decoration-none text-dark">
+            <button className="btn btn-warning mb-3" type="button">
+              <FontAwesomeIcon icon={faCircleLeft} />
+            </button>
+          </Link>  
       {showSuccess && (
         <div className="alert alert-success alert-dismissible fade show" role="alert">
           {message}
@@ -162,7 +170,10 @@ const PasswordChange = () => {
           </div>
         )}
 
+
+ 
         <div className="card shadow border-0 p-4 p-md-5" style={{ width: '100%', maxWidth: '600px', borderRadius: '20px' }}>
+          
           <h2 className="text-center mb-4 fw-bold text-dark">Change Password</h2>
 
           <form onSubmit={handleSubmit}>

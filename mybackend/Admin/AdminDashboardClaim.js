@@ -8,6 +8,7 @@ exports.adminClaims = (db) => {
       c.accident_date AS accident_date,
       c.status,
       c.claimed_amount AS claimed_amount,
+      staff.name,
       rk.risk_level
 
     FROM claims c
@@ -17,6 +18,8 @@ exports.adminClaims = (db) => {
 
     LEFT JOIN risk_assessment rk 
       ON rk.user_id = u.id
+      LEFT JOIN users staff
+    ON staff.id = c.approved_staff
 
     ORDER BY c.claim_id DESC
   `;

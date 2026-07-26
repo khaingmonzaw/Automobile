@@ -1,408 +1,446 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleLeft } from "@fortawesome/free-solid-svg-icons";
+import * as mmNrc from "mm-nrc";
 
-// Warning မတက်စေရန် ErrorIcon ကို Component အပြင်ဘက် (Global Scope) သို့ ရွှေ့ထုတ်ထားပါသည်
-const ErrorIcon = () => (
-  <div 
-    className="position-absolute end-0 top-50 translate-middle-y me-3 d-flex align-items-center justify-content-center border border-danger rounded-circle text-danger fw-bold" 
-    style={{ width: "18px", height: "18px", fontSize: "11px", pointerEvents: "none", lineHeight: "1" }}
-  >
-    !
-  </div>
-);
+function UpdateStaff() {
+    const navigate = useNavigate();
+   const user = JSON.parse(localStorage.getItem("user") || "{}");
+const id = user?.id;
 
-const Adminprofileupdate = () => {
-  const navigate = useNavigate();
-  
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userId = user?.id;
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertType, setAlertType] = useState("warning");
+    const [errors, setErrors] = useState({});
+    const [coverageOptions, setCoverageOptions] = useState([]);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('Admin');
-  const [nrc, setNrc] = useState('');
-  const [dob, setDob] = useState('');
-  const [address, setAddress] = useState('');
+    const inputStyle = { borderColor: '#A0CFFF', outline: 'none', boxShadow: 'none' };
 
-  const [originalData, setOriginalData] = useState(null);
 
-  const [showAlertModal, setShowAlertModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-  const today = new Date().toISOString().split('T')[0];
 
-  const [errors, setErrors] = useState({
-    name: false,
-    email: false,
-    phone: false,
-    nrc: false,
-    dob: false,
-    address: false
-  });
+ useEffect(() => {
 
-  const triggerModalAlert = (msg, autoNavigate = false) => {
-    setModalMessage(msg);
-    setShouldRedirect(autoNavigate);
-    setShowAlertModal(true);
-  };
+    const fetchStaff = async () => {
 
-  const closeAlertModal = () => {
-    setShowAlertModal(false);
-    if (shouldRedirect) {
-      navigate('/Admin/Profile');
-    }
-  };
+        try {
 
-  useEffect(() => {
-    const fetchAdminProfile = async () => {
-      if (!userId) {
-        triggerModalAlert("Data Not Found. Please Login First!!!", true);
-        return;
-      }
+            const response = await fetch(
+                `http://localhost:3000/api/staff_details/${id}`
+            );
 
-      try {
-        const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          const profileData = Array.isArray(data) ? data[0] : data;
-          
-          setName(profileData?.name || profileData?.fullName || '');
-          setEmail(profileData?.email || '');
-          setPhone(profileData?.phone || '');
-          setRole(profileData?.role || 'Admin');
-          setNrc(profileData?.nrc || '');
-          setDob(profileData?.dob ? profileData.dob.split('T')[0] : '');
-          setAddress(profileData?.address || '');
+            const data = await response.json();
 
-          setOriginalData(profileData);
-        } else {
-          const errText = await response.text();
-          triggerModalAlert(`Backend returned error: ${errText}`);
+            console.log(data); // check data
+
+            if(response.ok){
+
+                let nrcState = "";
+                let nrcTownship = "";
+                let nrcType = "N";
+                let nrcNumber = "";
+
+
+                // Split NRC
+                if(data.nrc){
+
+                    const match = data.nrc.match(
+                        /^(\d+)\/([A-Z]+)\((.*?)\)(\d+)$/
+                    );
+
+
+                    if(match){
+
+                        nrcState = match[1];
+                        nrcTownship = match[2];
+                        nrcType = match[3];
+                        nrcNumber = match[4];
+
+                    }
+                }
+
+
+                setFormData({
+
+                    fullName: data.name || "",
+                    email: data.email || "",
+                    phone: data.phone || "",
+                    dob: data.dob 
+                        ? data.dob.split("T")[0] 
+                        : "",
+
+
+                    nrcState: nrcState,
+                    nrcTownship: nrcTownship,
+                    nrcType: nrcType,
+                    nrcNumber: nrcNumber,
+
+
+                    address: data.address || ""
+
+                });
+
+            }
+
+
+        } catch(error){
+
+            console.log(error);
+
         }
-      } catch (error) {
-        triggerModalAlert(`Network connection to backend failed: ${error.message}`);
-      }
+
     };
 
-    fetchAdminProfile();
-  }, [userId]);
 
-  const handleCancelReset = () => {
-    if (originalData) {
-      setName(originalData.name || originalData.fullName || '');
-      setEmail(originalData.email || '');
-      setPhone(originalData.phone || '');
-      setRole(originalData.role || 'Admin');
-      setNrc(originalData.nrc || '');
-      setDob(originalData.dob ? originalData.dob.split('T')[0] : '');
-      setAddress(originalData.address || '');
-      navigate('/Admin/Staff');
-    }
-    setErrors({
-      name: false,
-      email: false,
-      phone: false,
-      nrc: false,
-      dob: false,
-      address: false
+    fetchStaff();
+
+},[id]);
+
+
+
+
+
+    //alert box
+
+
+    const showCustomAlert = (message, type = "warning") => {
+        setAlertMessage(message);
+        setAlertType(type);
+        setShowAlert(true);
+    };
+    //validation
+    const validate = () => {
+        let newErrors = {};
+
+        const nameRegex = /^[a-zA-Z\s\u1000-\u109F]+$/;
+        const emailRegex = /^[^0-9][a-zA-Z0-9._%+-]+@[a-zA-Z]{4,}\.[a-zA-Z]{3,}$/;
+        const phoneRegex = /^09\d{9}$/;
+
+        // Full Name
+        if (!formData.fullName.trim()) {
+            newErrors.fullName = "*Full Name is required";
+        } else if (!nameRegex.test(formData.fullName)) {
+            newErrors.fullName =
+                "*Full Name must not contain digits or special characters";
+        }
+
+        // Email
+        if (!formData.email.trim()) {
+            newErrors.email = "*Email is required";
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email = "*Please enter a valid email";
+        }
+
+        // Phone
+        if (!formData.phone.trim()) {
+            newErrors.phone = "*Phone number is required";
+        } else if (!phoneRegex.test(formData.phone)) {
+            newErrors.phone =
+                "*Phone number must start with 09 and contain 11 digits";
+        }
+
+        // DOB
+        if (!formData.dob) {
+            newErrors.dob = "*Date of Birth is required";
+        } else {
+            const birthDate = new Date(formData.dob);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (
+                monthDiff < 0 ||
+                (monthDiff === 0 && today.getDate() < birthDate.getDate())
+            ) {
+                age--;
+            }
+
+            if (age < 18) {
+                newErrors.dob = "*You must be at least 18 years old";
+            } else if (age > 99) {
+                newErrors.dob = "*Age must be under 100 years";
+            }
+        }
+
+        // NRC
+        if (!formData.nrcState)
+            newErrors.nrcState = "*State is required";
+
+        if (!formData.nrcTownship)
+            newErrors.nrcTownship = "*Township is required";
+
+        if (!formData.nrcNumber.trim())
+            newErrors.nrcNumber = "*NRC Number is required";
+
+        // Address
+        if (!formData.address.trim()) {
+            newErrors.address = "*Address is required";
+        }
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
+    const [formData, setFormData] = useState({
+        fullName: "", email: "", phone: "", dob: "", nrcState: "",
+        nrcTownship: "", nrcType: "N", nrcNumber: "", address: ""
+
+
     });
-  };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
 
-    if (originalData) {
-      const isUnchanged = 
-        name.trim() === (originalData.name || originalData.fullName || '').trim() &&
-        email.trim() === (originalData.email || '').trim() &&
-        phone.trim() === (originalData.phone || '').trim() &&
-        nrc.trim() === (originalData.nrc || '').trim() &&
-        dob.trim() === (originalData.dob ? originalData.dob.split('T')[0] : '').trim() &&
-        address.trim() === (originalData.address || '').trim();
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
 
-      if (isUnchanged) {
-        triggerModalAlert('No data changed.');
-        return;
-      }
-    }
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
 
-    const newErrors = {
-      name: !name.toString().trim(),
-      email: !email.toString().trim(),
-      phone: !phone.toString().trim(),
-      nrc: !nrc.toString().trim(),
-      dob: !dob.toString().trim(),
-      address: !address.toString().trim()
+        setErrors((prev) => ({
+            ...prev,
+            [name]: "",
+        }));
     };
 
-    setErrors(newErrors);
+    const states = mmNrc.getNrcStates();
+    const types = mmNrc.getNrcTypes();
+    const allTownships = mmNrc.getNrcTownships();
+    const selectedState = states.find(
+        state => state.number.en === formData.nrcState
+    );
 
-    if (newErrors.name || newErrors.email || newErrors.phone || newErrors.nrc || newErrors.dob || newErrors.address) {
-      return;
-    }
+    const townships = selectedState
+        ? mmNrc.getNrcTownshipsByStateId(selectedState.id)
+        : [];
 
-    const updatedForm = { 
-      name: name.trim(),  
-      email: email.trim(), 
-      phone: phone.trim(), 
-      role,
-      nrc: nrc.trim(),
-      dob,
-      address: address.trim()
-    };
+
+
+
+
+
+
+ const handleSave = async () => {
+    if (!validate()) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedForm),
-      });
 
-      if (response.ok) {
-         triggerModalAlert('Profile updated successfully!', true);
-      } else {
-          const errorData = await response.json().catch(() => ({}));
-          triggerModalAlert(`Failed to update: ${errorData.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-       triggerModalAlert('Could not connect to the backend server.');
+        const response = await fetch(
+            `http://localhost:3000/api/update_staff/${id}`,
+            {
+                method: "PUT",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(formData)
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if(response.ok){
+
+            showCustomAlert(
+                "Staff updated successfully.",
+                "success"
+            );
+
+            setTimeout(()=>{
+                navigate("/Admin/Staff");
+            },1000);
+
+        }else{
+
+            showCustomAlert(
+                data.message,
+                "danger"
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.log(error);
+
+        showCustomAlert(
+            "Server Error",
+            "danger"
+        );
     }
-  };
-
-  return (
-    <div className="container-fluid py-3 text-start bg-light min-vh-100">
-      {showAlertModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,.5)", zIndex: 1055 }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title fw-bold">System Notification</h5>
-                <button type="button" className="btn-close" onClick={closeAlertModal}></button>
-              </div>
-              <div className="modal-body text-center py-4">
-                <p className="mb-0 fw-medium text-dark">{modalMessage}</p>
-              </div>
-              <div className="modal-footer justify-content-center">
-                <button className="btn btn-warning fw-bold text-dark px-4" onClick={closeAlertModal}>
-                  OK
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-2 text-start">
-        <Link to="/Admin/Staff" className="text-decoration-none text-dark">
-          <button className='btn btn-warning'>
-              <FontAwesomeIcon icon={faCircleLeft} />
-          </button>
-        </Link>
-      </div>
-
-      <div className="row my-3">
-        <div className="card col-md-9 mx-auto bg-white p-4 border rounded-3 shadow-sm" style={{ maxWidth: "750px" }}>
-          <h2 className="mb-2 fw-bold fs-4 text-dark text-center">Update Admin Profile</h2>
-          <hr className="mb-4 text-secondary opacity-25" />
-          
-          <form onSubmit={handleSave} noValidate>
-            
-            <div className="row my-3">
-              <div className="col-sm-4 d-flex align-items-center">
-                <label htmlFor="admin-name" className="form-label text-secondary fw-semibold mb-0">
-                  Full Name <span className="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="position-relative">
-                  <input 
-                    id="admin-name"
-                    type="text" 
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.name ? 'border-danger' : 'border-secondary-subtle'}`}
-                    placeholder="Enter Full Name...." 
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (e.target.value.trim()) setErrors(prev => ({...prev, name: false}));
-                    }}
-                    style={{ borderRadius: "8px", fontSize: "14px", paddingRight: "40px" }}
-                  />
-                  {errors.name && <ErrorIcon />}
-                </div>
-                {errors.name && (
-                  <div className="text-danger small mt-1 text-start fw-medium">Full Name is required.</div>
-                )}
-              </div>
-            </div>
-
-            <div className="row my-3">
-              <div className="col-sm-4 d-flex align-items-center">
-                <label htmlFor="admin-email" className="form-label text-secondary fw-semibold mb-0">
-                  Email <span className="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="position-relative">
-                  <input 
-                    id="admin-email"
-                    type="email"
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.email ? 'border-danger' : 'border-secondary-subtle'}`}
-                    placeholder="name@example.com" 
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, email: false}));
-                    }}
-                    style={{ borderRadius: "8px", fontSize: "14px", paddingRight: "40px" }}
-                  />
-                  {errors.email && <ErrorIcon />}
-                </div>
-                {errors.email && (
-                  <div className="text-danger small mt-1 text-start fw-medium">Email is required.</div>
-                )}
-              </div>
-            </div>
-
-            <div className="row my-3">
-              <div className="col-sm-4 d-flex align-items-center">
-                <label htmlFor="admin-phone" className="form-label text-secondary fw-semibold mb-0">
-                  Phone Number <span className="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="position-relative">
-                  <input 
-                    id="admin-phone"
-                    type="text"
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.phone ? 'border-danger' : 'border-secondary-subtle'}`}
-                    placeholder="09XXXXXXXXX" 
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, phone: false}));
-                    }}
-                    style={{ borderRadius: "8px", fontSize: "14px", paddingRight: "40px" }}
-                  />
-                  {errors.phone && <ErrorIcon />}
-                </div>
-                {errors.phone && (
-                  <div className="text-danger small mt-1 text-start fw-medium">Phone Number is required.</div>
-                )}
-              </div>
-            </div>
-
-            
-
-            <div className="row my-3">
-              <div className="col-sm-4 d-flex align-items-center">
-                <label htmlFor="admin-nrc" className="form-label text-secondary fw-semibold mb-0">
-                  NRC No <span className="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="position-relative">
-                  <input 
-                    id="admin-nrc"
-                    type="text"
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.nrc ? 'border-danger' : 'border-secondary-subtle'}`}
-                    placeholder="12/MKaLa(N)XXXXXX" 
-                    value={nrc}
-                    onChange={(e) => {
-                      setNrc(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, nrc: false}));
-                    }}
-                    style={{ borderRadius: "8px", fontSize: "14px", paddingRight: "40px" }}
-                  />
-                  {errors.nrc && <ErrorIcon />}
-                </div>
-                {errors.nrc && (
-                  <div className="text-danger small mt-1 text-start fw-medium">NRC No is required.</div>
-                )}
-              </div>
-            </div>
-
-            <div className="row my-3">
-              <div className="col-sm-4 d-flex align-items-center">
-                <label htmlFor="admin-dob" className="form-label text-secondary fw-semibold mb-0">
-                  Date of Birth <span className="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="position-relative">
-                  <input 
-                    id="admin-dob"
-                    type="date"
-                    max={today}
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.dob ? 'border-danger' : 'border-secondary-subtle'}`}
-                    value={dob}
-                    onChange={(e) => {
-                      setDob(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, dob: false}));
-                    }}
-                    style={{ borderRadius: "8px", fontSize: "14px", paddingRight: "40px" }}
-                  />
-                  {errors.dob && <ErrorIcon />}
-                </div>
-                {errors.dob && (
-                  <div className="text-danger small mt-1 text-start fw-medium">Date of Birth is required.</div>
-                )}
-              </div>
-            </div>
-
-            <div className="row my-3">
-              <div className="col-sm-4 pt-1">
-                <label htmlFor="admin-address" className="form-label text-secondary fw-semibold mb-0">
-                  Address <span className="text-danger">*</span>
-                </label>
-              </div>
-              <div className="col-sm-8">
-                <div className="position-relative">
-                  <textarea 
-                    id="admin-address"
-                    className={`form-control py-2 px-3 text-dark fw-medium ${errors.address ? 'border-danger' : 'border-secondary-subtle'}`}
-                    placeholder="Enter Address...." 
-                    rows="3"
-                    value={address}
-                    onChange={(e) => {
-                      setAddress(e.target.value);
-                      if(e.target.value.trim()) setErrors(prev => ({...prev, address: false}));
-                    }}
-                    style={{ borderRadius: "12px", resize: "none", fontSize: "14px", paddingRight: "40px" }}
-                  />
-                  {errors.address && (
-                    <div className="position-absolute end-0 top-0 mt-3" style={{ transform: "translateY(0)" }}>
-                      <ErrorIcon />
-                    </div>
-                  )}
-                </div>
-                {errors.address && (
-                  <div className="text-danger small mt-1 text-start fw-medium">Address is required.</div>
-                )}
-              </div>
-            </div>
-
-            <div className="d-flex justify-content-center gap-3 mt-4">
-              <button type="submit" className="btn btn-warning fw-bold text-dark shadow-sm px-4">
-                Update
-              </button>
-              <button 
-                type="button" 
-                className="btn btn-danger fw-bold text-white shadow-sm px-4" 
-                onClick={handleCancelReset}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
 };
+    const renderRow = (label, input, error) => (
+        <div className="row mb-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
+            <label className="col-sm-4 col-form-label fw-bold text-dark" style={{ textAlign: 'left' }}>{label}</label>
+            <div className="col-sm-8">{input}
+                {error && <small className="text-danger d-block mt-1">{error}</small>}
+            </div>
+        </div>
+    );
 
-export default Adminprofileupdate;
+    const SectionHeader = ({ icon, title }) => (
+        <h5 className="fw-bold my-3 pb-2 border-bottom" style={{ color: '#F3D955', borderColor: '#34495e', textAlign: 'left' }}>
+            {icon} {title}
+        </h5>
+    );
+
+
+    return (
+        <>
+
+            {showAlert && (
+                <div
+                    className="modal fade show d-block"
+                    tabIndex="-1"
+                    style={{
+                        backgroundColor: "rgba(0,0,0,0.5)"
+                    }}
+                >
+
+                    <div className="modal-dialog modal-dialog-centered">
+
+                        <div className="modal-content shadow">
+
+                            <div className={`modal-header bg-light text-dark`}>
+
+                                <h5 className="modal-title fw-bold">
+                                    {
+                                        alertType === "success"
+                                            ? "Success"
+                                            : alertType === "danger"
+                                                ? "Error"
+                                                : "Warning"
+                                    }
+                                </h5>
+
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowAlert(false)}
+                                >
+                                </button>
+
+                            </div>
+
+
+                            <div className="modal-body text-center">
+
+                                <p className="fw-semibold mb-0">
+                                    {alertMessage}
+                                </p>
+
+                            </div>
+
+
+                            <div className="modal-footer justify-content-center">
+
+                                <button
+                                    className={`btn btn-${alertType} fw-bold px-4`}
+                                    onClick={() => setShowAlert(false)}
+                                >
+                                    OK
+                                </button>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+            )}   <div className="mb-2 text-start">
+                <Link to="/Admin/Profile" className="text-decoration-none text-dark" >
+                    <button className='btn btn-warning'>
+                        <FontAwesomeIcon icon={faCircleLeft} />
+                    </button></Link>
+            </div>
+
+            <div className="container mt-4 bg-white p-4 shadow-sm rounded text-start">
+                <div className="d-flex justify-content-center align-items-center mb-4">
+                    <h3 className="fw-bold ">Update Staff</h3>
+
+                </div>
+
+                <div className="row mx-auto px-3">
+                    <div className="col-md-10 ">
+                        <SectionHeader icon="" title="Staff Information" />
+                        {renderRow( <>
+    Full Name <span className="text-danger">*</span>
+  </> , <input name="fullName" value={formData.fullName ?? ""} onChange={handleInputChange} className={`form-control  ${errors.fullName ? "is-invalid" : ""
+                            }`} style={inputStyle} />,
+                            errors.fullName)}
+                        {renderRow( <>
+    Email 
+  </>, <input
+  name="email"
+  type="email"
+  value={formData.email ?? ""}
+  disabled
+  className="form-control bg-light"
+  style={{
+    ...inputStyle,
+    cursor: "not-allowed",
+    backgroundColor: "#f8f9fa"
+  }}
+/>,
+                            errors.email)}
+                        {renderRow( <>
+    Phone <span className="text-danger">*</span>
+  </>, <input name="phone" value={formData.phone ?? ""} onChange={handleInputChange} className={`form-control ${errors.phone ? "is-invalid" : ""
+                            }`} style={inputStyle} />, errors.phone)}
+                        {renderRow( <>
+    DOB <span className="text-danger">*</span>
+  </>, <input name="dob" type="date" value={formData.dob ?? ""} onChange={handleInputChange} className={`form-control ${errors.dob ? "is-invalid" : ""
+                            }`} style={inputStyle} />, errors.dob)}
+
+                        {renderRow( <>
+    NRC <span className="text-danger">*</span>
+  </>, (
+                            <div className="d-flex gap-1">
+                                <select name="nrcState" className="form-select " value={formData.nrcState ?? ""} onChange={handleInputChange} style={inputStyle}>
+                                    <option value="">Select</option>
+                                    {states.map((s) => <option key={s.id} value={s.number.en}>{s.number.en}</option>)}
+                                </select>
+                                <select name="nrcTownship" className="form-select " value={formData.nrcTownship ?? ""} onChange={handleInputChange} style={inputStyle}>
+                                    <option value="">Select</option>
+                                    {townships.map((t) => <option key={t.id} value={t.code}>{t.short.en}</option>)}
+                                </select>
+                                <select name="nrcType" className="form-select " value={formData.nrcType ?? ""} onChange={handleInputChange} style={inputStyle}>
+                                    {types.map((t) => <option key={t.id} value={t.name.en}>{t.name.en}</option>)}
+                                </select>
+                                <input name="nrcNumber" type="text" className="form-control " value={formData.nrcNumber ?? ""} onChange={handleInputChange} maxLength={6} style={inputStyle} />
+                            </div>
+                        ), errors.nrcState ||
+                        errors.nrcTownship ||
+                        errors.nrcNumber)}
+
+                        {renderRow( <>
+   Address <span className="text-danger">*</span>
+  </>, <input name="address" value={formData.address ?? ""} onChange={handleInputChange} className={`form-control  ${errors.address ? "is-invalid" : ""
+                            }`} style={inputStyle} />, errors.address)}
+
+
+
+
+
+                    </div>
+
+
+                </div>
+
+                <div className="d-flex justify-content-center gap-3 mt-4">
+                    <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Save</button>
+                    <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button>
+                </div>
+            </div>
+        </>
+    );
+}
+
+export default UpdateStaff;

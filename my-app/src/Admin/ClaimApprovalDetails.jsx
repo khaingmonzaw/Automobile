@@ -16,6 +16,8 @@ const ClaimApprovalDetails = () => {
   const [showSuccess, setShowSuccess] = useState(false); // Controls the success banner
   const [message, setMessage] = useState("");             // Stores the success/error text
 
+
+  
   useEffect(() => {
     if (!data) {
       alert("No calculation record context found. Redirecting...");

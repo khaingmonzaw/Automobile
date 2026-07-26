@@ -289,7 +289,7 @@ function Layout() {
 
               <li className="mb-2">
   <NavLink
-    to="/Admin/Adminprofile"
+    to="/Admin/Profile"
     className={({ isActive }) =>
       `d-block p-3 rounded text-decoration-none ${
         isActive ? "bg-warning text-white" : "text-dark"

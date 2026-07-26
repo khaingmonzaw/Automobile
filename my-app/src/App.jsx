@@ -88,15 +88,15 @@ function App() {
         <Route path="CoverageTypes/NewCoverage" element={<NewCoverage />} />
         <Route path="CoverageTypes/CoverageUpdate/:coverageId" element={<CoverageUpdate />} />
         <Route path="ClaimApprovalDetails" element={<ClaimApprovalDetails />} />
-        <Route path="PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
+        <Route path="Profile/PasswordChangeAdmin" element={< PasswordChangeAdmin />} />
         <Route path="Users/Adduser" element={<Adduser />} />
         <Route path="Users/Adduser/:id" element={<Adduser />} />
         <Route path="Users/UserDetail/:id" element={<UserDetail />} />
          <Route path="Users" element={<Userlist/>} /> 
          <Route path="AllClaims/ClaimStatusAction/:id" element={< ClaimStatusAction />} />
          <Route path="Staff" element={<Userlist/>} /> 
-         <Route path="Adminprofile" element={<Adminprofile/>} /> 
-         <Route path="Adminprofileupdate" element={<Adminprofileupdate/>} /> 
+         <Route path="Profile" element={<Adminprofile/>} /> 
+         <Route path="Profile/Update" element={<Adminprofileupdate/>} /> 
 
 
   

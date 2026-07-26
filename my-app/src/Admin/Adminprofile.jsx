@@ -86,11 +86,7 @@ const Adminprofile = () => {
 
   return (
     <div className="container-fluid min-vh-100 p-4 bg-light text-start">
-      <Link to="/Admin/Staff" className="text-decoration-none text-dark">
-        <button className="btn btn-warning mb-3" type="button">
-          <FontAwesomeIcon icon={faCircleLeft} />
-        </button>
-      </Link>
+     
       
       <div className="row g-4 mb-4 py-2">
         <div className="col-12">
@@ -108,7 +104,7 @@ const Adminprofile = () => {
               {/* Action Buttons Group (Update Profile & Change Password) */}
              <div className="d-flex align-items-center gap-2">
                 <Link 
-                  to="/Admin/Adminprofileupdate" 
+                  to="/Admin/Profile/update" 
                   className="text-decoration-none btn btn-warning btn-sm fw-semibold d-flex align-items-center justify-content-center"
                   style={{ width: "32px", height: "32px" }}
                   title="Update Profile"
@@ -117,7 +113,7 @@ const Adminprofile = () => {
                 </Link>
                 
                 <Link 
-                  to="/Admin/PasswordChangeAdmin" 
+                  to="/Admin/Profile/PasswordChangeAdmin" 
                   className="text-decoration-none btn btn-outline-warning btn-sm fw-semibold d-flex align-items-center justify-content-center"
                   style={{ width: "32px", height: "32px" }}
                   title="Change Password"
