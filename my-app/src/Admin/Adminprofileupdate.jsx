@@ -363,13 +363,13 @@ const id = user?.id;
 
             <div className="container mt-4 bg-white p-4 shadow-sm rounded text-start">
                 <div className="d-flex justify-content-center align-items-center mb-4">
-                    <h3 className="fw-bold ">Update Staff</h3>
+                    <h3 className="fw-bold ">Update Profile</h3>
 
                 </div>
 
                 <div className="row mx-auto px-3">
                     <div className="col-md-10 ">
-                        <SectionHeader icon="" title="Staff Information" />
+                        <SectionHeader icon="" title="" />
                         {renderRow( <>
     Full Name <span className="text-danger">*</span>
   </> , <input name="fullName" value={formData.fullName ?? ""} onChange={handleInputChange} className={`form-control  ${errors.fullName ? "is-invalid" : ""
@@ -435,7 +435,7 @@ const id = user?.id;
                 </div>
 
                 <div className="d-flex justify-content-center gap-3 mt-4">
-                    <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Save</button>
+                    <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Update</button>
                     <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button>
                 </div>
             </div>

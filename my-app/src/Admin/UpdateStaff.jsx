@@ -7,8 +7,7 @@ import * as mmNrc from "mm-nrc";
 
 function UpdateStaff() {
     const navigate = useNavigate();
-    const { id } = useParams();
-
+const { id } = useParams();
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertType, setAlertType] = useState("warning");
@@ -241,26 +240,22 @@ function UpdateStaff() {
 
         const data = await response.json();
 
+if (response.ok) {
+    showCustomAlert("Staff updated successfully.", "success");
 
-        if(response.ok){
+    setTimeout(() => {
+        navigate("/Admin/Staff");
+    }, 1000);
+} else {
+    if (data.message === "Email already exists") {
+        setErrors((prev) => ({
+            ...prev,
+            email: "Email already exists",
+        }));
+    }
 
-            showCustomAlert(
-                "Staff updated successfully.",
-                "success"
-            );
-
-            setTimeout(()=>{
-                navigate("/Admin/Staff");
-            },1000);
-
-        }else{
-
-            showCustomAlert(
-                data.message,
-                "danger"
-            );
-
-        }
+    showCustomAlert(data.message, "danger");
+}
 
 
     }catch(error){
@@ -354,7 +349,7 @@ function UpdateStaff() {
 
                 </div>
             )}   <div className="mb-2 text-start">
-                <Link to="/Admin/Staff" className="text-decoration-none text-dark" >
+                <Link to="/Admin/Profile" className="text-decoration-none text-dark" >
                     <button className='btn btn-warning'>
                         <FontAwesomeIcon icon={faCircleLeft} />
                     </button></Link>
@@ -368,14 +363,14 @@ function UpdateStaff() {
 
                 <div className="row mx-auto px-3">
                     <div className="col-md-10 ">
-                        <SectionHeader icon="" title="Staff Information" />
+                        <SectionHeader icon="" title="staff infromation" />
                         {renderRow( <>
     Full Name <span className="text-danger">*</span>
   </> , <input name="fullName" value={formData.fullName ?? ""} onChange={handleInputChange} className={`form-control  ${errors.fullName ? "is-invalid" : ""
                             }`} style={inputStyle} />,
                             errors.fullName)}
                         {renderRow( <>
-    Email <span className="text-danger">*</span>
+    Email 
   </>, <input name="email" value={formData.email ?? ""} onChange={handleInputChange} className={`form-control ${errors.email ? "is-invalid" : ""
                             }`} style={inputStyle} />,
                             errors.email)}
@@ -424,7 +419,7 @@ function UpdateStaff() {
                 </div>
 
                 <div className="d-flex justify-content-center gap-3 mt-4">
-                    <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Save</button>
+                    <button className="btn  fw-bold" style={{ backgroundColor: '#f4d03f', color: '#000', border: 'none', width: '100px' }} onClick={handleSave}>Update</button>
                     <button className="btn  fw-bold" style={{ backgroundColor: '#f93e3e', color: 'white', border: 'none', width: '100px' }} onClick={() => navigate(-1)}>Cancel</button>
                 </div>
             </div>
